@@ -16,36 +16,63 @@
 # UFODAP: path, type avi, file, w=1, 360->800, don't make new vid and mv
 # instructions for Windows users, if you have errors, go to the bottom:
 
-movie_dir=`pwd`/..  #Please set full pathname.
-# set details of how movies are named, including filename "extension".
-ext="MOV"  # case-sensitive extension
-movie_files="$movie_dir/XQE_0004.$ext"
-#Some movie files end with the camera name, such as *_A1.
+#movie_dir=`pwd`/..  #Please set full pathname.
+# set below details of how movies are named, including filename "extension".
+#ext="MOV"  # case-sensitive extension
+
+movie_dir=/data/GIT/C-TAP/MOVIES
+ext=mp4
+
+# Put a shell globbing in the quotes below here get the list
+# of full pathnames of one or more movie files, for example
+# movie_files="$movie_dir/N884A6_ch1_main_202409*.$type"
+# Some movie file names incorporate the camera name, so we can select
+# from one camera, eg ..$path/*_A1.
+
+#movie_files="$movie_dir/XQE_0004.$ext"
+movie_files="$movie_dir/N884A6_ch1_main_*.$ext"
+
+numMovieFiles=`ls $movie_files | wc -l`
+
+echo "We will process $numMovieFiles movie files."
+
 echo $movie_files
+
+
+
 o=0
 for movie_file in $movie_files
  do
-    echo $movie_file
+    echo "Extracting frames from $movie_file"
     moviePrefix=`basename ${movie_file%.$ext}`
     echo "moviePrefix=" $moviePrefix
+
     p=`ls -alth $movie_files | wc -l`
+    
     ((++o))
-    echo "$o of $p movie file(s)"
+    echo "$o of $numMovieFiles movie file(s)"
     
     echo "Making Mick West redundant, processing ONI FOIA files..."
     FileName="${moviePrefix}.${ext}"
     echo $FileName
     #rsync -Ph ${path}/${FileName} .
-    mkdir -p bitmaps
+    rm  -f bitmaps/*  #Must because old files are not necessarilly written over
+    # by the C++ programs.  -f makes succeed even if dir bitmaps doesn't exist.
+    # Don't use -r since it's better not remake a dir because
+    # we can then watch it from another
+    # shell.  (In unix, a dir/file remade with the same name is different.)
+    
+    mkdir -p bitmaps #-p so it's ok if dir bitmaps exists.
     
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
-    cd bitmaps/
+    cd bitmaps/  #ffmpeg puts bitmaps in its cwd.
     echo
     echo "Calling ffmpeg.."
-    echo
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
-    ffmpeg -threads 0 -hide_banner -an -i  $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB"  thumb%06d.bmp
-    echo
+    ffmpeg -threads 0 -hide_banner -an -i  $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB"  thumb%06d.bmp \
+	&> ../ffmpeg.stderr
+    # save ffmpeg's report temporarilly IN THE DIR ABOVE
+    # because the C++ programs process all files in the cwd.
     echo "ffmpeg done."
     echo
     
@@ -176,7 +203,11 @@ for movie_file in $movie_files
     echo "Cleaning detritus..."
     cd ../
     mv bitmaps/${Prefix}.${ext} .
+    
     #rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ *.err bitmaps/
+    # sdc: Keep old bitmaps BUT the script removes them early next time
+    # because the C++ programs process all files in their cwd.
+
     rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ 
     echo "Cosmic consciousness has been achieved!!"
     
