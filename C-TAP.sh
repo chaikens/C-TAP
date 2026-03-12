@@ -16,35 +16,47 @@
 # UFODAP: path, type avi, file, w=1, 360->800, don't make new vid and mv
 # instructions for Windows users, if you have errors, go to the bottom:
 
-path="."
-type="mp4"  # case-sensitive
-file="$path/N884A6_ch1_main_202409*.$type" #make it all of 1 cam eg ..$path/*_A1.
+movie_dir=`pwd`/..  #Please set full pathname.
+# set details of how movies are named, including filename "extension".
+ext="MOV"  # case-sensitive extension
+movie_files="$movie_dir/XQE_0004.$ext"
+#Some movie files end with the camera name, such as *_A1.
+echo $movie_files
 o=0
-for m in $file
+for movie_file in $movie_files
  do
-    
-    Prefix=`basename ${m%.$type}`
-    echo $Prefix
-    p=`ls -alth $file | wc -l`
+    echo $movie_file
+    moviePrefix=`basename ${movie_file%.$ext}`
+    echo "moviePrefix=" $moviePrefix
+    p=`ls -alth $movie_files | wc -l`
     ((++o))
     echo "$o of $p movie file(s)"
     
     echo "Making Mick West redundant, processing ONI FOIA files..."
-    FileName="${Prefix}.${type}"
+    FileName="${moviePrefix}.${ext}"
+    echo $FileName
     #rsync -Ph ${path}/${FileName} .
     mkdir -p bitmaps
     
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd bitmaps/
-    ffmpeg -threads 0 -hide_banner -an -i ../${FileName} -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
-    f=`ls -alth | wc -l`
-    f=$((f-3))
+    echo
+    echo "Calling ffmpeg.."
+    echo
+    #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
+    ffmpeg -threads 0 -hide_banner -an -i  $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB"  thumb%06d.bmp
+    echo
+    echo "ffmpeg done."
+    echo
+    
+    f=`ls  | wc -l`
+    #f=$((f-3))
     echo "$f frames captured"
     
     cd ../
     rm -f ImageProc.exe
     g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
-    Input="${Prefix}.int"
+    Input="${moviePrefix}.int"
     rm -f $Input
     
     u=0; v=0
@@ -53,9 +65,10 @@ for m in $file
     echo "Removing any quantum woo; reticulating $t splines..."
     while [ $u -lt $f ]
     do
-	./ImageProc.exe $u $t 0 >> $Input 2>> ${Prefix}.err
+
+	./ImageProc.exe $u $t 0 >> $Input 2>> ${moviePrefix}.err
 	((++v))
-	echo Phase 1A: Part $v of $w Done
+	echo Phase 1A: From $u to $t "," Part $v of $w Done
 	if [ $v -gt $w ]
 	then
 	    echo "Don't panic -- there was a remainder from the division!"
@@ -68,7 +81,7 @@ for m in $file
     done
     
     g++ -O3 FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
-    Output="${Prefix}.out"
+    Output="${moviePrefix}.out"
     rm -f $Output
     ff=`more ${Input} | wc -l`
     echo "$ff frames read"
@@ -82,7 +95,7 @@ for m in $file
 	    g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
 	    u=0; v=0
             t=$((f/w))
-            rm $Input
+            #rm $Input
 	    echo "Part deux: electric boogaloo..."
             while [ $u -lt $f ]
             do
@@ -101,7 +114,7 @@ for m in $file
             done
 	    g++ -O3 FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
 	fi
-	rm $Output
+	#rm $Output
 	./ImageProc.exe $Input $ff 0.98 > $Output
 	echo "Phase 1B: Re-Done!" && n=`more ${Output} | wc -l`
     fi
@@ -155,15 +168,16 @@ for m in $file
     
     echo "Breaking Lue's NDA..."
     cd bitmaps/
-    ext="MOV" #NOT same as type above!
+    ext="MOV" #NOT same as ext above!
     #mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
-    ffmpeg -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${Prefix}.${ext}
-    #ffmpeg -i ${Prefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
+    ffmpeg -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${moviePrefix}.${ext}
+    #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
     echo "Cleaning detritus..."
     cd ../
     mv bitmaps/${Prefix}.${ext} .
-    rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ *.err bitmaps/
+    #rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ *.err bitmaps/
+    rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ 
     echo "Cosmic consciousness has been achieved!!"
     
 done
