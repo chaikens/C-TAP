@@ -72,7 +72,18 @@ for movie_file in $movie_files
     ffmpeg -threads 0 -hide_banner -an -i  $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB"  thumb%06d.bmp \
 	&> ../ffmpeg.stderr
     # save ffmpeg's report temporarilly IN THE DIR ABOVE
-    # because the C++ programs process all files in the cwd.
+    # because the FLIRanalysisPhase1aCamX.cpp processes all files in the cwd.
+    #
+    # --from ffmpeg documentation:
+    #  -fps_mode vfr (failed with sdc's old 4.4 ffmpeg version, so he removed it)
+    #  "Frames are passed through with their timestamp or dropped so as to prevent 2 frames from having the same timestamp."
+    #
+    # in the filter (quoted string)
+    #  decimate "Drop duplicated frames at regular intervals."
+    #  setpts changes the presentation timestamp (pts)
+    #    N is the input frame count
+    #    TB is the Time Base of the input timestamps (usually 1/framerate)
+    
     echo "ffmpeg done."
     echo
     
