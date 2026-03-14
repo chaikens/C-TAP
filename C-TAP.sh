@@ -20,8 +20,18 @@
 # set below details of how movies are named, including filename "extension".
 #ext="MOV"  # case-sensitive extension
 
-movie_dir=/data/GIT/C-TAP/MOVIES
+SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY/2025-01-17
 ext=mp4
+
+if [ "$(df $slow_movie_dir)" == "$(df .)" ]
+then
+    echo "Movie dir $slow_movie_dir and programs $(pwd) are on the same filesystem"
+    COPYMOVIES=
+else
+    COPYMOVIES=true
+    FAST_MOVIE_DIR="$(pwd)/TMPMOVIEDIR"
+    mkdir -p $FAST_MOVIE_DIR
+fi
 
 # Put a shell globbing in the quotes below here get the list
 # of full pathnames of one or more movie files, for example
@@ -29,28 +39,30 @@ ext=mp4
 # Some movie file names incorporate the camera name, so we can select
 # from one camera, eg ..$path/*_A1.
 
-#movie_files="$movie_dir/XQE_0004.$ext"
-movie_files="$movie_dir/N884A6_ch1_main_*.$ext"
+
+movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 
 numMovieFiles=`ls $movie_files | wc -l`
 
-echo "We will process $numMovieFiles movie files."
+echo "We will process these $numMovieFiles movie files."
 
-echo $movie_files
-
-
-
+#echo $movie_files
+ls $movie_files
+echo
+echo
 o=0
 for movie_file in $movie_files
- do
-    echo "Extracting frames from $movie_file"
-    moviePrefix=`basename ${movie_file%.$ext}`
-    echo "moviePrefix=" $moviePrefix
-
-    p=`ls -alth $movie_files | wc -l`
-    
+do
     ((++o))
     echo "$o of $numMovieFiles movie file(s)"
+    
+    if [ $COPYMOVIES ]
+    then
+	moviePrefix=`basename ${movie_file%.$ext}`
+	rsync -pH --progress $movie_file $FAST_MOVIE_DIR
+	movie_file=$FAST_MOVIE_DIR/$moviePrefix.$ext
+	FAST_MOVIE_DELETE_ME=$movie_file
+    fi
     
     echo "Making Mick West redundant, processing ONI FOIA files..."
     FileName="${moviePrefix}.${ext}"
@@ -69,8 +81,11 @@ for movie_file in $movie_files
     echo
     echo "Calling ffmpeg.."
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
-    ffmpeg -threads 0 -hide_banner -an -i  $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB"  thumb%06d.bmp \
+    ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf               \
+	   "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
+	   thumb%06d.bmp \
 	&> ../ffmpeg.stderr
+    # redirect both stdout and stderr
     # save ffmpeg's report temporarilly IN THE DIR ABOVE
     # because the FLIRanalysisPhase1aCamX.cpp processes all files in the cwd.
     #
@@ -88,7 +103,6 @@ for movie_file in $movie_files
     echo
     
     f=`ls  | wc -l`
-    #f=$((f-3))
     echo "$f frames captured"
     
     cd ../
@@ -211,18 +225,34 @@ for movie_file in $movie_files
     ffmpeg -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${moviePrefix}.${ext}
     #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
-    echo "Cleaning detritus..."
-    cd ../
-    mv bitmaps/${Prefix}.${ext} .
+    # We're done with I/O thru the bitmaps dir
+    cd ..
+
+    # save the result movie
+    mv bitmaps/${moviePrefix}.${ext} .
     
+
+    echo "Cleaning detritus..."
+
+
     #rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ *.err bitmaps/
     # sdc: Keep old bitmaps BUT the script removes them early next time
     # because the C++ programs process all files in their cwd.
 
     rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ 
-    echo "Cosmic consciousness has been achieved!!"
+
+    if [ $COPYMOVIES ]
+    then
+	echo "about to delete input movie"
+	echo $movie_file
+	echo
+	echo "not done yet"
+    fi
     
+    echo "Cosmic consciousness has been achieved!!"
+    echo "from yet another movie $o of $numMovieFiles."
 done
+echo "True, full consciousness can now be reasserted by you poor human user."
 
 # buy a Mac or install Linux. Just kidding (But get Ubuntu for Windows!)
 # remove all instances of -Ofast (or replace w/ -O3). There should be 4
