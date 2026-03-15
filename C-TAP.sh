@@ -61,12 +61,23 @@ o=0
 for movie_file in $movie_files
 do
     ((++o))
-    echo "$o of $numMovieFiles movie file(s)"
+    echo "Begin processing $o of $numMovieFiles movie file(s)"
     
     if [ $COPYMOVIES ]
     then
 	moviePrefix=`basename ${movie_file%.$ext}`
-	rsync -pH --progress $movie_file $FAST_MOVIE_DIR
+	echo "Checking if we already have the copy"
+	if diff $movie_file $FAST_MOVIE_DIR/$moviePrefix.$ext
+	then
+	    echo 'They are the same'
+	else
+	    echo 'Copying (rsync) one movie from slow to fast filesystem.' 
+	    if [ ! rsync -pH --progress $movie_file $FAST_MOVIE_DIR ]
+	    then
+		echo 'Copying (rsync) failed.  exiting.'
+	    fi
+	fi
+	
 	movie_file=$FAST_MOVIE_DIR/$moviePrefix.$ext
 	FAST_MOVIE_DELETE_ME=$movie_file
     fi
@@ -88,10 +99,22 @@ do
     echo
     echo "Calling ffmpeg.."
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
-    ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf               \
+    ffmpeg -xerror -threads 0 -hide_banner -an -i $movie_file -vf       \
 	   "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
 	   thumb%06d.bmp \
-	&> ../ffmpeg.stderr
+	   &> ../ffmpeg.stderr
+
+
+    if [ $? ]
+    then
+	echo
+	echo ffmpeg error
+	echo opening emacs on ffmpeg output
+	emacs ../ffmpeg.stderr &
+	echo exiting
+	exit
+    fi
+    
     # redirect both stdout and stderr
     # save ffmpeg's report temporarilly IN THE DIR ABOVE
     # because the FLIRanalysisPhase1aCamX.cpp processes all files in the cwd.
