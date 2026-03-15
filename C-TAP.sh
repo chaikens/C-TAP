@@ -97,13 +97,19 @@ do
 	
 	movie_file=$FAST_MOVIE_DIR/$moviePrefix.$ext
 	FAST_MOVIE_DELETE_ME=$movie_file
+    else
+	moviePrefix=`basename ${movie_file%.$ext}`
+	echo '(debugging)'
+	echo "our movie_file:"
+	echo $movie_file
     fi
-    
+ 
     echo "Making Mick West redundant, processing ONI FOIA files..."
     FileName="${moviePrefix}.${ext}"
     echo $FileName
 
 
+    
     # BITMAPS_DIR is assurred at the beginning, not sep. for each movie
     rm  -f $BITMAPS_DIR/*
     #aside from saving space, we must delete old bitmaps
@@ -116,7 +122,7 @@ do
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
     echo
-    echo "Calling ffmpeg..to watch this, run in another window"
+    echo "Calling ffmpeg to extract bitmap frames..to watch this, run in another window:"
     echo "tail -f $RESULTS_DIR/ffmpeg.outputs"
     echo
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
@@ -158,24 +164,32 @@ do
     f=`ls  | wc -l`
     echo "$f frames captured"
 
-    echo ${moviePrefix}
-    exit
+    #echo ${moviePrefix}
+    #This is the input movie name without movie type extension.
+    #Result files will be named
+    # ${moviePrefix}.int
+    # ${moviePrefix}.out
+    # ${moviePrefix}.MOV (that's the "baby movie")
 
     
     cd $SOFTWARE_DIR
     rm -f ImageProc.exe
     g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
-    Input="${moviePrefix}.int"
+    RESULT_OF_1a_BASE="${moviePrefix}.int"
     rm -f $Input
     
     u=0; v=0
     w=30
     t=$((f/w))
     echo "Removing any quantum woo; reticulating $t splines..."
+
+    cd $BITMAPS_PARENT_DIR
+    #That's where the C++ image processors expect us to be
+    
     while [ $u -lt $f ]
     do
 
-	$SOFTWARE_DIR/ImageProc.exe $u $t 0 >> $Input 2>> ${moviePrefix}.err
+	$SOFTWARE_DIR/ImageProc.exe $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>> ${RESULTS_DIR}/${moviePrefix}.err
 	((++v))
 	echo Phase 1A: From $u to $t "," Part $v of $w Done
 	if [ $v -gt $w ]
@@ -188,19 +202,22 @@ do
 	    t=$((f-u))
 	fi
     done
-    
+
+    cd ${SOFTWARE_DIR}
     g++ -O3 FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
-    Output="${moviePrefix}.out"
-    rm -f $Output
-    ff=`more ${Input} | wc -l`
+    
+    RESULT_OF_1b_BASE="${moviePrefix}.out"
+    rm -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+    ff=`more  ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l`
     echo "$ff frames read"
-    ./ImageProc.exe $Input $ff 0.5 > $Output
+    ${SOFTWARE_DIR}/ImageProc.exe  ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     echo "Phase 1B: Done!"
-    n=`more ${Output} | wc -l` && echo "$n frames have objects?"
+    n=`less ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l` && echo "$n frames have objects?"
     if [ $n -gt 50000 ] || [ $n -eq 0 ]
     then
 	if [ $n == 0 ]
 	then
+	    cd ${SOFTWARE_DIR}
 	    g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
 	    u=0; v=0
             t=$((f/w))
@@ -208,7 +225,7 @@ do
 	    echo "Part deux: electric boogaloo..."
             while [ $u -lt $f ]
             do
-		./ImageProc.exe $u $t 1 >> $Input 2> /dev/null
+		${SOFTWARE_DIR}/ImageProc.exe $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null
 		((++v))
 		echo Phase 1A: Part $v of $w Done
 		if [ $v -gt $w ]
@@ -221,11 +238,12 @@ do
                     t=$((f-u))
 		fi
             done
+	    cd ${SOFTWARE_DIR}
 	    g++ -O3 FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
 	fi
 	#rm $Output
-	./ImageProc.exe $Input $ff 0.98 > $Output
-	echo "Phase 1B: Re-Done!" && n=`more ${Output} | wc -l`
+	${SOFTWARE_DIR}/ImageProc.exe ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+	echo "Phase 1B: Re-Done!" && n=`less $${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
     fi
     echo "$n frames have objects in them"
 
@@ -237,7 +255,7 @@ do
     # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
     
     echo "Logging range, deploying Little Green Men.."
-    cat ${Output} | while read evt frame extr x y prob
+    cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | while read evt frame extr x y prob
     do
 	((++frame))
 	if (( $frame %5 == 0 ))
@@ -266,13 +284,19 @@ do
         else
             pad=""
         fi
+
 	if [ $y -lt 800 ]
 	then
-	    string="convert bitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
+	    echo '$y -lt 800 yes branch'
+	    BITMAP_EDIT_CMD=\
+"convert bitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	else
-	    string="convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
+	    echo  '$y -lt 800 no branch'
+	    BITMAP_EDIT_CMD=\
+"convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	fi
-	eval $string
+	echo 'We will eval' $BITMAP_EDIT_CMD
+	eval $BITMAP_EDIT_CMD
     done
     
     echo "Breaking Lue's NDA..."
