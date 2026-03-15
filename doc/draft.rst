@@ -52,4 +52,8 @@ For one movie
   - x, y coords in the frame of the pixel with diffs max abs value
   - naive bayisan classifier score 0 ...  1 => garbage ... real thing
 
-- baby movie (?? name) selected frames with circles added around event locations.
+- baby movie
+  - (currently) in the bitmaps dir, selected frames with circles added are named picdddddd.bmp
+    (d=decimal digit)
+  - these are assembled into a movie named MV.MOV (upper case ext distinguishes from input MV.mov)
+
