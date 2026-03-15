@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # PRE-REQ: FFMPEG (any v) +ImageMagick (Win: command prompt not enough)
@@ -20,8 +19,25 @@
 # set below details of how movies are named, including filename "extension".
 #ext="MOV"  # case-sensitive extension
 
-SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY/2025-01-17
+SLOW_MOVIE_DIR=$(pwd)
 ext=mp4
+
+SOFTWARE_DIR=$(pwd)
+
+BITMAPS_PARENT_DIR=$(pwd)
+BITMAPS_DIR="$BITMAPS_PARENT_DIR/bitmaps"
+if ! mkdir -p $BITMAPS_DIR
+then
+    echo "Cant make BITMAPS_DIR $BITMAPS_DIR"
+    exit
+fi
+
+RESULTS_DIR="`pwd`"
+if ! mkdir -p $RESULTS_DIR
+then
+    echo "Cant make RESULTS_DIR"
+    exit
+fi
 
 if ! SLOW_FILESYS_REPORT=$(df $SLOW_MOVIE_DIR 2>&1 )
    then
@@ -47,7 +63,8 @@ fi
 # from one camera, eg ..$path/*_A1.
 
 
-movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
+#movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
+movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"
 
 numMovieFiles=`ls $movie_files | wc -l`
 
@@ -85,57 +102,67 @@ do
     echo "Making Mick West redundant, processing ONI FOIA files..."
     FileName="${moviePrefix}.${ext}"
     echo $FileName
-    #rsync -Ph ${path}/${FileName} .
-    rm  -f bitmaps/*  #Must because old files are not necessarilly written over
+
+
+    # BITMAPS_DIR is assurred at the beginning, not sep. for each movie
+    rm  -f $BITMAPS_DIR/*
+    #aside from saving space, we must delete old bitmaps
+    #because old files are not necessarilly written over
     # by the C++ programs.  -f makes succeed even if dir bitmaps doesn't exist.
     # Don't use -r since it's better not remake a dir because
     # we can then watch it from another
     # shell.  (In unix, a dir/file remade with the same name is different.)
     
-    mkdir -p bitmaps #-p so it's ok if dir bitmaps exists.
-    
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
-    cd bitmaps/  #ffmpeg puts bitmaps in its cwd.
+    cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
     echo
-    echo "Calling ffmpeg.."
+    echo "Calling ffmpeg..to watch this, run in another window"
+    echo "tail -f $RESULTS_DIR/ffmpeg.outputs"
+    echo
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
-    ffmpeg -xerror -threads 0 -hide_banner -an -i $movie_file -vf       \
-	   "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
+    ffmpeg -xerror -threads 0 -hide_banner -an                          \
+           -i $movie_file                                               \
+           -vf \
+	    "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
 	   thumb%06d.bmp \
-	   &> ../ffmpeg.stderr
-
-
-    if [ $? ]
-    then
-	echo
-	echo ffmpeg error
-	echo opening emacs on ffmpeg output
-	emacs ../ffmpeg.stderr &
-	echo exiting
-	exit
-    fi
+	&> $RESULTS_DIR/ffmpeg.outputs
     
-    # redirect both stdout and stderr
-    # save ffmpeg's report temporarilly IN THE DIR ABOVE
+    # &> redirects both stdout and stderr to save temporarilly.
     # because the FLIRanalysisPhase1aCamX.cpp processes all files in the cwd.
     #
     # --from ffmpeg documentation:
-    #  -fps_mode vfr (failed with sdc's old 4.4 ffmpeg version, so he removed it)
-    #  "Frames are passed through with their timestamp or dropped so as to prevent 2 frames from having the same timestamp."
+    # -fps_mode vfr (failed with sdc's old 4.4 ffmpeg version, so he removed it)
+    #  "Frames are passed through with their timestamp or
+    #   dropped so as to prevent 2 frames from having the same timestamp."
     #
     # in the filter (quoted string)
-    #  decimate "Drop duplicated frames at regular intervals."
+    #  decimate = "Drop duplicated frames at regular intervals."
     #  setpts changes the presentation timestamp (pts)
     #    N is the input frame count
     #    TB is the Time Base of the input timestamps (usually 1/framerate)
     
+
+    if [ ! $? ]
+    then
+	echo
+	echo ffmpeg error
+	echo opening emacs on ffmpeg output
+	emacs $RESULTS_DIR/ffmpeg.outputs &
+	echo exiting
+	exit
+    fi
+
     echo "ffmpeg done."
     echo
     
     f=`ls  | wc -l`
     echo "$f frames captured"
+
+    echo ${moviePrefix}
+    exit
+
     
-    cd ../
+    cd $SOFTWARE_DIR
     rm -f ImageProc.exe
     g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
     Input="${moviePrefix}.int"
@@ -148,7 +175,7 @@ do
     while [ $u -lt $f ]
     do
 
-	./ImageProc.exe $u $t 0 >> $Input 2>> ${moviePrefix}.err
+	$SOFTWARE_DIR/ImageProc.exe $u $t 0 >> $Input 2>> ${moviePrefix}.err
 	((++v))
 	echo Phase 1A: From $u to $t "," Part $v of $w Done
 	if [ $v -gt $w ]
