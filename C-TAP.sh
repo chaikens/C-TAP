@@ -23,9 +23,16 @@
 SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY/2025-01-17
 ext=mp4
 
-if [ "$(df $slow_movie_dir)" == "$(df .)" ]
+if ! SLOW_FILESYS_REPORT=$(df $SLOW_MOVIE_DIR 2>&1 )
+   then
+       echo Bad SLOW MOVIE DIR
+       echo $SLOW_FILESYS_REPORT
+       exit
+fi
+
+if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
 then
-    echo "Movie dir $slow_movie_dir and programs $(pwd) are on the same filesystem"
+    echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
     COPYMOVIES=
 else
     COPYMOVIES=true
