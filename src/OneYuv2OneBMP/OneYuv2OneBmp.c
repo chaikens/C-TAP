@@ -61,6 +61,8 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
       readcount += bmpreadret;
     }
   system("rm -f OneTemp.bmp OneTemp.yuv");
+  close(bmpFD);
+  close(yuvFD);
   return 0;
 }
 
