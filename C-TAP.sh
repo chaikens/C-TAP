@@ -140,6 +140,20 @@ do
     # -fps_mode vfr (failed with sdc's old 4.4 ffmpeg version, so he removed it)
     #  "Frames are passed through with their timestamp or
     #   dropped so as to prevent 2 frames from having the same timestamp."
+
+    #
+    # try -vsync vfr
+    # (from https://www.codegenes.net/blog/fastest-way-to-extract-frames-using-ffmpeg/
+    #
+    # who advises:
+    # ffmpeg -threads 0 -vsync vfr -pix_fmt yuv420p -i input.mp4 output_%04d.jpg
+    # to convert rgb24 to yuv420p (does old way go from yuv420p in the movie to rgb24)?
+    #
+    # and..
+    # If you need smaller frames (e.g., 720p instead of 4K), use fast scaling with -sws_flags fast_bilinear:
+    # ffmpeg -threads 0 -vsync vfr -pix_fmt yuv420p -sws_flags fast_bilinear -s 1280x720 -i input.mp4 output_%04d.jpg
+    #
+    #
     #
     # in the filter (quoted string)
     #  decimate = "Drop duplicated frames at regular intervals."
@@ -295,7 +309,7 @@ do
 	    BITMAP_EDIT_CMD=\
 "convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	fi
-	echo 'We will eval' $BITMAP_EDIT_CMD
+	# echo 'We will eval' $BITMAP_EDIT_CMD
 	eval $BITMAP_EDIT_CMD
     done
     
