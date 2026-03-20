@@ -204,7 +204,7 @@ do
     done
 
     cd ${SOFTWARE_DIR}
-    g++ -O3 FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
+    g++ -O3 -Wno-unused-result FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
     
     RESULT_OF_1b_BASE="${moviePrefix}.out"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
@@ -239,7 +239,7 @@ do
 		fi
             done
 	    cd ${SOFTWARE_DIR}
-	    g++ -O3 FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
+	    g++ -O3 -Wno-unused-result FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
 	fi
 	#rm $Output
 	${SOFTWARE_DIR}/ImageProc.exe ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
