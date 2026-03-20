@@ -183,7 +183,7 @@ static bool (*inExclusionZone)( pixCoord ii, pixCoord jj );
 // One can code this variable be set when the program runs 
 // by copying the pointer from the array below.
 
-static bool (*( ezFunArray[])) (pixCoord, pixCoord)  =
+static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
   { ezNone, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
     ezCamB1, ezCamB2, ezCamB3, ezCamA4 };
 

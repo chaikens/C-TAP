@@ -23,12 +23,13 @@ SLOW_MOVIE_DIR=$(pwd)
 ext=mp4
 
 SOFTWARE_DIR=$(pwd)
-# cd $(SOFTWARE_DIR)
+cd $SOFTWARE_DIR
 
-Phase1a=$SOFTWARE_DIR/Phase1a
-g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o $Phase1a
-Phase1b=$SOFTWARE_DIR/Phase2a
-g++ -O3 -Wno-unused-result FLIRanalysisPhase1bCamX.cpp -o $Phase1b
+Phase1a=Phase1a
+make Phase1a
+Phase1b=Phase1b
+make Phase1b
+
 
 BITMAPS_PARENT_DIR=$(pwd)
 BITMAPS_DIR="$BITMAPS_PARENT_DIR/bitmaps"
