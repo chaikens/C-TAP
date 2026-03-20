@@ -180,6 +180,9 @@ do
     
 
     RESULT_OF_1a_BASE="${moviePrefix}.int"
+    rm -f $(RESULTS_DIR)/${RESULT_OF_1a_BASE}
+    #Phase1a will be run multiple times, appending each time,
+    # we must start with nothing.
 
     u=0; v=0
     w=30
@@ -239,7 +242,7 @@ do
 	fi
 	#rm $Output
 	$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
-	echo "Phase 1B: Re-Done!" && n=`less $${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
+	echo "Phase 1B: Re-Done!" && n=`less ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
     fi
     echo "$n frames have objects in them"
 
