@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-char *useage = "TestOneYuv2OneBmp wwwwxhhhh infile.yuv outfile.bmp";
+const char *useage = "TestOneYuv2OneBmp wwwwxhhhh infile.yuv outfile.bmp";
 
 int main(int argc, char **argv)
 {
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     {
       printf("yuvsize not 3/2*npixels??");
     }
-  char *pyuv = malloc(yuvsize);
+  char *pyuv = (char *) malloc(yuvsize);
   if (!pyuv) { error(1, errno, "Malloc for yuv failed."); }
   
   int yuvFD = open(YUVinFilename, O_RDONLY, 0);
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     error(1, errno, "yuv read ret %ld, didn't read %d bytes.", nread, yuvsize);
   }
 
-  char *pbmp = malloc(rgblen + 54);
+  char *pbmp = (char *) malloc(rgblen + 54);
   if( !pbmp ) {error(1, errno, "Malloc for bmp failed."); }
 
   int funret = OneYuv2OneBmp( width, height, pyuv, pbmp );

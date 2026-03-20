@@ -37,12 +37,12 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
   */
   char command[240];
   command[0] = 0;
-  char *comPrefix = "ffmpeg -hide_banner -an -video_size ";
+  const char *comPrefix = "ffmpeg -hide_banner -an -video_size ";
   strncat(command, comPrefix, strlen(comPrefix));
   char vidsizestr[12];
   int sizelen = sprintf(vidsizestr, "%ux%u", width, height);
   strncat(command, vidsizestr, sizelen);
-  char *comSuffix = " -i OneTemp.yuv -frames:v 1 OneTemp.bmp > OneYuvs.ffmpeg.msgs 2>&1";
+  const char *comSuffix = " -i OneTemp.yuv -frames:v 1 OneTemp.bmp > OneYuvs.ffmpeg.msgs 2>&1";
   /* bash &> for redir both stdout and stderr didn't work */
   strncat(command, comSuffix, strlen(comSuffix));
 
