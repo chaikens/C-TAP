@@ -32,7 +32,7 @@ then
     exit
 fi
 
-RESULTS_DIR="`pwd`"
+RESULTS_DIR="`pwd`/RESULTS"
 if ! mkdir -p $RESULTS_DIR
 then
     echo "Cant make RESULTS_DIR"
@@ -295,7 +295,7 @@ do
 	    BITMAP_EDIT_CMD=\
 "convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	fi
-	echo 'We will eval' $BITMAP_EDIT_CMD
+	# echo 'We will eval' $BITMAP_EDIT_CMD
 	eval $BITMAP_EDIT_CMD
     done
     
@@ -303,7 +303,7 @@ do
     cd bitmaps/
     ext="MOV" #NOT same as ext above!
     #mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
-    ffmpeg -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${moviePrefix}.${ext}
+    ffmpeg -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${ext}
     #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
     # We're done with I/O thru the bitmaps dir

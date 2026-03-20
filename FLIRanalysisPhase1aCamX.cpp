@@ -9,6 +9,19 @@
 #include <vector>
 
 #define Custom
+/* When Custom is defined, 
+   (1) global variable std::string camera = "Custom"
+
+   (2) code in main() unconditionally 
+       sets CROP_{X,Y}{I,F} from Camsett.txt
+
+   (3) Mysterious (buggy?) line which does nothing is compiled
+       before computing the differences:
+   
+      #ifdef Custom
+	if ( false ) ExclusionZone = true;
+      #endif
+*/ 
 
 #ifdef Custom
 unsigned int CROP_YI = 0; //left edge
@@ -17,12 +30,12 @@ unsigned int CROP_XI = 0; //top edge
 unsigned int CROP_YI = 15;
 unsigned int CROP_XI = 10;
 #endif
+
 #ifdef CamB1
 unsigned int CROP_YF = 1275;
 #else
 unsigned int CROP_YF = 1249; //right edge (UFODAP: 1920)
 #endif
-
 #ifdef CamA1 //bottom edge is crop_xf. High num to catch boat: 635 MIN. 650 for mult frames
 unsigned int CROP_XF = 590; static const std::string camera = "A1";
 #endif
@@ -48,7 +61,8 @@ unsigned int CROP_XF = 575; static const std::string camera = "B3";
 unsigned int CROP_XF = 590; static const std::string camera = "B4";
 #endif
 #ifdef Custom
-unsigned int CROP_XF = 1080; /*default: UFODAP*/ static const std::string camera = "Custom";
+unsigned int CROP_XF = 1080; /*default: UFODAP*/
+static const std::string camera = "Custom";
 #endif
 
 using namespace std;
@@ -101,13 +115,15 @@ int main ( int argc, char** argv ) {
   for ( unsigned short k = 0; k < 20; ++k ) {
     fscanf ( file, "%s %lf", line, &temp );
     CamSett.push_back(temp);
-  } fscanf ( file, "%s", line ); fclose(file);
+  }
+  fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   if ( line[0] != 'c' ) {
     file = fopen("CamSett.txt","a");
     fprintf(file, "cameraName= %s\n", camera.c_str());
     fclose(file);
   }
+
 #ifdef Custom
   CROP_XI = (unsigned int)CamSett[15];
   CROP_XF = (unsigned int)CamSett[16];
@@ -204,8 +220,15 @@ int main ( int argc, char** argv ) {
 #ifdef CamB4
 	if ( abs(jj-1203) < 45 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-65) < 65) || ((jj-637)*(jj-637)+(ii-364)*(ii-364)) < 11000 ) ExclusionZone = true;
 #endif
+
+
 #ifdef Custom
-	if ( false ) ExclusionZone = true;
+	if ( false /*
+                      Here you can put a predicate to be true if (ii,jj) is a Custom exclusion zone,
+                      We have none, so false serves as a placeholder.
+                      ExclusionZone was already initialized to false.
+		   */
+	     ) ExclusionZone = true;
 #endif
 	
 	if ( !ExclusionZone || k == start ) {
@@ -223,33 +246,44 @@ int main ( int argc, char** argv ) {
 	    { minimum[2] = diffs[2]; minLoc[2][0] = ii; minLoc[2][1] = jj; if ( minimum[2] <-MinThr ) ++NumPixAbvThr[2][1]; if ( minimum[2] <-SubThr ) ++NumPixAbvSubThrSum; }
 	}
 	
-      }
-    }
+      } /* end pixel y loop */
+    } /* end pixel x loop */
     
-    if ( k > start )
-      fprintf(stdout,"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",k,
-	     maximum[0],maxLoc[0][1],maxLoc[0][0],maximum[1],maxLoc[1][1],maxLoc[1][0],maximum[2],maxLoc[2][1],maxLoc[2][0],
-	     minimum[0],minLoc[0][1],minLoc[0][0],minimum[1],minLoc[1][1],minLoc[1][0],minimum[2],minLoc[2][1],minLoc[2][0],
-	     NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
-	     NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],NumPixAbvSubThrSum);
+    if ( k > start ) {
+      fprintf(stdout,"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
+	      k,
+	      maximum[0],maxLoc[0][1],maxLoc[0][0],
+	      maximum[1],maxLoc[1][1],maxLoc[1][0],
+	      maximum[2],maxLoc[2][1],maxLoc[2][0],
+	      minimum[0],minLoc[0][1],minLoc[0][0],
+	      minimum[1],minLoc[1][1],minLoc[1][0],
+	      minimum[2],minLoc[2][1],minLoc[2][0],
+	      NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
+	      NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],
+	      NumPixAbvSubThrSum);
+    }
     else {
+      
       /*fprintf(stderr,
 	      "The absolute (no subt) details from the first frame:\n%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",k,
              maximum[0],maxLoc[0][1],maxLoc[0][0],maximum[1],maxLoc[1][1],maxLoc[1][0],maximum[2],maxLoc[2][1],maxLoc[2][0],
              minimum[0],minLoc[0][1],minLoc[0][0],minimum[1],minLoc[1][1],minLoc[1][0],minimum[2],minLoc[2][1],minLoc[2][0],
              NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
              NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],NumPixAbvSubThrSum);*/
-#ifdef CamB1
-      cerr << NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0] << endl;
-      if ( (NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0]) > CloudCover || CC )
-	{ Ret[0] = 360; Ret[1] = 230; }
-#else
-      cerr << CloudCover - CloudCover << endl;
-#endif
+
+      /* #ifdef CamB1
+	 cerr << NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0] << endl;
+	 if ( (NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0]) > CloudCover || CC )
+	 { Ret[0] = 360; Ret[1] = 230; }
+	 #else
+	 cerr << CloudCover - CloudCover << endl; 
+         #endif 
+      */
+
     }
     
-  }
+  } /* end of frame loop */
   
   return 0;
   
-}
+} /* end of main */
