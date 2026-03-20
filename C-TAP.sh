@@ -180,7 +180,7 @@ do
     
 
     RESULT_OF_1a_BASE="${moviePrefix}.int"
-    rm -f $(RESULTS_DIR)/${RESULT_OF_1a_BASE}
+    rm -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
     #Phase1a will be run multiple times, appending each time,
     # we must start with nothing.
 
