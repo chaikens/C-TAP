@@ -12,7 +12,8 @@ then
     echo good for $NAME.int
     rm RESULTS/$NAME.int.diff
 else
-    echo "DIFFERENCE! OLDRESULTS/$NAME.int RESULTS/$NAME.int" RESULTS/$NAME.int.diff
+    echo "DIFFERENCE! OLDRESULTS/$NAME.int RESULTS/$NAME.int"
+    echo "see RESULTS/$NAME.int.diff"
 fi
 
 if diff OLDRESULTS/$NAME.out RESULTS/$NAME.out > RESULTS/$NAME.out.diff
@@ -21,6 +22,7 @@ then
     rm RESULTS/$NAME.out.diff
 else
     echo "DIFFERENCE! OLDRESULTS/$NAME.out RESULTS/$NAME.out"
+    echo "see RESULTS/$NAME.out.diff"
 fi
 
 if diff OLDRESULTS/$NAME.MOV RESULTS/$NAME.MOV > /dev/null
@@ -28,6 +30,7 @@ then
     echo good for $NAME.MOV
 else
     echo "DIFFERENCE! OLDRESULTS/$NAME.MOV RESULTS/$NAME.MOV"
+    echo "different movie files."
 fi
 
 
