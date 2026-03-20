@@ -8,6 +8,8 @@
 #include <sstream>
 #include <vector>
 
+typedef unsigned short pixCoord; 
+
 #define Custom
 /* When Custom is defined, 
    (1) global variable std::string camera = "Custom"
@@ -104,6 +106,51 @@ unsigned char* readBMP(char* filename)
 
 }
 
+static bool inExclusionZone( pixCoord ii, pixCoord jj )
+{
+  bool ExclusionZone = false;
+	
+#ifdef CamA1
+  if ( abs(jj-1205) < 40 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-70) < 70) || ((jj-637)*(jj-637)+(ii-363)*(ii-363)) < 10000 ) ExclusionZone = true;
+#endif
+#ifdef CamA2
+  if ( abs(jj-1120) < 100 || (abs(jj-323) < 280 && abs(ii-39) < 40) || (abs(jj-1055) < 170 && abs(ii-49) < 50) || (abs(jj-650) < 115 && abs(ii-353) < 75) ||
+	     ((jj-640)*(jj-640)+(ii-130)*(ii-130)) < 10000 ) ExclusionZone = true;
+#endif
+#ifdef CamA3
+  if ( abs(jj-1163) < 100 || (abs(jj-133) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-36) < 35) || ((jj-635)*(jj-635)+(ii-357)*(ii-357)) < 10000 ) ExclusionZone = true;
+#endif
+#ifdef CamA4
+  if ( abs(jj-1123) < 100 || (abs(jj-323) < 278 && abs(ii-39) < 40) || (abs(jj-1055) < 170 && abs(ii-48) < 50) || ((jj-630)*(jj-630)+(ii-351)*(ii-351)) < 10000 ) ExclusionZone = true;
+#endif
+#ifdef CamB1
+  if ( abs(jj-1123) < 98 || (abs(jj-650) < 340 && abs(ii-Ret[0]) < Ret[1]) || (abs(jj-323) < 278 && abs(ii-38) < 37) || ( jj > 1025 && ii > 565 ) || (abs(jj-1058) < 163 && abs(ii-50) < 50) ||
+             ((jj-649)*(jj-649)+(ii-362)*(ii-362)) < 6400 || ((jj-885)*(jj-885)+(ii-205)*(ii-205)) < 900 || ((jj-408)*(jj-408)+(ii-205)*(ii-205)) < 529 ) ExclusionZone = true;
+#endif
+#ifdef CamB2
+  if ( abs(jj-1205) < 45 || (abs(jj-135) < 100 && abs(ii-28) < 27) || (abs(jj-1163) < 100 && abs(ii-37) < 34) ) ExclusionZone = true;
+#endif
+#ifdef CamB3
+  if ( abs(jj-1135) < 85 || (abs(jj-323) < 278 && abs(ii-40) < 36) || (abs(jj-1058) < 170 && abs(ii-70) < 25) || (abs(jj-640) < 115 && abs(ii-358) < 75) ) ExclusionZone = true;
+#endif
+#ifdef CamB4
+  if ( abs(jj-1203) < 45 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-65) < 65) || ((jj-637)*(jj-637)+(ii-364)*(ii-364)) < 11000 ) ExclusionZone = true;
+#endif
+
+
+#ifdef Custom
+  if ( false /*
+	       Here you can put a predicate to be true if (ii,jj) is a Custom exclusion zone,
+	       We have none, so false serves as a placeholder.
+	       ExclusionZone was already initialized to false.
+	     */
+       ) ExclusionZone = true;
+#endif
+
+  return ExclusionZone;
+
+}
+
 int main ( int argc, char** argv ) {
   
   unsigned long start = (unsigned long)atof(argv[1]);
@@ -192,46 +239,7 @@ int main ( int argc, char** argv ) {
 	int jj = j;
 	int ii = height - 1 - i;
 	
-	bool ExclusionZone = false;
-	
-#ifdef CamA1
-	if ( abs(jj-1205) < 40 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-70) < 70) || ((jj-637)*(jj-637)+(ii-363)*(ii-363)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamA2
-	if ( abs(jj-1120) < 100 || (abs(jj-323) < 280 && abs(ii-39) < 40) || (abs(jj-1055) < 170 && abs(ii-49) < 50) || (abs(jj-650) < 115 && abs(ii-353) < 75) ||
-	     ((jj-640)*(jj-640)+(ii-130)*(ii-130)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamA3
-	if ( abs(jj-1163) < 100 || (abs(jj-133) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-36) < 35) || ((jj-635)*(jj-635)+(ii-357)*(ii-357)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamA4
-	if ( abs(jj-1123) < 100 || (abs(jj-323) < 278 && abs(ii-39) < 40) || (abs(jj-1055) < 170 && abs(ii-48) < 50) || ((jj-630)*(jj-630)+(ii-351)*(ii-351)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamB1
-	if ( abs(jj-1123) < 98 || (abs(jj-650) < 340 && abs(ii-Ret[0]) < Ret[1]) || (abs(jj-323) < 278 && abs(ii-38) < 37) || ( jj > 1025 && ii > 565 ) || (abs(jj-1058) < 163 && abs(ii-50) < 50) ||
-             ((jj-649)*(jj-649)+(ii-362)*(ii-362)) < 6400 || ((jj-885)*(jj-885)+(ii-205)*(ii-205)) < 900 || ((jj-408)*(jj-408)+(ii-205)*(ii-205)) < 529 ) ExclusionZone = true;
-#endif
-#ifdef CamB2
-	if ( abs(jj-1205) < 45 || (abs(jj-135) < 100 && abs(ii-28) < 27) || (abs(jj-1163) < 100 && abs(ii-37) < 34) ) ExclusionZone = true;
-#endif
-#ifdef CamB3
-	if ( abs(jj-1135) < 85 || (abs(jj-323) < 278 && abs(ii-40) < 36) || (abs(jj-1058) < 170 && abs(ii-70) < 25) || (abs(jj-640) < 115 && abs(ii-358) < 75) ) ExclusionZone = true;
-#endif
-#ifdef CamB4
-	if ( abs(jj-1203) < 45 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-65) < 65) || ((jj-637)*(jj-637)+(ii-364)*(ii-364)) < 11000 ) ExclusionZone = true;
-#endif
-
-
-#ifdef Custom
-	if ( false /*
-                      Here you can put a predicate to be true if (ii,jj) is a Custom exclusion zone,
-                      We have none, so false serves as a placeholder.
-                      ExclusionZone was already initialized to false.
-		   */
-	     ) ExclusionZone = true;
-#endif
-	
-	if ( !ExclusionZone || k == start ) {
+	if ( !inExclusionZone(ii, jj) || k == start ) {
 	  if ( diffs[0] > maximum[0] )
 	    { maximum[0] = diffs[0]; maxLoc[0][0] = ii; maxLoc[0][1] = jj; if ( maximum[0] > MinThr ) ++NumPixAbvThr[0][0]; if ( maximum[0] > SubThr ) ++NumPixAbvSubThrSum; }
 	  if ( diffs[1] > maximum[1] )

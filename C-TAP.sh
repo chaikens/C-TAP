@@ -23,6 +23,12 @@ SLOW_MOVIE_DIR=$(pwd)
 ext=mp4
 
 SOFTWARE_DIR=$(pwd)
+# cd $(SOFTWARE_DIR)
+
+Phase1a=$SOFTWARE_DIR/Phase1a
+g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o $Phase1a
+Phase1b=$SOFTWARE_DIR/Phase2a
+g++ -O3 -Wno-unused-result FLIRanalysisPhase1bCamX.cpp -o $Phase1b
 
 BITMAPS_PARENT_DIR=$(pwd)
 BITMAPS_DIR="$BITMAPS_PARENT_DIR/bitmaps"
@@ -172,12 +178,9 @@ do
     # ${moviePrefix}.MOV (that's the "baby movie")
 
     
-    cd $SOFTWARE_DIR
-    rm -f ImageProc.exe
-    g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
+
     RESULT_OF_1a_BASE="${moviePrefix}.int"
-    rm -f $Input
-    
+
     u=0; v=0
     w=30
     t=$((f/w))
@@ -189,7 +192,7 @@ do
     while [ $u -lt $f ]
     do
 
-	$SOFTWARE_DIR/ImageProc.exe $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 
+	$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 
 	((++v))
 	echo Phase 1A: From $u to $t "," Part $v of $w Done
 	if [ $v -gt $w ]
@@ -203,29 +206,24 @@ do
 	fi
     done
 
-    cd ${SOFTWARE_DIR}
-    g++ -O3 -Wno-unused-result FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
-    
     RESULT_OF_1b_BASE="${moviePrefix}.out"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     ff=`more  ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l`
     echo "$ff frames read"
-    ${SOFTWARE_DIR}/ImageProc.exe  ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+    $Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     echo "Phase 1B: Done!"
     n=`less ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l` && echo "$n frames have objects?"
     if [ $n -gt 50000 ] || [ $n -eq 0 ]
     then
 	if [ $n == 0 ]
 	then
-	    cd ${SOFTWARE_DIR}
-	    g++ -O3 -Wno-unused-result FLIRanalysisPhase1aCamX.cpp -o ImageProc.exe
 	    u=0; v=0
             t=$((f/w))
             #rm $Input
 	    echo "Part deux: electric boogaloo..."
             while [ $u -lt $f ]
             do
-		${SOFTWARE_DIR}/ImageProc.exe $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null
+		$Phase1b $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null
 		((++v))
 		echo Phase 1A: Part $v of $w Done
 		if [ $v -gt $w ]
@@ -238,11 +236,9 @@ do
                     t=$((f-u))
 		fi
             done
-	    cd ${SOFTWARE_DIR}
-	    g++ -O3 -Wno-unused-result FLIRanalysisPhase1bCamX.cpp -o ImageProc.exe
 	fi
 	#rm $Output
-	${SOFTWARE_DIR}/ImageProc.exe ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+	$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
 	echo "Phase 1B: Re-Done!" && n=`less $${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
     fi
     echo "$n frames have objects in them"
@@ -250,7 +246,7 @@ do
     # don't waste time on empty file OR overloading your HD
     if [ $n -gt 465000 ] || [ $n -eq 0 ]
     then
-	rm -f ImageProc.exe; echo "Either too many or too few objects..."; continue
+	echo "Either too many or too few objects..."; continue
     fi
     # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
     
@@ -287,40 +283,40 @@ do
 
 	if [ $y -lt 800 ]
 	then
-	    echo '$y -lt 800 yes branch'
+	    # echo '$y -lt 800 yes branch'
 	    BITMAP_EDIT_CMD=\
 "convert bitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	else
-	    echo  '$y -lt 800 no branch'
+	    # echo  '$y -lt 800 no branch'
 	    BITMAP_EDIT_CMD=\
 "convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	fi
-	# echo 'We will eval' $BITMAP_EDIT_CMD
+	# ..echo 'We will eval' $BITMAP_EDIT_CMD
 	eval $BITMAP_EDIT_CMD
     done
     
     echo "Breaking Lue's NDA..."
     cd bitmaps/
-    ext="MOV" #NOT same as ext above!
+    EXT="MOV" #NOT same as ext above!
     #mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
-    ffmpeg -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${ext}
+    ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${EXT}
     #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
     # We're done with I/O thru the bitmaps dir
     cd ..
 
     # save the result movie
-    mv bitmaps/${moviePrefix}.${ext} .
+
     
 
     echo "Cleaning detritus..."
 
 
-    #rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ *.err bitmaps/
+    #rm -rf *.cpp~ *.sh~ *.txt~ *.err bitmaps/
     # sdc: Keep old bitmaps BUT the script removes them early next time
     # because the C++ programs process all files in their cwd.
 
-    rm -rf ImageProc.exe *.cpp~ *.sh~ *.txt~ 
+    rm -f *.cpp~ *.sh~ *.txt~ 
 
     if [ $COPYMOVIES ]
     then
