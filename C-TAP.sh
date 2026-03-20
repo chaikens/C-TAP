@@ -189,7 +189,7 @@ do
     while [ $u -lt $f ]
     do
 
-	$SOFTWARE_DIR/ImageProc.exe $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>> ${RESULTS_DIR}/${moviePrefix}.err
+	$SOFTWARE_DIR/ImageProc.exe $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 
 	((++v))
 	echo Phase 1A: From $u to $t "," Part $v of $w Done
 	if [ $v -gt $w ]
