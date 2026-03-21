@@ -19,6 +19,23 @@
 # set below details of how movies are named, including filename "extension".
 #ext="MOV"  # case-sensitive extension
 
+#settings for debugging or not.
+DEBUG=true
+#DEBUG=false
+if [ $DEBUG = "true" ]
+then
+    echo
+    echo We are debugging
+    echo
+    ulimit -c unlimited
+    MAKE_DEBUG=yes #not used yet
+    #deal with this manually for now.
+    REUSE_BMPS=no
+else
+    ulimit -c 0
+    MAKE_DEBUG=no  #not used yet
+fi
+
 SLOW_MOVIE_DIR=$(pwd)
 ext=mp4
 
@@ -117,15 +134,6 @@ do
 
 
     
-    # BITMAPS_DIR is assurred at the beginning, not sep. for each movie
-    rm  -f $BITMAPS_DIR/*
-    #aside from saving space, we must delete old bitmaps
-    #because old files are not necessarilly written over
-    # by the C++ programs.  -f makes succeed even if dir bitmaps doesn't exist.
-    # Don't use -r since it's better not remake a dir because
-    # we can then watch it from another
-    # shell.  (In unix, a dir/file remade with the same name is different.)
-    
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
 
@@ -134,14 +142,31 @@ do
     echo
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
     
+    # try below doesn't work.
+    #touch $RESULTS_DIR/ffmpeg.outputs
+    #xterm -e tail -f $RESULTS_DIR/ffmpeg.outputs
 
+    if [ $REUSE_BMPS != "yes" ]
+    then
+	# BITMAPS_DIR is assurred at the beginning, not sep. for each movie
+	rm  -f $BITMAPS_DIR/*
+	#aside from saving space, we must delete old bitmaps
+	#because old files are not necessarilly written over
+	# by the C++ programs.  -f makes succeed even if dir bitmaps doesn't exist.
+	# Don't use -r since it's better not remake a dir because
+	# we can then watch it from another
+	# shell.  (In unix, a dir/file remade with the same name is different.)
 	ffmpeg -xerror -threads 0 -hide_banner -an                          \
            -i $movie_file                                               \
            -vf \
 	    "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
 	   thumb%06d.bmp \
-	   &> $RESULTS_DIR/ffmpeg.outputs
-
+	   &> $RESULTS_DIR/ffmpeg.outputs 
+    else
+	echo
+	echo "We're reusing movie bitmaps for debugging speed."
+	rm -f pic*.bmp
+    fi
       
     
     # &> redirects both stdout and stderr to save temporarilly.
@@ -172,8 +197,8 @@ do
     echo "ffmpeg done."
     echo
     
-    f=`ls  | wc -l`
-    echo "$f frames captured"
+    nframes=`ls  | wc -l`
+    echo "$nframes frames captured"
 
     #echo ${moviePrefix}
     #This is the input movie name without movie type extension.
@@ -182,90 +207,109 @@ do
     # ${moviePrefix}.out
     # ${moviePrefix}.MOV (that's the "baby movie")
 
-    
+    echo
+    echo "Beginning Phase1a"
+    echo
 
     RESULT_OF_1a_BASE="${moviePrefix}.int"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
     #Phase1a will be run multiple times, appending each time,
     # we must start with nothing.
 
-    u=0; v=0
-    #w=30
-    w=1
-    t=$((f/w))
-    echo "Removing any quantum woo; reticulating $t splines..."
-
     cd $BITMAPS_PARENT_DIR
     #That's where the C++ image processors expect us to be
-    
-    while [ $u -lt $f ]
-    do
-	time ./$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+    # for now "bitmaps/thumb{0-9}^6.bmp" filenames are hard coded. 
 
+    if [ true ]
+    then
+	# run Phase1 once on all the frames
+	./$Phase1a 0 $nframes 0 > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+    else
+	# orig. code runs Phase1 in stages
+	u=0; v=0
+	w=30
+	t=$((f/w))
+	echo "Removing any quantum woo; reticulating $t splines..."
+	while [ $u -lt $nframes ]
+	do
+	    ./$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+	    ((++v))
+	    echo Phase 1A: From $u to $((t+u)) "," Part $v of $w Done
+	    if [ $v -gt $w ]
+	    then
+		echo "Don't panic -- there was a remainder from the division!"
+	    fi
+	    u=$((u+t))
+	    if [ $((u+t)) -gt $nframes ]
+	    then
+		t=$((nframes-u))
+	    fi
+	done
+    fi
 
-	((++v))
-	echo Phase 1A: From $u to $t "," Part $v of $w Done
-	if [ $v -gt $w ]
-	then
-	    echo "Don't panic -- there was a remainder from the division!"
-	fi
-	u=$((u+t))
-	if [ $((u+t)) -gt $f ]
-	then
-	    t=$((f-u))
-	fi
-    done
+    ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
+    echo Phase1 Completed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines \
+    "in ${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 
     echo
-    echo Phase1 Completed
+    echo Beginning Phase1b
     echo
-    
-
     
     RESULT_OF_1b_BASE="${moviePrefix}.out"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
-    ff=`more  ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l`
-    echo "$ff frames read"
-
     
-
-    ./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
-    echo "Phase 1B: Done!"
-    n=`less ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l` && echo "$n frames have objects?"
+    echo "./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}"
+    echo
+    
+    if ./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+    then
+	n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`	
+	echo "First try of Phase1b reported $n frames have objects."
+    else
+	echo "First Phase1b failure"
+	exit
+    fi
+    
     if [ $n -gt 50000 ] || [ $n -eq 0 ]
     then
 	if [ $n == 0 ]
 	then
+	    echo "Part deux: electric boogaloo... First try found 0 frames with objects."
+	    echo "We will redo Phase1a"
 	    u=0; v=0
-            t=$((f/w))
-            #rm $Input
-	    echo "Part deux: electric boogaloo..."
-            while [ $u -lt $f ]
+	    w=30
+            t=$((nframes/w))
+            while [ $u -lt $nframes ]
             do
-		./$Phase1b $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null
+		./$Phase1a $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null 
 		((++v))
-		echo Phase 1A: Part $v of $w Done
+		echo Phase 1Bs 1A redo: Part $v of $w Done
 		if [ $v -gt $w ]
 		then
                     echo "Don't panic -- there was a remainder from the division!"
 		fi
 		u=$((u+t))
-		if [ $((u+t)) -gt $f ]
+		if [ $((u+t)) -gt $nframes ]
 		then
-                    t=$((f-u))
+                    t=$((nframes-u))
 		fi
             done
 	fi
 	#rm $Output
-	$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
-	echo "Phase 1B: Re-Done!" && n=`less ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
-    fi
-    echo "$n frames have objects in them"
+	if ./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+	   then
+	       n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
+	       echo "Phase 1B: Re-Done reports $n frames with objects."
 
+	fi
+    fi
+    
     # don't waste time on empty file OR overloading your HD
     if [ $n -gt 465000 ] || [ $n -eq 0 ]
     then
-	echo "Either too many or too few objects..."; continue
+	echo "Either too many or too few objects..."
+	echo "On to the next movie, if any"
+	continue #top level movie loop
     fi
     # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
     
@@ -347,7 +391,9 @@ do
     
     echo "Cosmic consciousness has been achieved!!"
     echo "from yet another movie $o of $numMovieFiles."
+
 done
+
 echo "True, full consciousness can now be reasserted by you poor human user."
 
 # buy a Mac or install Linux. Just kidding (But get Ubuntu for Windows!)

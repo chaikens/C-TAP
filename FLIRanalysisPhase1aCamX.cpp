@@ -3,6 +3,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <error.h>
+#include <errno.h>
 #include <cmath>
 #include <math.h>
 #include <sstream>
@@ -77,13 +79,17 @@ static char * bmfilename( int f );
 
 static unsigned char *BMP_A;
 static unsigned char *BMP_B;
+static int frameCnt = -1;
 
 void readFirstBMPToAandAllocB(char* filename)
 {
   int i;
   FILE* f = fopen(filename, "rb");
+  if( !f ) {
+    error(1, errno, "Opening first frame %s failed.", filename);
+  }
   unsigned char info[54];
-
+  size_t readret;
   // read the 54-byte header
   fread(info, sizeof(unsigned char), 54, f);
 
@@ -98,9 +104,18 @@ void readFirstBMPToAandAllocB(char* filename)
   BMP_B = new unsigned char[imgsize];
 
   // read the rest of the data at once
-  fread(BMP_A, sizeof(unsigned char), imgsize, f);
+  readret = fread(BMP_A, sizeof(unsigned char), imgsize, f);
+  if( readret != imgsize){
+    if( readret < 0 ) {
+      error(1, errno, "Reading %s failed.", filename);
+    }
+      else {
+	error(1, 0, "Only %ld of %u read, wrong bitmap fmt %s", readret, imgsize, filename);
+      }
+    }
   fclose(f);
-
+  frameCnt = 1;
+  
   for(int i = 0; i < imgsize; i += 3)
     {
       // flip the order of every 3 bytes
@@ -114,12 +129,24 @@ void readFirstBMPToAandAllocB(char* filename)
 
 void readSubsequentBMP(char* filename, unsigned char *dest)
 {
+  size_t readret;
   FILE* f = fopen(filename, "rb");
+  if( !f ) {
+    error(1, errno, "Opening %dth frame %s failed.", frameCnt+1, filename);
+  }
   unsigned char info[54];
 
   // read the 54-byte header
-  fread(info, sizeof(unsigned char), 54, f);
-
+  readret = fread(info, sizeof(unsigned char), 54, f);
+  if( readret != 54){
+    if( readret < 0 ) {
+      error(1, errno, "Reading header from %s failed.", filename);
+    }
+    else {
+	error(1, 0, "Only %ld of %u read, wrong bitmap fmt? %s", readret, 54, filename);
+      }
+    }
+  
   // extract image height and width from header
   if( width   != *(int*)&info[18] ||
       height  != *(int*)&info[22]  ) {
@@ -132,9 +159,19 @@ void readSubsequentBMP(char* filename, unsigned char *dest)
   }
   
   // read the rest of the data at once
-  fread(dest, sizeof(unsigned char), imgsize, f);
+  readret = fread(dest, sizeof(unsigned char), imgsize, f);
+  if( readret != imgsize){
+    if( readret < 0 ) {
+      error(1, errno, "Reading %s failed.", filename);
+    }
+    else {
+	error(1, 0, "Only %ld of %u read, wrong bitmap fmt %s", readret, imgsize, filename);
+      }
+    }
   fclose(f);
 
+  frameCnt++;
+  
   for(int i = 0; i < imgsize; i += 3)
     {
       // flip the order of every 3 bytes
@@ -238,8 +275,10 @@ int main ( int argc, char** argv ) {
   
   unsigned long start = (unsigned long)atof(argv[1]);
   unsigned long end = start + (unsigned long)atof(argv[2]);
-  bool CC = atoi(argv[3]);
-  
+  //arg[3] is unused!
+  if( argc >= 3 ) {
+    bool CC = atoi(argv[3]);
+  }  
   char line[80]; double temp; vector<double> CamSett;
   FILE *file = fopen("CamSett.txt","r");
   for ( unsigned short k = 0; k < 20; ++k ) {
