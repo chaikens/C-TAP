@@ -190,7 +190,8 @@ do
     # we must start with nothing.
 
     u=0; v=0
-    w=30
+    #w=30
+    w=1
     t=$((f/w))
     echo "Removing any quantum woo; reticulating $t splines..."
 
@@ -199,7 +200,7 @@ do
     
     while [ $u -lt $f ]
     do
-	./$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+	time ./$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 
 
 	((++v))
