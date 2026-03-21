@@ -128,17 +128,21 @@ do
     
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
-    echo
+
     echo "Calling ffmpeg to extract bitmap frames..to watch this, run in another window:"
     echo "tail -f $RESULTS_DIR/ffmpeg.outputs"
     echo
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
-    ffmpeg -xerror -threads 0 -hide_banner -an                          \
+    
+
+	ffmpeg -xerror -threads 0 -hide_banner -an                          \
            -i $movie_file                                               \
            -vf \
 	    "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
 	   thumb%06d.bmp \
-	&> $RESULTS_DIR/ffmpeg.outputs
+	   &> $RESULTS_DIR/ffmpeg.outputs
+
+      
     
     # &> redirects both stdout and stderr to save temporarilly.
     # because the FLIRanalysisPhase1aCamX.cpp processes all files in the cwd.
@@ -195,8 +199,9 @@ do
     
     while [ $u -lt $f ]
     do
+	./$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 
-	$Phase1a $u $t 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 
+
 	((++v))
 	echo Phase 1A: From $u to $t "," Part $v of $w Done
 	if [ $v -gt $w ]
@@ -210,11 +215,20 @@ do
 	fi
     done
 
+    echo
+    echo Phase1 Completed
+    echo
+    
+
+    
     RESULT_OF_1b_BASE="${moviePrefix}.out"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     ff=`more  ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l`
     echo "$ff frames read"
-    $Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+
+    
+
+    ./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ff 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     echo "Phase 1B: Done!"
     n=`less ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l` && echo "$n frames have objects?"
     if [ $n -gt 50000 ] || [ $n -eq 0 ]
@@ -227,7 +241,7 @@ do
 	    echo "Part deux: electric boogaloo..."
             while [ $u -lt $f ]
             do
-		$Phase1b $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null
+		./$Phase1b $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null
 		((++v))
 		echo Phase 1A: Part $v of $w Done
 		if [ $v -gt $w ]

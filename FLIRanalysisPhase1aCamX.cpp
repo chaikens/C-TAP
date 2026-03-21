@@ -71,9 +71,14 @@ using namespace std;
 
 int Ret[2] = { 505, 85 };
 int diffs[3] = { 0, 0, 0 };
-int width, height;
+unsigned int width, height, imgsize;
 
-unsigned char* readBMP(char* filename)
+static char * bmfilename( int f );
+
+static unsigned char *BMP_A;
+static unsigned char *BMP_B;
+
+void readFirstBMPToAandAllocB(char* filename)
 {
   int i;
   FILE* f = fopen(filename, "rb");
@@ -88,22 +93,59 @@ unsigned char* readBMP(char* filename)
   //cerr << width << " " << height << endl;
 
   // allocate three bytes per pixel
-  int size = 3 * width * height;
-  unsigned char* data = new unsigned char[size];
+  imgsize = 3 * width * height;
+  BMP_A = new unsigned char[imgsize];
+  BMP_B = new unsigned char[imgsize];
 
   // read the rest of the data at once
-  fread(data, sizeof(unsigned char), size, f);
+  fread(BMP_A, sizeof(unsigned char), imgsize, f);
   fclose(f);
 
-  for(i = 0; i < size; i += 3)
+  for(int i = 0; i < imgsize; i += 3)
     {
       // flip the order of every 3 bytes
-      unsigned char tmp = data[i];
-      data[i] = data[i+2]; data[i+2] = tmp;
+      unsigned char tmp = BMP_A[i];
+      BMP_A[i] = BMP_A[i+2]; BMP_A[i+2] = tmp;
     }
 
-  return data;
+  return ;
 }
+
+
+void readSubsequentBMP(char* filename, unsigned char *dest)
+{
+  FILE* f = fopen(filename, "rb");
+  unsigned char info[54];
+
+  // read the 54-byte header
+  fread(info, sizeof(unsigned char), 54, f);
+
+  // extract image height and width from header
+  if( width   != *(int*)&info[18] ||
+      height  != *(int*)&info[22]  ) {
+    cerr << "DIFFERENT DIM of Subsequent bitmap " << filename << endl;
+    cerr << "First had width=" << width
+	 << " height=" << height << endl;
+    cerr << "But now!  width=" << *(int*)&info[18]
+	 << " height=" << *(int*)&info[22] << endl;
+    exit(1);
+  }
+  
+  // read the rest of the data at once
+  fread(dest, sizeof(unsigned char), imgsize, f);
+  fclose(f);
+
+  for(int i = 0; i < imgsize; i += 3)
+    {
+      // flip the order of every 3 bytes
+      unsigned char tmp = dest[i];
+      dest[i] = dest[i+2]; dest[i+2] = tmp;
+    }
+
+  return ;
+}
+
+
 
 //
 // Below, code any bool predicates for camera exclusion zones.
@@ -218,38 +260,19 @@ int main ( int argc, char** argv ) {
   CROP_YI = (unsigned int)CamSett[17];
   CROP_YF = (unsigned int)CamSett[18];
 #endif
+
+  unsigned long k = start;
+
+  readFirstBMPToAandAllocB( bmfilename(k+1) );
+  unsigned char* dataOld = BMP_B;
+  unsigned char* dataNew = BMP_A;
+
   
-  for ( unsigned long k = start; k < end; ++k ) {
-    
-    char* fileNameNew;
-    stringstream temp; //stringstream().swap(temp);
-    if ( k < 9 ) temp << "bitmaps/thumb00000" << (k+1) << ".bmp";
-    else if ( k < 99 ) temp << "bitmaps/thumb0000" << (k+1) << ".bmp";
-    else if ( k < 999 ) temp << "bitmaps/thumb000" << (k+1) << ".bmp";
-    else if ( k < 9999 ) temp << "bitmaps/thumb00" << (k+1) << ".bmp";
-    else if ( k < 99999 ) temp << "bitmaps/thumb0" << (k+1) << ".bmp";
-    else temp << "bitmaps/thumb" << (k+1) << ".bmp";
-     string name;
-    temp >> name;
-    fileNameNew = &name[0];
-    unsigned char* dataNew = readBMP ( fileNameNew );
-    unsigned char* dataOld;
-    
-    if ( k > start ) {
-       char* fileNameOld;
-      stringstream temp2; //stringstream().swap(temp);
-      if ( k < 10 ) temp2 << "bitmaps/thumb00000" << k << ".bmp";
-      else if ( k < 100 ) temp2 << "bitmaps/thumb0000" << k << ".bmp";
-      else if ( k < 1000 ) temp2 << "bitmaps/thumb000" << k << ".bmp";
-      else if ( k < 10000 ) temp2 << "bitmaps/thumb00" << k << ".bmp";
-      else if ( k < 100000 ) temp2 << "bitmaps/thumb0" << k << ".bmp";
-      else temp2 << "bitmaps/thumb" << k << ".bmp";
-       name.clear();
-      temp2 >> name;
-      fileNameOld = &name[0];
-      dataOld = readBMP ( fileNameOld );
-    }
-    
+  for ( k = start+1; k < end; ++k ) {
+    unsigned char* tem = dataOld; dataOld = dataNew; dataNew = tem; 
+
+    readSubsequentBMP ( bmfilename(k+1), dataNew );
+
     int maximum[3] = {-1,-1,-1}; int minimum[3] = {256,256,256}; int maxLoc[3][2] = {0}; int minLoc[3][2] = {0};
     int NumPixAbvThr[3][2] = {0};
     int NumPixAbvSubThrSum = 0, CloudCover = 100;
@@ -259,16 +282,11 @@ int main ( int argc, char** argv ) {
 	
 	int rgbColorNew[3], rgbColorOld[3];
 	
-	if ( k == start ) {
-	  rgbColorOld[0] = 0;
-          rgbColorOld[1] = 0;
-          rgbColorOld[2] = 0;
-        }
-	else {
-	  rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0];
-	  rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1];
-	  rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2];
-	}
+	
+	rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0];
+	rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1];
+	rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2];
+	
 	
 	rgbColorNew[0] = (int)dataNew[3 * (i * width + j) + 0];
         rgbColorNew[1] = (int)dataNew[3 * (i * width + j) + 1];
@@ -298,7 +316,7 @@ int main ( int argc, char** argv ) {
       } /* end pixel y loop */
     } /* end pixel x loop */
     
-    if ( k > start ) {
+
       fprintf(stdout,"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
 	      k,
 	      maximum[0],maxLoc[0][1],maxLoc[0][0],
@@ -310,29 +328,20 @@ int main ( int argc, char** argv ) {
 	      NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
 	      NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],
 	      NumPixAbvSubThrSum);
-    }
-    else {
-      
-      /*fprintf(stderr,
-	      "The absolute (no subt) details from the first frame:\n%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",k,
-             maximum[0],maxLoc[0][1],maxLoc[0][0],maximum[1],maxLoc[1][1],maxLoc[1][0],maximum[2],maxLoc[2][1],maxLoc[2][0],
-             minimum[0],minLoc[0][1],minLoc[0][0],minimum[1],minLoc[1][1],minLoc[1][0],minimum[2],minLoc[2][1],minLoc[2][0],
-             NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
-             NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],NumPixAbvSubThrSum);*/
 
-      /* #ifdef CamB1
-	 cerr << NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0] << endl;
-	 if ( (NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0]) > CloudCover || CC )
-	 { Ret[0] = 360; Ret[1] = 230; }
-	 #else
-	 cerr << CloudCover - CloudCover << endl; 
-         #endif 
-      */
-
-    }
     
   } /* end of frame loop */
   
   return 0;
-  
+  /* We don't free BMP_A and BMP_B memory since we exit 1a's process right away.*/
+  /* Yes, we will skip frames when the caller asks for a partial job! */
+  /* Each output line is numbered by it's OLD frame. */
 } /* end of main */
+
+
+static char * bmfilename( int f )
+{
+  static char fn[] = "bitmaps/thumb000000.bmpXXXXXXXXXXXXXXXXXXXXXX";
+  sprintf(fn,"bitmaps/thumb0%05d.bmp", f);
+  return fn;
+}
