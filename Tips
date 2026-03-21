@@ -1,0 +1,8 @@
+Lots of script bugs due to parameters to commands not being set.
+They would be easier to detect by using this shell feature:
+${parameter:?word} prints a message including word if word is not null
+and exits a non-interactive shell if parameter is unset or null.
+
+echo ${pa:?}
+bash: pa: parameter null or not set
+
