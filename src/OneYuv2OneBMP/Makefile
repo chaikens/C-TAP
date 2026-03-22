@@ -15,9 +15,9 @@ install: OneYuv2OneBmp.o
 	cp OneYuv2OneBmp.o OneYuv2OneBmp.h ../..
 
 
-Test: Test.yuv
+Test: TestOneFrame.yuv
 	./TestOneYuv2OneBmp 3840x2160 TestOneFrame.yuv TestResult.bmp
 	eog TestResult.bmp
 
-Test.yuv :
+TestOneFrame.yuv :
 	ffmpeg -hide_banner -y -i ../../DroneCalib1.mp4 -frames:v 1  TestOneFrame.yuv
