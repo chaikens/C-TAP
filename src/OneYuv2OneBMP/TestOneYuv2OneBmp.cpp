@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "OneYuv2OneBmp.h"
+/*
+ * gives us uint8_t uint16_t for our image and video files
+ */
 #include <error.h>
 #include <string.h>
 #include <errno.h>
@@ -37,7 +40,7 @@ int main(int argc, char **argv)
     {
       printf("yuvsize not 3/2*npixels??");
     }
-  char *pyuv = (char *) malloc(yuvsize);
+  uint8_t *pyuv = (uint8_t *) malloc(yuvsize);
   if (!pyuv) { error(1, errno, "Malloc for yuv failed."); }
   
   int yuvFD = open(YUVinFilename, O_RDONLY, 0);
@@ -50,7 +53,7 @@ int main(int argc, char **argv)
     error(1, errno, "yuv read ret %ld, didn't read %d bytes.", nread, yuvsize);
   }
 
-  char *pbmp = (char *) malloc(rgblen + 54);
+  uint8_t *pbmp = (uint8_t *) malloc(rgblen + 54);
   if( !pbmp ) {error(1, errno, "Malloc for bmp failed."); }
 
   int funret = OneYuv2OneBmp( width, height, pyuv, pbmp );

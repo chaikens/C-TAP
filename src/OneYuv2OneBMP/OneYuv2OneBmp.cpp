@@ -6,21 +6,30 @@ If we continue to run 1a on bmp data, a more efficient soln may be better.
  */
 
 
+#include <cstdint>
+/*
+ * gives us uint8_t uint16_t for our image and video files
+ */
+#include <cassert>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <error.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <string.h>
 
 #include "OneYuv2OneBmp.h"
 
+using namespace std;
+
 int OneYuv2OneBmp(unsigned int width, unsigned int height,
-		     const char *YUVin, char *BMPout)
-{
+		     const uint8_t *YUVin, uint8_t *BMPout)
+{ //
+  // Use ffmpeg and two temporary files.
+  //
   system("rm -f OneTemp.yuv OneTemp.bmp");
   //printf("Will open OneTemp.yuv\n");
   int yuvFD = open("OneTemp.yuv", O_CREAT | O_RDWR, S_IRUSR|S_IWUSR);
@@ -30,7 +39,8 @@ int OneYuv2OneBmp(unsigned int width, unsigned int height,
     }
   size_t yuvlen = ( width * height * 3 ) / 2;
   size_t yuvwriteret = write(yuvFD, YUVin, yuvlen);
-
+  assert(yuvlen == yuvwriteret);
+  
   /* construct ffmpeg call like
 ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp.bmp > ffmpeg.messages 2>&1 
   Only the size is variable. 
@@ -50,15 +60,17 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
 
   int bmpFD = open("OneTemp.bmp", O_RDONLY, 0);
   size_t readcount= 0;
+  uint8_t *p = BMPout;
   while ( readcount < yuvlen*2+54 )
     {
-      //printf("of OneTemp.bmp, we did read %ld bytes.\n", readcount);
-      size_t bmpreadret = read(bmpFD, BMPout, yuvlen*2+54);
+      fprintf(stderr, "Short Read of OneTemp.bmp, we did read %ld bytes.\n", readcount);
+      size_t bmpreadret = read(bmpFD, p, yuvlen*2+54);
       if( bmpreadret < 0 )
 	{
 	  error(1, errno, "Read of OneTemp.bmp failed.");
 	}
       readcount += bmpreadret;
+      p += bmpreadret;
     }
   system("rm -f OneTemp.bmp OneTemp.yuv");
   close(bmpFD);
