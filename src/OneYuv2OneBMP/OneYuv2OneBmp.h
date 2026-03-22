@@ -1,3 +1,5 @@
+#include "mustbelittleendian.h" //only developed for g++ little endian (like Linux PCs)
+
 #if defined __cplusplus
 #include <cstdint>
 #else

@@ -1,8 +1,8 @@
-TestOneYuv2OneBmp: OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h
-	g++  TestOneYuv2OneBmp.cpp OneYuv2OneBmp.o -o TestOneYuv2OneBmp
+TestOneYuv2OneBmp: OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
+	g++  -g TestOneYuv2OneBmp.cpp OneYuv2OneBmp.o -o TestOneYuv2OneBmp
 
-OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h
-	gcc  -c OneYuv2OneBmp.cpp
+OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
+	gcc  -g -c OneYuv2OneBmp.cpp
 
 
 SeeOptconvert4toBMP.txt : OneYuv2OneBmp.h SeeOptconvert4toBMP.cpp Makefile
@@ -14,3 +14,10 @@ SeeOptconvert4toBMP.txt : OneYuv2OneBmp.h SeeOptconvert4toBMP.cpp Makefile
 install: OneYuv2OneBmp.o
 	cp OneYuv2OneBmp.o OneYuv2OneBmp.h ../..
 
+
+Test: Test.yuv
+	./TestOneYuv2OneBmp 3840x2160 TestOneFrame.yuv TestResult.bmp
+	eog TestResult.bmp
+
+Test.yuv :
+	ffmpeg -hide_banner -y -i ../../DroneCalib1.mp4 -frames:v 1  TestOneFrame.yuv

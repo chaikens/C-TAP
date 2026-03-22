@@ -59,18 +59,24 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
   system(command);
 
   int bmpFD = open("OneTemp.bmp", O_RDONLY, 0);
-  size_t readcount= 0;
+
   uint8_t *p = BMPout;
+  size_t bmpreadret = read(bmpFD, p, yuvlen*2+54);
+  if( bmpreadret < 0 )
+    {
+      error(1, errno, "Read of OneTemp.bmp failed.");
+    }
+  size_t readcount = bmpreadret ;
   while ( readcount < yuvlen*2+54 )
     {
-      fprintf(stderr, "Short Read of OneTemp.bmp, we did read %ld bytes.\n", readcount);
-      size_t bmpreadret = read(bmpFD, p, yuvlen*2+54);
+      fprintf(stderr, "error, or just short Read of OneTemp.bmp, we did read %ld bytes.\n", readcount);
       if( bmpreadret < 0 )
 	{
 	  error(1, errno, "Read of OneTemp.bmp failed.");
 	}
       readcount += bmpreadret;
       p += bmpreadret;
+      bmpreadret = read(bmpFD, p, yuvlen*2+54-readcount);
     }
   system("rm -f OneTemp.bmp OneTemp.yuv");
   close(bmpFD);
