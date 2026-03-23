@@ -37,7 +37,23 @@ typedef struct __attribute__((packed)) BITMAPINFOHEADER {
   int32_t ResolutionVert;
   uint32_t ColorsInPalette;  /* 0 to default to 2^n */
   uint32_t NImportantColors; /* Usually ignored, 0 if all colors are used. */
-} BITMAPIINFOHEADER;
+} BITMAPINFOHEADER;
+
+typedef struct __attribute__((packed)) CLASSICBMPHEADERS {
+  BITMAP_FILEHEADER fileHeader;
+  BITMAPINFOHEADER infoHeader;
+} CLASSICBMPHEADERS;
+
+CLASSICBMPHEADERS *makeClassicHeaders ( int width, int height );
+
+//
+// Wikipedia says there are 7 kinds of DIB, Bitmap information headers
+// also, they all have 32 bit fields.
+// the 40 byte one is BITMAPINFOHEADER
+//
+// Versions after BITMAPINFOHEADER only add fields to the end of the header of the previous version.
+//
+
 
 //
 // 138-14=124, so the other header we have is BITMAPV5HEADER (the biggest!)

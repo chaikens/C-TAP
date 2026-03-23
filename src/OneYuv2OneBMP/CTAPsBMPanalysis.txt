@@ -15,9 +15,11 @@ BitsOffset=54
 BMHeader Size=40
 Width=1920
 Height=1080
-#ColorPlanes(should be 1)=1
+NColorPlanes(should be 1)=1
+NBitsPerPixel aka Depth=24
 Compression Meth=0
  (Masks for pixel format are not used, they're only for case 3.)
+SizeOfRawBmpData=6220800
 ResolutionHoriz=0 Vert=0
 #Palette Colors=0  #Important ones=0
 
@@ -38,9 +40,11 @@ BitsOffset=138
 BMHeader Size=124
 Width=1920
 Height=1080
-#ColorPlanes(should be 1)=1
+NColorPlanes(should be 1)=1
+NBitsPerPixel aka Depth=32
 Compression Meth=3
 ( 3 is BI_BITFIELDS, and masks are used ONLY in this case )
+SizeOfRawBmpData=8294400
 ResolutionHoriz=0 Vert=0
 #Palette Colors=0  #Important ones=0
 

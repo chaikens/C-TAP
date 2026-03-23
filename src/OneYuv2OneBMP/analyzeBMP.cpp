@@ -49,7 +49,8 @@ int main(int argc, char **argv)
   cout << "BMHeader Size=" << pbmi40->MySize << endl;
   cout << "Width="     << pbmi40->Width  << endl;
   cout << "Height="    << pbmi40->Height << endl;
-  cout << "#ColorPlanes(should be 1)=" << pbmi40->NColorPlanes << endl;
+  cout << "NColorPlanes(should be 1)=" << pbmi40->NColorPlanes << endl;
+  cout << "NBitsPerPixel aka Depth=" << pbmi40->BitsPerPixel << endl;
   cout << "Compression Meth=" << pbmi40->CompressionMeth << endl;
   if(pbmi40->CompressionMeth == 3) {
     cout << "( 3 is BI_BITFIELDS, and masks are used ONLY in this case )"
@@ -59,6 +60,7 @@ int main(int argc, char **argv)
     cout << " (Masks for pixel format are not used, they're only for case 3.)"
 	 << endl;
   }
+  cout << "SizeOfRawBmpData=" << pbmi40->SizeOfRawBmpData << endl;
   cout << "ResolutionHoriz="  << pbmi40->ResolutionHoriz
        << " Vert="            << pbmi40->ResolutionVert << endl;
   cout << "#Palette Colors="  << pbmi40->ColorsInPalette
