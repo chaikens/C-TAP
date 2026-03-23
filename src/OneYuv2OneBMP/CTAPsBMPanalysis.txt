@@ -1,0 +1,69 @@
+in Dir 
+/data/GIT/C-TAP/src/OneYuv2OneBMP
+
+../../bitmaps/thumb000001.bmp
+
+Signature=BM
+Compiler'ss Idea of header size=14
+
+FileSize=6220854
+Reserved1=0
+Reserved2=0
+BitsOffset=54
+(calculated) Bitmap info struct size=40
+
+BMHeader Size=40
+Width=1920
+Height=1080
+#ColorPlanes(should be 1)=1
+Compression Meth=0
+ (Masks for pixel format are not used, they're only for case 3.)
+ResolutionHoriz=0 Vert=0
+#Palette Colors=0  #Important ones=0
+
+First Pixel, memory order:
+0 0 1
+
+../../bitmaps/pic00038.bmp
+
+Signature=BM
+Compiler'ss Idea of header size=14
+
+FileSize=8294538
+Reserved1=0
+Reserved2=0
+BitsOffset=138
+(calculated) Bitmap info struct size=124
+
+BMHeader Size=124
+Width=1920
+Height=1080
+#ColorPlanes(should be 1)=1
+Compression Meth=3
+( 3 is BI_BITFIELDS, and masks are used ONLY in this case )
+ResolutionHoriz=0 Vert=0
+#Palette Colors=0  #Important ones=0
+
+
+Higher Version Attributes:
+ Red   Mask=0x00ff0000 bytes 0000 0000 0xff 0000
+ Green Mask=0x0000ff00 bytes 0000 0xff 0000 0000
+ Blue  Mask=0x000000ff bytes 0xff 0000 0000 0000
+ Alpha Mask=0xff000000 bytes 0000 0000 0000 0xff
+
+CSType= 0x73524742
+CIEXYZTRIPLE Endpoints:
+ciexyzRed:
+(0, 0, 0)
+ciexyzGreen:
+(0, 0, 0)
+ciexyzBlue:
+(0, 0, 0)
+Gammas: Red=0 Green=0 Blue=0
+Intent=4
+Profile Data=0 Profile Size=0
+Reserved=0
+
+First Pixel, memory order:
+0 0 0 255
+See Masks above.

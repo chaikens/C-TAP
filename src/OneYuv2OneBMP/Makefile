@@ -13,6 +13,18 @@ SeeOptconvert4toBMP.txt : OneYuv2OneBmp.h SeeOptconvert4toBMP.cpp Makefile
 analyzeBMP : analyzeBMP.cpp bmp.h mustbelittleendian.h Makefile
 	g++ -g analyzeBMP.cpp -o analyzeBMP
 
+CTAPsBPManalysis.txt: analyzeBMP Makefile
+	echo "in Dir " > CTAPsBMPanalysis.txt
+	pwd >> CTAPsBMPanalysis.txt
+	echo >> CTAPsBMPanalysis.txt
+	echo "../../bitmaps/thumb000001.bmp" >> CTAPsBMPanalysis.txt
+	echo >> CTAPsBMPanalysis.txt
+	./analyzeBMP < ../../bitmaps/thumb000001.bmp >> CTAPsBMPanalysis.txt
+	echo >> CTAPsBMPanalysis.txt
+	echo "../../bitmaps/pic00038.bmp" >> CTAPsBMPanalysis.txt
+	echo >> CTAPsBMPanalysis.txt
+	./analyzeBMP < ../../bitmaps/pic000038.bmp >> CTAPsBMPanalysis.txt
+
 install: OneYuv2OneBmp.o
 	cp OneYuv2OneBmp.o OneYuv2OneBmp.h ../..
 

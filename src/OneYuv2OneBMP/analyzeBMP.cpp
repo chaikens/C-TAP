@@ -6,10 +6,17 @@
 using namespace std;
 int main(int argc, char **argv)
 {
+  if(argc != 1) {
+    error(1, 0,
+	  "Please run me with no arguments and input redirected like < file.bmp.\n");
+  }
   BITMAP_FILEHEADER *pheader = new BITMAP_FILEHEADER;
   fread(pheader, sizeof(BITMAP_FILEHEADER), 1, stdin);
+  cout << "Signature=";
   cout.write( (const char *) pheader->Signature, sizeof( pheader->Signature ));
-  cout << "Compilers Idea of header size=" << (sizeof (BITMAP_FILEHEADER)) << endl;
+  cout << endl;
+  cout << "Compiler'ss Idea of header size=" << (sizeof (BITMAP_FILEHEADER)) << endl;
+  cout << endl;
   cout << "FileSize=" << pheader->FileSize << endl
        << "Reserved1=" << pheader->Reserved1 << endl
        << "Reserved2=" << pheader->Reserved2 << endl
@@ -17,7 +24,7 @@ int main(int argc, char **argv)
 
   int bmhsize = (pheader->OffsetToData - sizeof(*pheader));
 
-  cout << "Bitmap info struct size="
+  cout << "(calculated) Bitmap info struct size="
        << bmhsize << endl;
 
   BITMAPINFOHEADER *pbmi40  = NULL;
@@ -38,30 +45,69 @@ int main(int argc, char **argv)
     error(1, 0, "Unsupported bitmap header size %d", bmhsize);
   }
 
+  cout << endl;
   cout << "BMHeader Size=" << pbmi40->MySize << endl;
   cout << "Width="     << pbmi40->Width  << endl;
   cout << "Height="    << pbmi40->Height << endl;
   cout << "#ColorPlanes(should be 1)=" << pbmi40->NColorPlanes << endl;
   cout << "Compression Meth=" << pbmi40->CompressionMeth << endl;
-  cout << "( 3 is BI_BITFIELDS, and masks are used ONLY in this case )" << endl;
+  if(pbmi40->CompressionMeth == 3) {
+    cout << "( 3 is BI_BITFIELDS, and masks are used ONLY in this case )"
+	 << endl;
+  }
+  else {
+    cout << " (Masks for pixel format are not used, they're only for case 3.)"
+	 << endl;
+  }
   cout << "ResolutionHoriz="  << pbmi40->ResolutionHoriz
        << " Vert="            << pbmi40->ResolutionVert << endl;
   cout << "#Palette Colors="  << pbmi40->ColorsInPalette
-       << "  #Important ones="  << pbmi40->NImportantColors;
+       << "  #Important ones="  << pbmi40->NImportantColors << endl;
 
   if(pbmi124) {
-    cout << "\nHigher Version Attributes:" << endl;
+    cout << endl << "\nHigher Version Attributes:" << endl;
 
-
-
-    cout << "Red Mask=";
+    uint8_t *pbyte;
+    cout << " Red   Mask=";
     printf("%#010x",pbmi124->bV5RedMask);
+
+    pbyte = (uint8_t *) &(pbmi124->bV5RedMask);
+    printf(" bytes %#04x %#04x %#04x %#04x\n",
+	   (uint8_t) pbyte[0],
+	   (uint8_t) pbyte[1],
+	   (uint8_t) pbyte[2],
+    	   (uint8_t) pbyte[3]);
+
     cout << " Green Mask=";
     printf("%#010x",pbmi124->bV5GreenMask);
-    cout << " Blue Mask=";
+
+    pbyte = (uint8_t *) &(pbmi124->bV5GreenMask);
+    printf(" bytes %#04x %#04x %#04x %#04x\n",
+	   (uint8_t) pbyte[0],
+	   (uint8_t) pbyte[1],
+	   (uint8_t) pbyte[2],
+    	   (uint8_t) pbyte[3]);
+
+    cout << " Blue  Mask=";
     printf("%#010x",pbmi124->bV5BlueMask);
-    cout << "  Alpha Mask=";
+
+    pbyte = (uint8_t *) &(pbmi124->bV5BlueMask);
+    printf(" bytes %#04x %#04x %#04x %#04x\n",
+	   (uint8_t) pbyte[0],
+	   (uint8_t) pbyte[1],
+	   (uint8_t) pbyte[2],
+    	   (uint8_t) pbyte[3]);
+
+    cout << " Alpha Mask=";
     printf("%#010x",pbmi124->bV5AlphaMask);
+
+    pbyte = (uint8_t *) &(pbmi124->bV5AlphaMask);
+    printf(" bytes %#04x %#04x %#04x %#04x\n",
+	   (uint8_t) pbyte[0],
+	   (uint8_t) pbyte[1],
+	   (uint8_t) pbyte[2],
+    	   (uint8_t) pbyte[3]);
+
     cout << endl;
 
     printf("CSType= %#010x\n", pbmi124->bV5CSType);
@@ -88,5 +134,24 @@ int main(int argc, char **argv)
     cout << "Reserved=" << hex << pbmi124-> bV5Reserved << endl;
   } //end of V5 additions
 
+  uint8_t *pp = new uint8_t[4];
+  fread(pp, 1, 4, stdin);
+  /*OK if we dont read them all for a 1-pixel 0 compressed bmp.*/
+  cout << endl << "First Pixel, memory order:" << endl;
+  printf("%d %d %d",
+	 (unsigned char) pp[0],
+	 (unsigned char) pp[1],
+	 (unsigned char) pp[2]);
+  switch (pbmi40->CompressionMeth) {
+  case 0 : printf("\n"); break;
+  case 3:  printf(" %d\n",
+		  (unsigned char) pp[3]);
+    printf("See Masks above.\n");
+    break;
+  default: printf(" <- first 3 bytes. Unsupported compression method %u\n",
+		  pbmi40->CompressionMeth);
+  }
+  
+  
   return 0;
 }
