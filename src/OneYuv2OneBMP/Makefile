@@ -2,14 +2,16 @@ TestOneYuv2OneBmp: OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefil
 	g++  -g TestOneYuv2OneBmp.cpp OneYuv2OneBmp.o -o TestOneYuv2OneBmp
 
 OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
-	gcc  -g -c OneYuv2OneBmp.cpp
+	g++  -g -c OneYuv2OneBmp.cpp
 
 
 SeeOptconvert4toBMP.txt : OneYuv2OneBmp.h SeeOptconvert4toBMP.cpp Makefile
-	gcc -g -O3 -Wno-unused-result -c SeeOptconvert4toBMP.cpp
+	g++ -g -O3 -Wno-unused-result -c SeeOptconvert4toBMP.cpp
 	objdump --reloc --disassemble --source SeeOptconvert4toBMP.o > SeeOptconvert4toBMP.txt
 	less SeeOptconvert4toBMP.txt
 
+analyzeBMP : analyzeBMP.cpp bmp.h mustbelittleendian.h Makefile
+	g++ -g analyzeBMP.cpp -o analyzeBMP
 
 install: OneYuv2OneBmp.o
 	cp OneYuv2OneBmp.o OneYuv2OneBmp.h ../..

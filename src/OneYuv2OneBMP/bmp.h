@@ -28,6 +28,7 @@ typedef struct __attribute__((packed)) BITMAP_FILEHEADER {
 typedef struct __attribute__((packed)) BITMAPINFOHEADER {
   int32_t MySize;            /* Wikipedia says its signed. */
   int32_t Width;
+  int32_t Height;
   uint16_t NColorPlanes;     /* Wikipedia says must be 1 */
   uint16_t BitsPerPixel;     /* aka Depth */
   uint32_t CompressionMeth;  /* 0=BI_RGB none, most common */
