@@ -1,3 +1,5 @@
+all: instructions
+
 TestOneYuv2OneBmp: OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
 	g++  -g TestOneYuv2OneBmp.cpp OneYuv2OneBmp.o -o TestOneYuv2OneBmp
 
@@ -36,3 +38,10 @@ Test: TestOneFrame.yuv TestOneYuv2OneBmp Makefile
 
 TestOneFrame.yuv :
 	ffmpeg -hide_banner -y -i ../../DroneCalib1.mp4 -frames:v 1  TestOneFrame.yuv
+
+depend:
+	-gccmakedep *.cpp
+
+
+instructions:
+	echo "For now, give specific targets to make"
