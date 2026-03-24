@@ -37,7 +37,7 @@ inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
   // dont bother hand optimizing: Max Compiler+CPU optimization should be great.
   //
   //order of colors in each BMP pixel:
-  const int b = 0; const int g = 1; const int r = 1;
+  const int b = 0; const int g = 1; const int r = 2;
 
   // conversion matrix acts from the left:
   const float by = 1.0; const float bu = 1.770; const float bv = 0.0; const float b1 = 0.0;
