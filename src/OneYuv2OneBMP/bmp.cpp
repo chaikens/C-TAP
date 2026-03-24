@@ -20,7 +20,7 @@ CLASSICBMPHEADERS *makeClassicHeaders( int width, int height)
   */
 
   pfh->Signature[0] = 'B'; pfh->Signature[1] = 'M';
-  pfh->FileSize = sizeof(CLASSICBMPHEADERS) + 3*width*height;
+  pfh->FileSize = sizeof(CLASSICBMPHEADERS) + 3*abs(width)*abs(height);
   // reserved and other field were 0'd by C++
   pfh->OffsetToData = sizeof(CLASSICBMPHEADERS);
 
@@ -44,7 +44,7 @@ typedef struct __attribute__((packed)) BITMAPINFOHEADER {
   pinfo->Width  = width;     // Variable!
   pinfo->Height = height;     // Variable!
   pinfo->NColorPlanes = 1;
-  pinfo->SizeOfRawBmpData = 3*width*height;
+  pinfo->SizeOfRawBmpData = 3*abs(width)*abs(height);
   pinfo->BitsPerPixel = 24;   // Most Simple
   pinfo->CompressionMeth = 0;  // BI_RGB, explicit so it's not overlooked
   // resolutions are 0
