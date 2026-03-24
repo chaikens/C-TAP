@@ -1,4 +1,8 @@
 #include "bmp.h"
+#include <error.h>
+#include <errno.h>
+#include <cstring>
+#include <cstdlib>
 
 CLASSICBMPHEADERS *makeClassicHeaders( int width, int height)
 {
@@ -37,14 +41,35 @@ typedef struct __attribute__((packed)) BITMAPINFOHEADER {
 */
 
   pinfo->MySize = sizeof(BITMAPINFOHEADER);
-  
-  
+  pinfo->Width  = width;     // Variable!
+  pinfo->Height = height;     // Variable!
+  pinfo->NColorPlanes = 1;
+  pinfo->SizeOfRawBmpData = 3*width*height;
+  pinfo->BitsPerPixel = 24;   // Most Simple
+  pinfo->CompressionMeth = 0;  // BI_RGB, explicit so it's not overlooked
+  // resolutions are 0
+  // ColorsInPalette 0
+  // NImportantColors 0
+  return p; //good luck!
+ }
 
 
-
-
-
+FULLBITMAP *makeClassicBitmap (int width, int height ) 
+{
+  FULLBITMAP *p = reinterpret_cast<FULLBITMAP *>
+    (new uint8_t [ sizeof(CLASSICBMPHEADERS) + 3 * abs(width) * abs(height) ]);
+  if( ! p )
+    {
+      error(1, errno, "memory alloc for full bitmap failed\n\
+width=%d, height=%d\n", width, height);
+    }
+  CLASSICBMPHEADERS *phs = makeClassicHeaders(width, height);
+  memcpy(p, phs, sizeof(*phs));
+  delete phs;
   return p;
 }
+
+  
+  
 
 

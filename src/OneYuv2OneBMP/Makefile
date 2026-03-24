@@ -1,5 +1,12 @@
 all: depend
 
+
+random_image: random_image.cpp bmp.o
+	g++ -g $^ -o $@
+
+bmp.o : bmp.cpp
+	g++ -g -c $<
+
 TestOneYuv2OneBmp: OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
 	g++  -g TestOneYuv2OneBmp.cpp OneYuv2OneBmp.o -o TestOneYuv2OneBmp
 

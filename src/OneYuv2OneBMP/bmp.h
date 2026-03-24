@@ -1,7 +1,8 @@
 // we have bmps with bits offsets 54 and 138..
 
 
-#include "mustbelittleendian.h" //only developed for g++ little endian (like Linux PCs)
+#include "mustbelittleendian.h"
+//only developed for g++ little endian (like Linux PCs)
 
 #if defined __cplusplus
 #include <cstdint>
@@ -45,8 +46,25 @@ typedef struct __attribute__((packed)) CLASSICBMPHEADERS {
 } CLASSICBMPHEADERS;
 
 CLASSICBMPHEADERS *makeClassicHeaders ( int width, int height );
+// given width and height, allocates and completely sets a 
+// classic bitmap header (with 40-byte BITMAPINFOHEADER).
+// Returns a pointer P to it.
+// The storage is given to the caller; Deallocate it to avoid mem leaks with
+// delete P;
 
-//
+typedef struct __attribute__((packed)) FULLBITMAP {
+  const CLASSICBMPHEADERS headers;
+  uint8_t bytes[];
+} FULLBITMAP;
+
+FULLBITMAP *makeClassicBitmap (int width, int height );
+// given width and height, allocates and completely sets a 
+// classic bitmap (with 40-byte BITMAPINFOHEADER) for 0 (all Black) image.
+// Returns a pointer P to it.
+// The headers are declared constant since there is no need to modify them.
+// The storage is given to the caller; Deallocate it to avoid mem leaks with
+// delete P;
+
 // Wikipedia says there are 7 kinds of DIB, Bitmap information headers
 // also, they all have 32 bit fields.
 // the 40 byte one is BITMAPINFOHEADER
