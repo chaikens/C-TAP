@@ -1,5 +1,7 @@
 #include "mustbelittleendian.h" //only developed for g++ little endian (like Linux PCs)
 
+#include "bmp.h"
+
 #if defined __cplusplus
 #include <cstdint>
 #else
@@ -9,26 +11,31 @@
  * gives us uint8_t uint16_t for our image and video files
  */
 
-/*
-Julien (surname unknown) suggests that there are problems with the above formulae and suggests the following instead:
-
-    Y = 0.299R + 0.587G + 0.114B
-
-    U'= (B-Y)*0.565
-
-    V'= (R-Y)*0.713
-
-with reciprocal versions:
-
-    R = Y + 1.403V'
-
-    G = Y - 0.344U' - 0.714V'
-
-    B = Y + 1.770U'
-
-from
-https://fourcc.org/fccyvrgb.php
-*/
+//
+//
+// Let size=width*height.
+// storeYsInBmp( width, height, YArray, pBMbytes);
+//  Temporarily store size Y values in the 2nd byte of each of size rgb triples.
+//
+// storeUsInBmp( width, height, UArray, pBMbytes);
+//    with full yuv in mem at YArray, ^---= YArray + width*height
+//  Temporarily store given size/4 U values in 1st byte of each of size rgb triples. 
+//
+// useVsFinishBmp( width, height, VArray, pBMbytes);
+//    and then also                   ^--== YArray + width*height+(1/4)*width*height 
+//  Use the stored Ys and Us, and the last size/4 V values,
+//  to compute the size rgb BMP triples were are converting to.
+//
+// This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
+// supporting a pipeline to process a sequence of raw image frames.
+//
+//
+static inline void storeYsInBmp( int width, int height,
+				const uint8_t *pYs, uint8_t *pBMbytes);
+static inline void storeUsInBmp( int width, int height,
+				const uint8_t *pUs, uint8_t *pBMbytes);
+static inline void useVsFinishBmp( int width, int height,
+				   const uint8_t *pVs, uint8_t *pBMbytes);
 
 inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
 	      const uint8_t *firstYPair, const uint8_t *secondYPair,
@@ -36,14 +43,10 @@ inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
 {
   // dont bother hand optimizing: Max Compiler+CPU optimization should be great.
   //
-  //order of colors in each BMP pixel:
-  const int b = 0; const int g = 1; const int r = 2;
-
-  // conversion matrix acts from the left:
-  const float by = 1.0; const float bu = 1.770; const float bv = 0.0; const float b1 = 0.0;
-  const float gy = 1.0; const float gu = -0.344; const float gv = -0.714; const float g1 = 0.0;
-  const float ry = 1.0; const float ru = 0.0; const float rv = 1.403; const float r1 = 0.0;
-
+  
+#include "yuv2bmpConstants.cpp"
+  //defines b, g, r and {b,g,r}{y,u,v,1} act-from-left conversion constants
+  
   // contributions from U and V common to our 4 pixels:
   float buv = bu*Ubyte[0] + bv*Vbyte[0] + b1;
   float guv = gu*Ubyte[0] + gv*Vbyte[0] + g1;
@@ -71,9 +74,13 @@ inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
 
 int OneYuv2OneBmp(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMPout);
+int OneYuv2OneBmpFast(unsigned int width, unsigned int height,
+		  const uint8_t *YUVin, uint8_t *BMPout);
+int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
+		       const uint8_t *YUVin, uint8_t *BMdata);
+  /* YUVin points to the YUV I420p data in memory.
+   BMdata points to memory for the bitmap byte triples.
+  */
 
-/* YUVin points to the YUV data in memory.
-   BMPout points to memory already allocated for the conversion a bmp file,
-   including the 54 byte header */
 
   

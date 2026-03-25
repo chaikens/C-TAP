@@ -20,10 +20,125 @@ If we continue to run 1a on bmp data, a more efficient soln may be better.
 #include <cstdio>
 #include <unistd.h>
 #include <string.h>
-
+#include <cmath>
 #include "OneYuv2OneBmp.h"
+#include <cstdlib> //for abs()
 
 using namespace std;
+
+//
+//
+// Let size=width*height.
+// storeYsInBmp( width, height, YArray, pBMbytes);
+//  Temporarily store size Y values in the 2nd byte of each of size rgb triples.
+//
+// storeUsInBmp( width, height, UArray, pBMbytes);
+//    with full yuv in mem at YArray, ^---= YArray + width*height
+//  Temporarily store given size/4 U values in 1st byte of each of size rgb triples. 
+//
+// useVsFinishBmp( width, height, VArray, pBMbytes);
+//    and then also                   ^--== YArray + width*height+(1/4)*width*height 
+//  Use the stored Ys and Us, and the last size/4 V values,
+//  to compute the size rgb BMP triples were are converting to.
+//
+// This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
+// supporting a pipeline to process a sequence of raw image frames.
+//
+//
+static inline void storeYsInBmp( int width, int height,
+				const uint8_t *pYs, uint8_t *pBMbytes
+				) {
+  width = abs(width); height = abs(height);
+  for (int i = 0; i < width*height; i++) {
+    //i indexes Y values
+    pBMbytes[ 3*i + 1 ] = pYs[i];  //one green rgb[1] val per Y value 
+  }
+  return;
+}
+
+static inline void storeUsInBmp( int width, int height,
+				const uint8_t *pUs, uint8_t *pBMbytes
+				) {
+  width = abs(width); height = abs(height);
+  int halfwidth = width/2;
+  int halfheight = height/2;
+  assert((width == 2*halfwidth) && (height == 2*halfheight) );
+  for (int i = 0; i < width*height/4; i++) {
+    pBMbytes[ 3*4*i + 0 ] =
+      pBMbytes[ 3*4*i + 3 ] =
+      pBMbytes[ 3*(4*i + width) + 0 ] =
+      pBMbytes[ 3*(4*i + width) + 3 ] = pUs[i];
+  }
+  return;
+}
+
+typedef struct rgbtriple { uint8_t tr; uint8_t tg; uint8_t tb; } rgbtriple;
+
+static inline uint8_t uint8clamp( float x )
+/* Please check if stricter clamping is needed */
+{
+  if( x < 0 )
+    { return 0;}
+  else {
+    if(x > 255){return 255;}
+    else {
+      return (uint8_t) round( x );
+    }
+  }
+}
+
+#include "yuv2bmpConstants.cpp"
+  // defines b, g, r and {b,g,r}{y,u,v,1} constants
+
+static inline rgbtriple tripleFromYUV( uint8_t y, uint8_t u, uint8_t v )
+{
+  rgbtriple ANS;
+  ANS.tr = uint8clamp(ry*y + ru*u + rv*v + r1);
+  ANS.tg = uint8clamp(gy*y + gu*u + gv*v + g1);
+  ANS.tb = uint8clamp(by*y + bu*u + bv*v + b1);
+  return ANS;
+}
+
+static inline void useVsFinishBmp( int width, int height,
+				   const uint8_t *pVs, uint8_t *pBMbytes)
+{
+  rgbtriple T;
+  for (int i = 0; i < width*height/4; i++) {
+
+    uint8_t commonU = pBMbytes[3*4*i];
+    uint8_t commonV = pVs[i];
+
+    // calc T
+    T = tripleFromYUV( pBMbytes[3*4*i + 1], commonU, commonV); 
+    pBMbytes[ 3*4*i + r ] = T.tr;
+    pBMbytes[ 3*4*i + g ] = T.tg;
+    pBMbytes[ 3*4*i + b ] = T.tb;
+
+    // calc T
+    T = tripleFromYUV( pBMbytes[3*4*i + 3 + 1], commonU, commonV); 
+    pBMbytes[ 3*4*i + 3 + r ] = T.tr;
+    pBMbytes[ 3*4*i + 3 + g ] = T.tg;
+    pBMbytes[ 3*4*i + 3 + b ] = T.tb;
+
+    // calc T
+    T = tripleFromYUV( pBMbytes[3*4*i + 3*width + 1], commonU, commonV);
+    pBMbytes[ 3*4*i + 3*width + r ] = T.tr;
+    pBMbytes[ 3*4*i + 3*width + g ] = T.tg;
+    pBMbytes[ 3*4*i + 3*width + b ] = T.tb;
+
+    // calc T
+    T = tripleFromYUV( pBMbytes[3*4*i + 3*width + 3 + 1], commonU, commonV);
+    pBMbytes[ 3*4*i + 3*width + 3 + r ] = T.tr;
+    pBMbytes[ 3*4*i + 3*width + 3 + g ] = T.tg;
+    pBMbytes[ 3*4*i + 3*width + 3 + b ] = T.tb;
+ 
+  }
+  return;
+}
+
+
+
+
 
 int OneYuv2OneBmp(unsigned int width, unsigned int height,
 		     const uint8_t *YUVin, uint8_t *BMPout)
@@ -83,5 +198,35 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
   close(yuvFD);
   return 0;
 }
+
+
+int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
+		  const uint8_t *YUVin, uint8_t *BMdata)
+  /* YUVin points to the YUV I420p data in memory.
+   BMdata points to memory for the bitmap byte triples.
+  */
+{
+//
+//
+// Let size=width*height.
+  storeYsInBmp( (int) width, (int) height, YUVin, BMdata);
+//  Temporarily store size Y values in the 2nd byte of each of size rgb triples.
+//
+  storeUsInBmp( (int) width, (int) height, YUVin+width*height, BMdata);
+//    with full yuv in mem at YArray,         ^---= YArray + width*height
+//  Temporarily store given size/4 U values in 1st byte of each of size rgb triples. 
+//
+  useVsFinishBmp( (int) width, (int) height, YUVin+width*height+(width/2)*(height/2), BMdata);
+//    and then also                   ^--== YArray + 3*width*height+(1/4)*width*height 
+//  Use the stored Ys and Us, and the last size/4 V values,
+//  to compute the size rgb BMP triples were are converting to.
+//
+// This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
+// supporting a pipeline to process a sequence of raw image frames.
+//
+//
+  return 0;
+}
+  
 
 
