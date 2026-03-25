@@ -63,11 +63,11 @@ static inline void storeUsInBmp( int width, int height,
   int halfwidth = width/2;
   int halfheight = height/2;
   assert((width == 2*halfwidth) && (height == 2*halfheight) );
-  for (int i = 0; i < width*height/4; i++) {
-    pBMbytes[ 3*4*i + 0 ] =
-      pBMbytes[ 3*4*i + 3 ] =
-      pBMbytes[ 3*(4*i + width) + 0 ] =
-      pBMbytes[ 3*(4*i + width) + 3 ] = pUs[i];
+  for (int i = 0; i < width*height/2; i++) {
+    pBMbytes[ 3*2*i + 0 ] =
+      pBMbytes[ 3*2*i + 3 ] =
+      pBMbytes[ 3*(2*i + width) + 0 ] =
+      pBMbytes[ 3*(2*i + width) + 3 ] = pUs[i];
   }
   return;
 }
@@ -93,9 +93,9 @@ static inline uint8_t uint8clamp( float x )
 static inline rgbtriple tripleFromYUV( uint8_t y, uint8_t u, uint8_t v )
 {
   rgbtriple ANS;
-  ANS.tr = uint8clamp(ry*y + ru*u + rv*v + r1);
-  ANS.tg = uint8clamp(gy*y + gu*u + gv*v + g1);
-  ANS.tb = uint8clamp(by*y + bu*u + bv*v + b1);
+  ANS.tr =  uint8clamp  (ry*y + ru*u + rv*v + r1);
+  ANS.tg =  uint8clamp  (gy*y + gu*u + gv*v + g1);
+  ANS.tb =  uint8clamp  (by*y + bu*u + bv*v + b1);
   return ANS;
 }
 
@@ -105,32 +105,32 @@ static inline void useVsFinishBmp( int width, int height,
   rgbtriple T;
   for (int i = 0; i < width*height/4; i++) {
 
-    uint8_t commonU = pBMbytes[3*4*i];
+    uint8_t commonU = pBMbytes[3*2*i];
     uint8_t commonV = pVs[i];
 
     // calc T
-    T = tripleFromYUV( pBMbytes[3*4*i + 1], commonU, commonV); 
-    pBMbytes[ 3*4*i + r ] = T.tr;
-    pBMbytes[ 3*4*i + g ] = T.tg;
-    pBMbytes[ 3*4*i + b ] = T.tb;
+    T = tripleFromYUV( pBMbytes[3*2*i + 1], commonU, commonV); 
+    pBMbytes[ 3*2*i + r ] = T.tr;
+    pBMbytes[ 3*2*i + g ] = T.tg;
+    pBMbytes[ 3*2*i + b ] = T.tb;
 
     // calc T
-    T = tripleFromYUV( pBMbytes[3*4*i + 3 + 1], commonU, commonV); 
-    pBMbytes[ 3*4*i + 3 + r ] = T.tr;
-    pBMbytes[ 3*4*i + 3 + g ] = T.tg;
-    pBMbytes[ 3*4*i + 3 + b ] = T.tb;
+    T = tripleFromYUV( pBMbytes[3*2*i + 3 + 1], commonU, commonV); 
+    pBMbytes[ 3*2*i + 3 + r ] = T.tr;
+    pBMbytes[ 3*2*i + 3 + g ] = T.tg;
+    pBMbytes[ 3*2*i + 3 + b ] = T.tb;
 
     // calc T
-    T = tripleFromYUV( pBMbytes[3*4*i + 3*width + 1], commonU, commonV);
-    pBMbytes[ 3*4*i + 3*width + r ] = T.tr;
-    pBMbytes[ 3*4*i + 3*width + g ] = T.tg;
-    pBMbytes[ 3*4*i + 3*width + b ] = T.tb;
+    T = tripleFromYUV( pBMbytes[3*2*i + 3*width + 1], commonU, commonV);
+    pBMbytes[ 3*2*i + 3*width + r ] = T.tr;
+    pBMbytes[ 3*2*i + 3*width + g ] = T.tg;
+    pBMbytes[ 3*2*i + 3*width + b ] = T.tb;
 
     // calc T
-    T = tripleFromYUV( pBMbytes[3*4*i + 3*width + 3 + 1], commonU, commonV);
-    pBMbytes[ 3*4*i + 3*width + 3 + r ] = T.tr;
-    pBMbytes[ 3*4*i + 3*width + 3 + g ] = T.tg;
-    pBMbytes[ 3*4*i + 3*width + 3 + b ] = T.tb;
+    T = tripleFromYUV( pBMbytes[3*2*i + 3*width + 3 + 1], commonU, commonV);
+    pBMbytes[ 3*2*i + 3*width + 3 + r ] = T.tr;
+    pBMbytes[ 3*2*i + 3*width + 3 + g ] = T.tg;
+    pBMbytes[ 3*2*i + 3*width + 3 + b ] = T.tb;
  
   }
   return;
