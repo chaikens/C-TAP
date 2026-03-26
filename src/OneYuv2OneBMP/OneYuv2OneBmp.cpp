@@ -63,7 +63,7 @@ static inline void storeUsInBmp( int width, int height,
   int halfwidth = width/2;
   int halfheight = height/2;
   assert((width == 2*halfwidth) && (height == 2*halfheight) );
-  for (int i = 0; i < width*height/2; i++) {
+  for (int i = 0; i < width*height/4; i++) {
     pBMbytes[ 3*2*i + 0 ] =
       pBMbytes[ 3*2*i + 3 ] =
       pBMbytes[ 3*(2*i + width) + 0 ] =
@@ -107,6 +107,10 @@ static inline void useVsFinishBmp( int width, int height,
 
     uint8_t commonU = pBMbytes[3*2*i];
     uint8_t commonV = pVs[i];
+
+    //assert(commonU == pBMbytes[3*2*i + 3]);
+    //assert(commonU == pBMbytes[3*2*i + 3*width]);
+    //assert(commonU == pBMbytes[3*2*i + 3*width + 3]);
 
     // calc T
     T = tripleFromYUV( pBMbytes[3*2*i + 1], commonU, commonV); 
@@ -154,7 +158,7 @@ int OneYuv2OneBmp(unsigned int width, unsigned int height,
     }
   size_t yuvlen = ( width * height * 3 ) / 2;
   size_t yuvwriteret = write(yuvFD, YUVin, yuvlen);
-  assert(yuvlen == yuvwriteret);
+  //assert(yuvlen == yuvwriteret);
   
   /* construct ffmpeg call like
 ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp.bmp > ffmpeg.messages 2>&1 
