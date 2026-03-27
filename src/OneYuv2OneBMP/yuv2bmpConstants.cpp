@@ -27,10 +27,31 @@ const float ry = 1.0*0.4; const float ru = 0.0; const float rv = 1.0*0.4; const 
 */
 
 /* OLD Constants */
-  // conversion matrix acts from the left:
+/*  // conversion matrix acts from the left:
 const float by = 1.0; const float bu = 1.0; const float bv = 0.0; const float b1 = 0.0;
 const float gy = 1.0; const float gu = -0.19408; const float gv = -0.50937; const float g1 = 0.0;
 const float ry = 1.0; const float ru = 0.0; const float rv = 1.0; const float r1 = 0.0;
+*/
+
+/* From https://fourcc.org/fccyvrgb.php
+This is the source of Juliens too!
+B = 1.164(Y - 16)                   + 2.018(U - 128)
+G = 1.164(Y - 16) - 0.813(V - 128) - 0.391(U - 128)
+R = 1.164(Y - 16) + 1.596(V - 128)
+
+Also 
+Y  =      (0.257 * R) + (0.504 * G) + (0.098 * B) + 16
+
+Cr = V =  (0.439 * R) - (0.368 * G) - (0.071 * B) + 128
+
+Cb = U = -(0.148 * R) - (0.291 * G) + (0.439 * B) + 128
+*/
+
+const float by = 1.164; const float bu = 2.018; const float bv = 0.0; const float b1 = 1.164*(-16) + 2.018*(-128);
+const float gy = 1.164; const float gu = -0.391; const float gv = -0.813; const float g1 = 1.164*(-16) + 0.813*128 + 0.391*128;
+const float ry = 1.164; const float ru = 0.0; const float rv = 1.596; const float r1 = 1.164*(-16) + 1.596*(-128);
+
+
 
 /* Sample application:
      // contributions from U and V common to our 4 pixels:
