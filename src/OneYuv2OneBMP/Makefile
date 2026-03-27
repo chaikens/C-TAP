@@ -434,6 +434,8 @@ TestOneYuv2OneBmp.o: TestOneYuv2OneBmp.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
  /usr/include/linux/falloc.h
+TryMacro.o: TryMacro.cpp /usr/include/stdc-predef.h
+TrymacroExpanded.o: TrymacroExpanded.cpp /usr/include/stdc-predef.h
 analyzeBMP.o: analyzeBMP.cpp /usr/include/stdc-predef.h bmp.h \
  mustbelittleendian.h /usr/include/c++/11/cstdint \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \

@@ -34,12 +34,15 @@ using namespace std;
 //
 // storeUsInBmp( width, height, UArray, pBMbytes);
 //    with full yuv in mem at YArray, ^---= YArray + width*height
-//  Temporarily store given size/4 U values in 1st byte of each of size rgb triples. 
+//  Temporarily store given size/4 U values, each 4 times, each time
+//  in the 1st byte of a rgb triple.  The 4 triples correspond to a
+//  2x2 square block of pixels.
 //
 // useVsFinishBmp( width, height, VArray, pBMbytes);
 //    and then also                   ^--== YArray + width*height+(1/4)*width*height 
 //  Use the stored Ys and Us, and the last size/4 V values,
-//  to compute the size rgb BMP triples were are converting to.
+//  to finish computing the BMP triples.  The V values, and corresponding
+//  4 Ys and (common) Us are processed in the same order as the preious step.
 //
 // This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
 // supporting a pipeline to process a sequence of raw image frames.
@@ -56,18 +59,85 @@ static inline void storeYsInBmp( int width, int height,
   return;
 }
 
+/* This macro was to be used twice below but the compiler didn't like it
+   I tried to be clever by substituting code into code */
+
+#define UVInBmpMainLoop( Save12, Save34 ) \
+  { int nPixRowsToGo = height; /*Count down.  We go down two at a time*/ \
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/ \
+  while( nPixRowsToGo > 0 )                                              \
+    {                                                                    \
+      if( nPixRowsToGo != 1 ) {                                          \
+	for( int iUV = 0; iUV <= halfwidth iUV++ ) {                     \
+	  /* 4 saves: */                                                 \
+         { Save12 }                                                      \
+         { Save34 }                                                      \
+	}                                                                \
+	nPixRowsToGo -= 2;                                               \
+      }                                                                  \
+      else {                                                             \
+	for( int iUV = 0; iUV <= halfwidth iUV++ ) {                     \
+	  /* only 2 saves: */                                            \
+	  { Save12 }						         \
+	  nPixRowsToGo -= 1;                                             \
+	}                                                                \
+      }                                                                  \
+    } }
+	  
+/* End of macro def'n */
+
 static inline void storeUsInBmp( int width, int height,
 				const uint8_t *pUs, uint8_t *pBMbytes
 				) {
   width = abs(width); height = abs(height);
   int halfwidth = width/2;
-  int halfheight = height/2;
-  assert((width == 2*halfwidth) && (height == 2*halfheight) );
-  for (int i = 0; i < width*height/4; i++) {
-    pBMbytes[ 3*2*i + 0 ] =
-      pBMbytes[ 3*2*i + 3 ] =
-      pBMbytes[ 3*(2*i + width) + 0 ] =
-      pBMbytes[ 3*(2*i + width) + 3 ] = pUs[i];
+  // Do all yuv images have even lengths and heights?
+  // Maybe look this up.
+  // For now, we'll tolerate an odd number height of rows.
+  // In any case, maybe code to exit gracefully instead of crashing.
+  assert((width == 2*halfwidth) );
+
+  /* Macro hack doen't work, do by hand below:
+  UVinBmpMainLoop ( {
+		     pBMbytes[ 3*2*iUV + 0 ] =
+		       pBMbytes[ 3*2*iUV + 3 ] = pUs[iUV];
+		   },
+		   {
+		     pBMbytes[ 3*(2*iUV + width) + 0 ] =
+		       pBMbytes[ 3*(2*iUV + width) + 3 ] = pUs[iUV];
+		   }
+		   )
+		   */
+
+  { int nPixRowsToGo = height; /*Count down.  We go down two at a time*/ 
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
+  while( nPixRowsToGo > 0 )                                              
+    {                                                                    
+      if( nPixRowsToGo != 1 ) {                                          
+	for( int iUV = 0; iUV <= halfwidth; iUV++ ) {                     
+	  /* 4 saves: */                                                 
+         {
+		     pBMbytes[ 3*4*iUV + 0 ] =
+		       pBMbytes[ 3*4*iUV + 3 ] = pUs[iUV];
+	 }
+	 {
+		     pBMbytes[ 3*(4*iUV + width) + 0 ] =
+		       pBMbytes[ 3*(4*iUV + width) + 3 ] = pUs[iUV];
+	 }
+	}                                                                
+	nPixRowsToGo -= 2;                                               
+      }                                                                  
+      else {                                                             
+	for( int iUV = 0; iUV <= halfwidth; iUV++ ) {                     
+	  /* only 2 saves: */                                            
+	  {
+	    pBMbytes[ 3*2*iUV + 0 ] =
+		       pBMbytes[ 3*4*iUV + 3 ] = pUs[iUV];
+	  }						         
+	  nPixRowsToGo -= 1;                                             
+	}                                                                
+      }                                                             
+    }
   }
   return;
 }
@@ -102,48 +172,115 @@ static inline rgbtriple tripleFromYUV( uint8_t y, uint8_t u, uint8_t v )
 static inline void useVsFinishBmp( int width, int height,
 				   const uint8_t *pVs, uint8_t *pBMbytes)
 {
+  width = abs(width); height = abs(height);
+  int halfwidth = width/2;
+
+  uint8_t commonU; //For our usually 4 pixels
+  uint8_t commonV; //For our usually 4 pixels
+  
   rgbtriple T;
-  for (int i = 0; i < width*height/4; i++) {
+  
+  /*  Not only does the macro version not compile, but its application code below is WRONG. 
+    UVinBmpMainLoop (
+		   { // common{U,V} will be used in 2nd code arg.
+		     commonU = pBMbytes[ 3*4*iUV ];
+		     commonV = pVs[iUV];
 
-    uint8_t commonU = pBMbytes[3*2*i];
-    uint8_t commonV = pVs[i];
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 1], commonU, commonV); 
+		     pBMbytes[ 3*2*iUV + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + b ] = T.tb;
 
-    //assert(commonU == pBMbytes[3*2*i + 3]);
-    //assert(commonU == pBMbytes[3*2*i + 3*width]);
-    //assert(commonU == pBMbytes[3*2*i + 3*width + 3]);
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3 + 1], commonU, commonV); 
+		     pBMbytes[ 3*2*iUV + 3 + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3 + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3 + b ] = T.tb;
+		   },
+		   {
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 1], commonU, commonV);
+		     pBMbytes[ 3*2*iUV + 3*width + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3*width + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3*width + b ] = T.tb;
 
-    // calc T
-    T = tripleFromYUV( pBMbytes[3*2*i + 1], commonU, commonV); 
-    pBMbytes[ 3*2*i + r ] = T.tr;
-    pBMbytes[ 3*2*i + g ] = T.tg;
-    pBMbytes[ 3*2*i + b ] = T.tb;
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 3 + 1], commonU, commonV);
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + b ] = T.tb;
+		   }
+		   )
+  */
+  int nPixRowsToGo = height; /*Count down.  We go down two at a time */ 
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
+  int iUV = 0; /* index into the V (for us here) uint8_t array in the YUV file*/
+               /* We stored the correponding U values in the RGB array so that we
+                  might process the Y, then U, then V values in a pipeline.  */
+  int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
+  while( nPixRowsToGo > 0 )                                              
+    {                                                                    
+      if( nPixRowsToGo != 1 ) {                                          
+	for( int x = 0; x <= width; x += 2 ) {
+	  /* 4 saves: */                                                 
+	  { //first of an adjacent pair of rows
+	    int iByte0Pix = 3*width*row + 3*x;
+	   // common{U,V} will be used in 2nd code arg.
+	   commonU = pBMbytes[ iByte0Pix ];
+	   commonV = pVs[iUV];
 
-    // calc T
-    T = tripleFromYUV( pBMbytes[3*2*i + 3 + 1], commonU, commonV); 
-    pBMbytes[ 3*2*i + 3 + r ] = T.tr;
-    pBMbytes[ 3*2*i + 3 + g ] = T.tg;
-    pBMbytes[ 3*2*i + 3 + b ] = T.tb;
+	   T = tripleFromYUV( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + r ] = T.tr;
+	   pBMbytes[ iByte0Pix + g ] = T.tg;
+	   pBMbytes[ iByte0Pix + b ] = T.tb;
 
-    // calc T
-    T = tripleFromYUV( pBMbytes[3*2*i + 3*width + 1], commonU, commonV);
-    pBMbytes[ 3*2*i + 3*width + r ] = T.tr;
-    pBMbytes[ 3*2*i + 3*width + g ] = T.tg;
-    pBMbytes[ 3*2*i + 3*width + b ] = T.tb;
+	   T = tripleFromYUV( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + r ] = T.tr;
+	   pBMbytes[ iByte0Pix + 3 + g ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + b ] = T.tb;
+	 }
+	  { //second of the adjacent pair of rows
+	    int iByte0Pix = 3*width*(row+1) + 3*x;
+	    T = tripleFromYUV( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + r ] = T.tr;
+	    pBMbytes[ iByte0Pix + g ] = T.tg;
+	    pBMbytes[ iByte0Pix + b ] = T.tb;
 
-    // calc T
-    T = tripleFromYUV( pBMbytes[3*2*i + 3*width + 3 + 1], commonU, commonV);
-    pBMbytes[ 3*2*i + 3*width + 3 + r ] = T.tr;
-    pBMbytes[ 3*2*i + 3*width + 3 + g ] = T.tg;
-    pBMbytes[ 3*2*i + 3*width + 3 + b ] = T.tb;
- 
-  }
-  return;
+	    T = tripleFromYUV( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 3 + r ] = T.tr;
+	    pBMbytes[ iByte0Pix + 3 + g ] = T.tg;
+	    pBMbytes[ iByte0Pix + 3 + b ] = T.tb;
+	 }
+	iUV++;
+	}
+	row += 2;
+	nPixRowsToGo -= 2;                                               
+      }                                                                  
+      else {
+	for( int x = 0; x <= width; x += 2 ) {                     
+	  /* 2 saves: */                                                 
+	  { int iByte0Pix = 3*width*row + 3*x;
+	   // common{U,V} will be used in 2nd code arg.
+	   commonU = pBMbytes[ iByte0Pix ]; 
+	   commonV = pVs[iUV];
+
+	   T = tripleFromYUV( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + r ] = T.tr;
+	   pBMbytes[ iByte0Pix + g ] = T.tg;
+	   pBMbytes[ iByte0Pix + b ] = T.tb;
+
+	   T = tripleFromYUV( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + r ] = T.tr;
+	   pBMbytes[ iByte0Pix + 3 + g ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + b ] = T.tb;
+	  }
+	  iUV++;
+	}
+	row += 1;
+	nPixRowsToGo -= 1;
+      }
+    }
+  return ;
 }
 
-
-
-
-
+ 
 int OneYuv2OneBmp(unsigned int width, unsigned int height,
 		     const uint8_t *YUVin, uint8_t *BMPout)
 { //
@@ -221,7 +358,7 @@ int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
 //  Temporarily store given size/4 U values in 1st byte of each of size rgb triples. 
 //
   useVsFinishBmp( (int) width, (int) height, YUVin+width*height+(width/2)*(height/2), BMdata);
-//    and then also                   ^--== YArray + 3*width*height+(1/4)*width*height 
+//    and then also                          ^--== YArray + width*height+(1/4)*width*height 
 //  Use the stored Ys and Us, and the last size/4 V values,
 //  to compute the size rgb BMP triples were are converting to.
 //
@@ -231,6 +368,3 @@ int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
 //
   return 0;
 }
-  
-
-
