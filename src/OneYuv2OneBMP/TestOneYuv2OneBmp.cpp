@@ -68,6 +68,7 @@ int main(int argc, char **argv)
     {
       
       funret = OneYuv2BmpDataFast( width, height, pyuv, pbmp+54 );
+      flipClassicBitmap((FULLBITMAP *) pbmp);
     }
   else
     {
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
       //this old function will remake the header, that doesn't hurt.
       //printf("OneYuv2OneBmp ret %d \n", funret);
     }
-  int bmpFD = open(BMPinFilename, O_CREAT | O_RDWR, S_IRUSR|S_IWUSR);
+  int bmpFD = open(BMPinFilename, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
   if( bmpFD < 0 ) {
     error(1, errno, "Failed to open result file %s\n", BMPinFilename);
   }

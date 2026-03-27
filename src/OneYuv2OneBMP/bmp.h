@@ -57,6 +57,7 @@ typedef struct __attribute__((packed)) FULLBITMAP {
   uint8_t bytes[];
 } FULLBITMAP;
 
+
 FULLBITMAP *makeClassicBitmap (int width, int height );
 // given width and height, allocates and completely sets a 
 // classic bitmap (with 40-byte BITMAPINFOHEADER) for 0 (all Black) image.
@@ -64,6 +65,11 @@ FULLBITMAP *makeClassicBitmap (int width, int height );
 // The headers are declared constant since there is no need to modify them.
 // The storage is given to the caller; Deallocate it to avoid mem leaks with
 // delete P;
+
+void flipClassicBitmap( FULLBITMAP *pbm );
+// Handy, temporary solution to upside-down results.
+// It's more efficient to store the rows in the right place when generating them!
+
 
 // Wikipedia says there are 7 kinds of DIB, Bitmap information headers
 // also, they all have 32 bit fields.

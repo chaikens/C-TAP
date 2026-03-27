@@ -69,6 +69,28 @@ width=%d, height=%d\n", width, height);
   return p;
 }
 
+void flipClassicBitmap( FULLBITMAP *pbm )
+{
+  int width  = pbm->headers.infoHeader.Width;
+  int height = pbm->headers.infoHeader.Height;
+  uint8_t *data = &(pbm->bytes[0]);
+  uint8_t *buf = new uint8_t[width*3];
+
+  int ra = 0;
+  int rb = height-1;
+
+  while(ra < rb) {
+    memcpy(buf, data + width*rb*3, width*3);
+    memcpy(data + width*rb*3, data + width*ra*3, width*3);
+    memcpy(data + width*ra*3, buf, width*3);
+    ra++;  rb--;
+  }
+
+  delete[] buf;
+  return;
+}
+
+
   
   
 
