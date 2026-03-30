@@ -59,8 +59,8 @@ testbmp : testbmp.cpp bmp.o bmp.h Makefile
 
 referenceBmp: referenceBmp.cpp bmp.o bmp.h Makefile
 	$(CXX) $(CXXFLAGS) $< bmp.o -o $@
-	./referenceBmp
-	eog referenceBmp.bmp
+	-./referenceBmp
+	-eog referenceBmp.bmp
 
 depend:
 	-gccmakedep *.cpp
@@ -1025,7 +1025,11 @@ referenceBmp.o: referenceBmp.cpp /usr/include/stdc-predef.h bmp.h \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h /usr/include/error.h \
- /usr/include/x86_64-linux-gnu/bits/error.h /usr/include/assert.h
+ /usr/include/x86_64-linux-gnu/bits/error.h /usr/include/assert.h \
+ /usr/include/c++/11/cstring /usr/include/string.h \
+ /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+ /usr/include/strings.h
 testbmp.o: testbmp.cpp /usr/include/stdc-predef.h bmp.h \
  mustbelittleendian.h /usr/include/c++/11/cstdint \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \

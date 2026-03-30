@@ -1,5 +1,7 @@
 // we have bmps with bits offsets 54 and 138..
-
+// Microsoft bitmap images use 1st quadrant Mathamatical Coordinates
+//  (0,0) is image's lower left corner
+//  (width-1,height-1) is upper right corner
 
 #include "mustbelittleendian.h"
 //only developed for g++ little endian (like Linux PCs)
@@ -53,8 +55,13 @@ CLASSICBMPHEADERS *makeClassicHeaders ( int width, int height );
 // delete P;
 
 typedef struct __attribute__((packed)) FULLBITMAP {
+public:
   const CLASSICBMPHEADERS headers;
   uint8_t bytes[];
+
+  bool drawRect( uint16_t xmin, uint16_t rwidth,
+		uint16_t ymin, uint16_t rheight,
+		uint8_t r, uint8_t g, uint8_t b );
 } FULLBITMAP;
 
 

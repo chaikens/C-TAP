@@ -3,7 +3,8 @@
 #include <errno.h>
 #include <cstring>
 #include <cstdlib>
-
+#include <iostream>
+using namespace std;
 CLASSICBMPHEADERS *makeClassicHeaders( int width, int height)
 {
   CLASSICBMPHEADERS *p = new CLASSICBMPHEADERS;
@@ -90,7 +91,40 @@ void flipClassicBitmap( FULLBITMAP *pbm )
   return;
 }
 
+bool FULLBITMAP::drawRect( uint16_t xmin, uint16_t rwidth,
+			  uint16_t ymin, uint16_t rheight,
+			  uint8_t r, uint8_t g, uint8_t b )
+{ //C++ vs Python reminder in C++, instead of this.classmemname
+  // we code this->classmemname or classmemname
+  uint16_t width  = headers.infoHeader.Width;
+  uint16_t height = headers.infoHeader.Height;
+  if( xmin+rwidth > width ||
+      ymin+rheight > height )
+    {
+      cerr << "FULLBITMAP::drawRect bad dims." << endl;
+      cerr << "Image size:";
+      fprintf(stderr, "width=%u, height=%u\n", width, height);
+      cerr << "Upper Left Corner:";
+      fprintf(stderr, "(%u,%d)\n", xmin, ymin);
+      cerr << "           Lower Right Corner:";
+      fprintf(stderr, "(%u,%u).\n", xmin+rwidth, ymin+rheight);
+      return false;
+    }
 
+  uint8_t *pdata = & bytes[0];
+  for( int x = xmin; x < xmin+rwidth; x++)
+    for( int y = ymin; y < ymin+rheight; y++)
+      {
+	pdata[y*3*width + x*3 + 2] = r;
+	pdata[y*3*width + x*3 + 1] = g;
+	pdata[y*3*width + x*3 + 0] = b;
+      }
+
+  return true;
+}
+
+
+ 
   
   
 
