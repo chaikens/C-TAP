@@ -57,13 +57,19 @@ testbmp : testbmp.cpp bmp.o bmp.h Makefile
 	$(CXX) $(CXXFLAGS)  $< bmp.o -o $@
 	./testbmp
 
-referenceBmp reference.bmp: referenceBmp.cpp bmp.o bmp.h Makefile
+referenceBmp referenceBmp.bmp: referenceBmp.cpp bmp.o bmp.h Makefile
 	$(CXX) $(CXXFLAGS) $< bmp.o -o $@
 	-./referenceBmp
 	-eog referenceBmp.bmp
 
-referenceBmp.yuv : referenceBmp.bmp
-	ffmpeg -hide_banner -y -i refererenceBmp.bmp -pix_fmt yuv420p referenceBmp.yuv &>referenceBmp_bmp_toyuv_ffmpeg.txt
+referenceBmp_ffmpeg.yuv : referenceBmp.bmp
+	ffmpeg -hide_banner -y -i referenceBmp.bmp -pix_fmt yuv420p referenceBmp_ffmpeg.yuv &>referenceBmp_bmp_toyuv_ffmpeg.txt
+
+referenceBmp_yuv_ffmpeg.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp
+	./TestOneYuv2OneBmp 64x32 referenceBmp_ffmpeg.yuv referenceBmp_yuv_ffmpeg.bmp 
+
+referenceBmp_yuv_CTAP.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp
+	./TestOneYuv2OneBmp --fast 64x32 referenceBmp_ffmpeg.yuv referenceBmp_yuv_CTAP.bmp
 
 depend:
 	-gccmakedep *.cpp
