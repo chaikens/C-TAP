@@ -57,10 +57,13 @@ testbmp : testbmp.cpp bmp.o bmp.h Makefile
 	$(CXX) $(CXXFLAGS)  $< bmp.o -o $@
 	./testbmp
 
-referenceBmp: referenceBmp.cpp bmp.o bmp.h Makefile
+referenceBmp reference.bmp: referenceBmp.cpp bmp.o bmp.h Makefile
 	$(CXX) $(CXXFLAGS) $< bmp.o -o $@
 	-./referenceBmp
 	-eog referenceBmp.bmp
+
+referenceBmp.yuv : referenceBmp.bmp
+	ffmpeg -hide_banner -y -i refererenceBmp.bmp -pix_fmt yuv420p referenceBmp.yuv &>referenceBmp_bmp_toyuv_ffmpeg.txt
 
 depend:
 	-gccmakedep *.cpp

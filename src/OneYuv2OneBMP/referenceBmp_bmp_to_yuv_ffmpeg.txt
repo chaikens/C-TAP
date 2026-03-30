@@ -1,0 +1,14 @@
+Input #0, bmp_pipe, from 'referenceBmp.bmp':
+  Duration: N/A, bitrate: N/A
+  Stream #0:0: Video: bmp, bgr24, 64x32, 25 fps, 25 tbr, 25 tbn, 25 tbc
+Stream mapping:
+  Stream #0:0 -> #0:0 (bmp (native) -> rawvideo (native))
+Press [q] to stop, [?] for help
+Output #0, rawvideo, to 'referenceBmp.yuv':
+  Metadata:
+    encoder         : Lavf58.76.100
+  Stream #0:0: Video: rawvideo (I420 / 0x30323449), yuv420p(tv, progressive), 64x32, q=2-31, 614 kb/s, 25 fps, 25 tbn
+    Metadata:
+      encoder         : Lavc58.134.100 rawvideo
+frame=    1 fps=0.0 q=-0.0 size=       3kB time=00:00:00.04 bitrate= 614.4kbits/s speed=N/A    frame=    1 fps=0.0 q=-0.0 Lsize=       3kB time=00:00:00.04 bitrate= 614.4kbits/s speed=33.2x    
+video:3kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000000%
