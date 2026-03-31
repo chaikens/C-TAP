@@ -1,0 +1,36 @@
+Hi Matt,
+
+No hurry; I have enough movie copies to start with and I'm still working (mired?) 
+with YUV conversion.  I can pick the drive up when we meet for a more leisurely time.
+
+I'm going to program the extraction and use of a 2^24 3-byte =(16*3)MB
+table (feasible in 21st century computers!) from ffmpeg's YUV->bmp conversion.
+Yesterday I discovered that ffmpeg's bmp->YUV->bmp composition (over a coarse 8x8x8 grid of
+colors) is not the identity. 
+
+I need to clarify how YUV loses information.  For individual 24bit colors, the YUV <-> RGB conversion
+is 1-1 over a somewhat limited range, due to 8-bit over/under flows, and, I think for some variants, 
+clamping requirements due to YUV's origin in analog color TV signals.  
+
+However, each 2x2 block of even origin contiguous pixel 
+blocks, 24*4=96 bits of data, is coded with 3*8=24 bytes of YUV data.  
+
+Differences in "luma" for pixels are captured with full spatial resolution, but pixels adjacent in 
+a 2x2 block with the same luma might have different rgb combinations.
+
+Note also the Bayer color sensor pattern in digital cameras has twice as many green sensors as either
+reds or blues.  (I think the sensor values are the digital camera RAW files that higher end
+cameras can save.  I don't know all they save for movies.)
+
+The Y value is mostly green; here are two formula variants:
+
+From https://learn.microsoft.com/en-us/windows/win32/medfound/about-yuv-video
+
+new used for HDTV, ITU-R BT.709
+Ypfla = 0.2125*R + 0.7154*G + 0.0721*B
+
+Old std def TV, TU-R BT.601
+YpflaOld = 0.299*R + 0.587*G + 0.114*B
+
+(I see a "tv" annotation in ffmpeg's reports).
+
