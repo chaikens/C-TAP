@@ -23,6 +23,7 @@ If we continue to run 1a on bmp data, a more efficient soln may be better.
 #include <cmath>
 #include "OneYuv2OneBmp.h"
 #include <cstdlib> //for abs()
+#include <iostream>
 
 using namespace std;
 
@@ -368,3 +369,134 @@ int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
 //
   return 0;
 }
+
+int MakeReferenceYUV()
+{
+/*************************************************************** 
+ We compute our YUP I420p Universal Frame, then save or pipe it
+ for ffmpeg to convert it to a Classical .bmp file.
+ We'll have a function to compute from a YUV triple the pixel
+ index corresponding the pixel corresponding to the YUV indices
+ for the pixel in the .bmp file with color correpoinding to the
+ YUV triple.
+
+ Structure of the .bmp representation of the image, with annotations
+ for the YUV indices and values. 
+ (Bmps render upside-down images when the rows 0, 1, ... are rendered 
+ top-to-bottom, so their x (row) and y (column) coordinates follow 
+ mathematicians' 1st quadrant convention.)
+
+     Rows;
+       for iV, all 2^8 Vvalues,
+           for iYh, all 2^4 high order 4-bit components of Yvalues
+              compute a pixel row, row index is 2^4*iV + iYh;  
+                           (to give a total of 2^12 rows);
+                   The Y array indices are identical to pixel indices;
+
+              retrieve, save for row processing (from the correct i? var) 
+                a UorVrow, index iUorVrow every other pixel row
+
+      ---------------------------------------------------------------
+
+      Columns for each row;
+
+              for iU, all 2^8 Uvalues,
+                  for iHl, all 2^4 low order compontents of Yvalues,
+                      retrieve (from the right i? var) and store the Y, U and V value,
+                          whose pixel column index is 2*4*iU + iHl; 
+			  a total 2^8*2^4 such triples;
+
+                          The Y array indices are identical to pixel indices;
+                      
+                          use an UorVcol index, iUorVcol, 
+                              one for every adjacent pair of pixel cols;
+
+
+
+The Y array indices follow the pixel array indices
+       iY = iP = 2^8*2^4*irow + icol
+
+The U or V array is indexed to evenly located 2x2 blocks of pixels
+(so U,V length is (1/4)*nPixels.
+
+
+***************************************************************/ 
+
+      
+ 
+  const size_t pcols = 2<<12;  //number of pixel columns   
+  const size_t rows  = 2<<12;  //number of pixel and byte rows
+  
+  const char outfilename[] = "I420pRef4096x4096Frame.yuv";
+
+
+
+
+  size_t psize = pcols*rows;  //number of pixels
+
+  
+  uint8_t *Y = new uint8_t[psize + psize/4 + psize/4];
+  if( Y == 0 )
+    {
+      cerr << "Failed memory alloc for our huge " <<
+	(psize + psize/4 + psize/4) <<
+	" byte array.";
+      exit (1);
+    }
+  //byte array for Y followed by the rest of YUV data 
+
+  uint8_t *U = Y + psize/4; //contains U array
+  uint8_t *V = U + psize/4; //and V array
+  
+  int pixRowParity = 0;
+  int iUandV = 0;
+
+  int iPix = 0;
+
+  for( int iV = 0; iV < 256; iV++ )
+    { /*
+       */
+      for( int iHh = 0; iHh < 16; iHh++ )
+	{ /*
+	   */
+	  for( int iU = 0; iU < 256; iU++ )
+	    { /*
+	       */
+	      for(int iYl = 0; iYl < 16; iYl++)
+		{ /*
+
+		   */
+		  // end of iYl loop  
+		}
+	      // end of iU loop
+	    }
+	  // end of iU loop
+	}
+      //end of iV loop
+    }
+
+  FILE* fp = fopen(outfilename, "w");
+  if(!fp) {
+    error(1, errno, "Output file %s opening failed.", outfilename);
+  }
+  size_t wret = fwrite( Y, 4096*3, 4096, fp);
+  if( wret != 4096 )
+    {
+      error(1, errno, "Failed or short file %s writing.", outfilename);
+    }
+
+  int cret = fclose(fp);
+  if(cret) {
+    error(1, errno, "Closing of %s failed.", outfilename);
+  }
+
+  return 0;
+
+}
+
+/*
+int main(int argc, char **argv)
+{
+  return MakeReferenceYUV();
+}
+*/

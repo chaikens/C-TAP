@@ -34,3 +34,8 @@ YpflaOld = 0.299*R + 0.587*G + 0.114*B
 
 (I see a "tv" annotation in ffmpeg's reports).
 
+I wrangled YUV and BMP indices all afternoon on paper, and may be
+able go get the right formulas working in the computer soon. 
+1-1 issues are weird..since the 24 bit YUV values depend on the
+pixel's neighbors' rgb values ... Y directly then the
+calc of U and V depends on Y. 
