@@ -394,25 +394,42 @@ int MakeReferenceYUV()
                    The Y array indices are identical to pixel indices;
 
               retrieve, save for row processing (from the correct i? var) 
-                a UorVrow, index iUorVrow every other pixel row
+                a UorVrow, index iUorVrow every other pixel row.
+              The pixel array row index is 2^4*iV + iYh, so the
+                UorV array row index is half-rounded-down 
+                                         = (2^3*iV) + (iYh>>1)
+                 We only need to do the store operation when iHh&0x1==0,
+                 since iV is CONSTANT for each iYh loop index value.
+                
 
       ---------------------------------------------------------------
 
-      Columns for each row;
+      Columns for each row;  iV and iYh are constant over a row, 
+                 and a row of pixel's length is 2^12, so the
+        Y linear index is 
+           (2^12)*(2^4*iV + iYh) + (the column index) we'll see below.
+   
+        The UorV linear index is 
+           ((2^12)/2)*(2^4iV + iYh) + floor((the column index)/2),
+           need used only when (the column index) is even. 
 
               for iU, all 2^8 Uvalues,
                   for iHl, all 2^4 low order compontents of Yvalues,
                       retrieve (from the right i? var) and store the Y, U and V value,
                           whose pixel column index is 2*4*iU + iHl; 
 			  a total 2^8*2^4 such triples;
+                          Result: the Y linear index=(2^12)*(2^4*iV + iYh) + 2*4*iU + iHl
 
                           The Y array indices are identical to pixel indices;
                       
                           use an UorVcol index, iUorVcol, 
                               one for every adjacent pair of pixel cols;
-
-
-
+                            half of 2*4*iU + iHl rounded down is
+                                      4*iU + iHl>>1, use only when iH1&0x1==0
+                          so the linear UorV index is:
+                              ((2^12)/2)*(2^4*iV + iYh) + 4*iU + iHl>>1
+                             to be used only when iHl&0x1==0.
+                            
 The Y array indices follow the pixel array indices
        iY = iP = 2^8*2^4*irow + icol
 
@@ -421,16 +438,11 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 
 
 ***************************************************************/ 
-
-      
  
-  const size_t pcols = 2<<12;  //number of pixel columns   
-  const size_t rows  = 2<<12;  //number of pixel and byte rows
+  const size_t pcols = 2<<12;  //4096, number of pixel columns   
+  const size_t rows  = 2<<12;  //4096, number of pixel (and bmp) rows
   
   const char outfilename[] = "I420pRef4096x4096Frame.yuv";
-
-
-
 
   size_t psize = pcols*rows;  //number of pixels
 
@@ -438,10 +450,8 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
   uint8_t *Y = new uint8_t[psize + psize/4 + psize/4];
   if( Y == 0 )
     {
-      cerr << "Failed memory alloc for our huge " <<
-	(psize + psize/4 + psize/4) <<
-	" byte array.";
-      exit (1);
+      error(1, errno, "Failed mem alloc for the %ld byte array.",
+	    (psize + psize/4 + psize/4));
     }
   //byte array for Y followed by the rest of YUV data 
 
@@ -453,19 +463,29 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 
   int iPix = 0;
 
-  for( int iV = 0; iV < 256; iV++ )
+  for( int ZiV = 0; ZiV <= 255; ZiV++ )
     { /*
        */
-      for( int iHh = 0; iHh < 16; iHh++ )
+      uint8_t iV = (uint8_t) ZiV;
+      for( int ZiYh = 0; ZiYh < 16; ZiYh++ )
 	{ /*
 	   */
-	  for( int iU = 0; iU < 256; iU++ )
+	  uint8_t iYh = (uint8_t) ZiYh;
+	  for( int ZiU = 0; ZiU < 255; ZiU++ )
 	    { /*
 	       */
-	      for(int iYl = 0; iYl < 16; iYl++)
+	      uint8_t iU = (uint8_t) ZiU;
+	      for(int ZiYl = 0; ZiYl < 16; ZiYl++)
 		{ /*
 
 		   */
+		  uint8_t iYl = (uint8_t) ZiYl;
+		  Y[4096*(16*iV + (iYh<<4)) + 8*iU + iYl] = iYh<<4 + iYl;
+		  if( (iYh&0x1==0) && (iYl&0x1==0) )
+		    {
+		      U[2048*(8*iV + iYh)+ 4*iU + iYl] = iU;
+		      V[2048*(8*iV + iYh)+ 4*iU + iYl] = iV;
+		    }
 		  // end of iYl loop  
 		}
 	      // end of iU loop

@@ -6,6 +6,7 @@ progs : random_image TestOneYuv2OneBmp analyzeBMP
 
 CXXFLAGS = -g
 CFLAGS   = -g
+PATH     := .:$(PATH)
 
 random_image: random_image.cpp bmp.o
 	$(CXX) $(CXXFLAGS)  $^ -o $@
@@ -50,7 +51,7 @@ Test: TestOneFrame.yuv TestOneYuv2OneBmp Makefile
 	eog OldTestResult.bmp FastTestResult.bmp
 .PHONY : Test
 
-MakeBigReferenceYUV: makeBigReferenceYUV.cpp OneYuv2OneBmp.o
+makeBigReferenceYUV: makeBigReferenceYUV.cpp OneYuv2OneBmp.o
 	$(CXX) $(CXXFLAGS) makeBigReferenceYUV.cpp OneYuv2OneBmp.o -o makeBigReferenceYUV
 
 
@@ -74,6 +75,12 @@ referenceBmp_yuv_ffmpeg.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp
 
 referenceBmp_yuv_CTAP.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp
 	./TestOneYuv2OneBmp --fast 64x32 referenceBmp_ffmpeg.yuv referenceBmp_yuv_CTAP.bmp
+
+I420pRef4096x4096Frame.yuv : makeBigReferenceYUV
+	makeBigReferenceYUV
+
+I420pRef4096x4096Frame.bmp : I420pRef4096x4096Frame.yuv makeBigReferenceYUV
+	ffmpeg -hide_banner -y -an -video_size 4096x4096 -i I420pRef4096x4096Frame.yuv -frames:v 1 I420pRef4096x4096Frame.bmp
 
 depend:
 	-gccmakedep *.cpp
