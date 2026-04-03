@@ -463,29 +463,31 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 
   int iPix = 0;
 
-  for( int ZiV = 0; ZiV <= 255; ZiV++ )
+  for( int iV = 0; iV < 256; iV++ )
     { /*
        */
-      uint8_t iV = (uint8_t) ZiV;
-      for( int ZiYh = 0; ZiYh < 16; ZiYh++ )
+      for( int iYh = 0; iYh < 16; iYh++ )
 	{ /*
 	   */
-	  uint8_t iYh = (uint8_t) ZiYh;
-	  for( int ZiU = 0; ZiU < 255; ZiU++ )
+	  for( int iU = 0; iU < 256; iU++ )
 	    { /*
 	       */
-	      uint8_t iU = (uint8_t) ZiU;
-	      for(int ZiYl = 0; ZiYl < 16; ZiYl++)
+	      for(int iYl = 0; iYl < 16; iYl++)
 		{ /*
 
 		   */
-		  uint8_t iYl = (uint8_t) ZiYl;
-		  Y[4096*(16*iV + (iYh<<4)) + 8*iU + iYl] = iYh<<4 + iYl;
-		  if( (iYh&0x1==0) && (iYl&0x1==0) )
+		  if( iV < 12 && iU < 12)
 		    {
-		      U[2048*(8*iV + iYh)+ 4*iU + iYl] = iU;
-		      V[2048*(8*iV + iYh)+ 4*iU + iYl] = iV;
+		      printf("iV=%d iYh=%d iU=%d iYl=%d "
+			     "Yindex=%d \n", iV, iYh, iU, iYl,
+			     (4096*(16*iV + (iYh)) + 16*iU + iYl));
 		    }
+		  Y[4096*(16*iV + (iYh)) + 16*iU + iYl] = iYh<<4 + iYl;
+		  //if( (iYh&0x1==0) && (iYl&0x1==0) )
+		  //{
+		  //  U[2048*(16*iV + iYh)+ 8*iU + iYl>>1] = iU;
+		  //    V[2048*(16*iV + iYh)+ 8*iU + iYl>>1] = iV;
+		  //  }
 		  // end of iYl loop  
 		}
 	      // end of iU loop
