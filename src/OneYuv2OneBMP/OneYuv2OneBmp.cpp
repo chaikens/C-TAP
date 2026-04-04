@@ -439,23 +439,25 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 
 ***************************************************************/ 
  
-  const size_t pcols = 2<<12;  //4096, number of pixel columns   
-  const size_t rows  = 2<<12;  //4096, number of pixel (and bmp) rows
+  const size_t pcols = 2<<(12-1);  //4096, 0xnumber of pixel columns   
+  const size_t rows  = 2<<(12-1);  //4096, number of pixel (and bmp) rows
   
   const char outfilename[] = "I420pRef4096x4096Frame.yuv";
 
   size_t psize = pcols*rows;  //number of pixels
 
-  
-  uint8_t *Y = new uint8_t[psize + psize/4 + psize/4];
+  printf("number of pixels=0x%lx\n", psize);
+  printf("yuv file size=0x%lx\n",psize + psize/4 + psize/4);
+  size_t yuvFileSize = psize + psize/4 + psize/4;
+  uint8_t *Y = new uint8_t[yuvFileSize];
   if( Y == 0 )
     {
       error(1, errno, "Failed mem alloc for the %ld byte array.",
-	    (psize + psize/4 + psize/4));
+	    (yuvFileSize));
     }
   //byte array for Y followed by the rest of YUV data 
 
-  uint8_t *U = Y + psize/4; //contains U array
+  uint8_t *U = Y + psize; //contains U array
   uint8_t *V = U + psize/4; //and V array
   
   int pixRowParity = 0;
@@ -476,19 +478,27 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 		{ /*
 
 		   */
-		  if( iV < 12 && iU < 12)
-		    {
-		      printf("iV=%d iYh=%d iU=%d iYl=%d "
-			     "Yindex=%d \n", iV, iYh, iU, iYl,
-			     (4096*(16*iV + (iYh)) + 16*iU + iYl));
-		    }
-		  Y[4096*(16*iV + (iYh)) + 16*iU + iYl] = iYh<<4 + iYl;
-		  //if( (iYh&0x1==0) && (iYl&0x1==0) )
+		  iPix++;
+		  //if( iV < 12 && iU < 12)
 		  //{
-		  //  U[2048*(16*iV + iYh)+ 8*iU + iYl>>1] = iU;
-		  //    V[2048*(16*iV + iYh)+ 8*iU + iYl>>1] = iV;
-		  //  }
-		  // end of iYl loop  
+		  //  printf("iV=%d iYh=%d iU=%d iYl=%d "
+		  //	     "Y[%d]=%d \n", iV, iYh, iU, iYl,
+		  //	     (4096*(16*iV + (iYh)) + 16*iU + iYl),
+		  //	     (iYh<<4) + iYl);
+		  //}
+		  Y[4096*(16*iV + (iYh)) + 16*iU + iYl] = (iYh<<4) + iYl;
+		  if( ((iYh & 0x1)==0) && ((iYl & 0x1)==0) )
+		  {
+		    size_t where = 1024*(16*iV + iYh)+ 8*iU + (iYl>>1);
+		    // had been 2048
+		    // had been 8, is this correct?----^ 
+		    assert( where < psize/4 );
+		    U[where] = iU;
+		    V[where] = iV;
+		    //assert( iU == 0 );
+		    //assert( iV == 0 );
+		  }
+		 //end of iYl loop  
 		}
 	      // end of iU loop
 	    }
@@ -496,13 +506,14 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 	}
       //end of iV loop
     }
+  assert(iPix == 4096*4096);
 
   FILE* fp = fopen(outfilename, "w");
   if(!fp) {
     error(1, errno, "Output file %s opening failed.", outfilename);
   }
-  size_t wret = fwrite( Y, 4096*3, 4096, fp);
-  if( wret != 4096 )
+  size_t wret = fwrite( Y, yuvFileSize, 1, fp);
+  if( wret != 1 )
     {
       error(1, errno, "Failed or short file %s writing.", outfilename);
     }
