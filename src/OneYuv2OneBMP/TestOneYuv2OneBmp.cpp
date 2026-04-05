@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "OneYuv2OneBmp.h"
@@ -12,27 +13,43 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-const char *usage = "TestOneYuv2OneBmp [--fast] wwwwxhhhh infile.yuv outfile.bmp";
+const char *usage = "TestOneYuv2OneBmp [--table|--formula] wwwwxhhhh infile.yuv outfile.bmp"
+  "\nDefault is --table";
 
 int main(int argc, char **argv)
 {
+  //options processing first
+  int useformula = 0; /* default is to use the table */
+  int digit_optind = 0;
+  static struct option long_options[] = {
+    {"table",   no_argument, &useformula, 0 },
+    {"formula", no_argument, &useformula, 1 },
+    {0, 0, 0, 0}
+  };
+
+  while( -1 != getopt_long( argc, argv,	 /* optstring */ "",
+			    long_options,
+			    /* &longindex */ 0 ) )
+    ;
+  
+  
   unsigned int width;
   unsigned int height;
   char *YUVinFilename;
   char *BMPinFilename;
   char xTent;
   
-  if( argc < 4 )
-    { error(1, 0, "missing args\n%s", usage); }
-
-  bool fast;
-  
-  if( argc == 5 ) {fast = true; argv++;}
-  else {fast = false;}
-  
   if( 3 != sscanf( argv[1], "%u%c%u", &width, &xTent, &height )||
       xTent != 'x' )
     { error(1, 0, "Bad <width>x<height> arg. %s", usage); }
+
+  if( !argv[2] || argv[2][0]=='-' ) {
+    error(1, 0, "Bad infile.yuv filename.");
+  }
+
+  if( !argv[3] || argv[3][0]=='-' ) {
+       error(1, 0, "Bad outfile.bmp filename.");
+  } 
 
   YUVinFilename = argv[2];
   BMPinFilename = argv[3];
@@ -64,15 +81,15 @@ int main(int argc, char **argv)
 
   int funret;
   
-  if(fast)
+  if(useformula)
     {
       
-      funret = OneYuv2BmpDataFast( width, height, pyuv, pbmp+54 );
+      funret = OneYuv2OneBmpByFormula( width, height, pyuv, pbmp+54 );
       flipClassicBitmap((FULLBITMAP *) pbmp);
     }
   else
     {
-      funret =     OneYuv2OneBmp( width, height, pyuv, pbmp );
+      funret = OneYuv2OneBmpByTable( width, height, pyuv, pbmp );
       //this old function will remake the header, that doesn't hurt.
       //printf("OneYuv2OneBmp ret %d \n", funret);
     }

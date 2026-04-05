@@ -31,12 +31,12 @@ using namespace std;
 //
 // Let size=width*height.
 // storeYsInBmp( width, height, YArray, pBMbytes);
-//  Temporarily store size Y values in the 2nd byte of each of size rgb triples.
+//  Temporarily store size Y values in the 2nd byte of each of size bgr triples.
 //
 // storeUsInBmp( width, height, UArray, pBMbytes);
 //    with full yuv in mem at YArray, ^---= YArray + width*height
 //  Temporarily store given size/4 U values, each 4 times, each time
-//  in the 1st byte of a rgb triple.  The 4 triples correspond to a
+//  in the 1st byte of a bgr triple.  The 4 triples correspond to a
 //  2x2 square block of pixels.
 //
 // useVsFinishBmp( width, height, VArray, pBMbytes);
@@ -55,7 +55,7 @@ static inline void storeYsInBmp( int width, int height,
   width = abs(width); height = abs(height);
   for (int i = 0; i < width*height; i++) {
     //i indexes Y values
-    pBMbytes[ 3*i + 1 ] = pYs[i];  //one green rgb[1] val per Y value 
+    pBMbytes[ 3*i + 1 ] = pYs[i];  //one green bgr[1] val per Y value 
   }
   return;
 }
@@ -142,8 +142,13 @@ static inline void storeUsInBmp( int width, int height,
   }
   return;
 }
-
-typedef struct rgbtriple { uint8_t tr; uint8_t tg; uint8_t tb; } rgbtriple;
+// bgr ordering, in reverence to Microsoft
+typedef struct __attribute__((packed)) bgrtriple
+{ public:
+  uint8_t tb; uint8_t tg; uint8_t tr;
+  bgrtriple(uint8_t ib, uint8_t ig, uint8_t ir) :
+    tb(ib), tg(ig), tr(ir) {  }
+} bgrtriple;
 
 static inline uint8_t uint8clamp( float x )
 /* Please check if stricter clamping is needed */
@@ -161,16 +166,15 @@ static inline uint8_t uint8clamp( float x )
 #include "yuv2bmpConstants.cpp"
   // defines b, g, r and {b,g,r}{y,u,v,1} constants
 
-static inline rgbtriple tripleFromYUV( uint8_t y, uint8_t u, uint8_t v )
+static inline bgrtriple tripleFromYUVByFla( uint8_t y, uint8_t u, uint8_t v )
 {
-  rgbtriple ANS;
-  ANS.tr =  uint8clamp  (ry*y + ru*u + rv*v + r1);
-  ANS.tg =  uint8clamp  (gy*y + gu*u + gv*v + g1);
-  ANS.tb =  uint8clamp  (by*y + bu*u + bv*v + b1);
-  return ANS;
+  return bgrtriple( uint8clamp (by*y + bu*u + bv*v +b1), //blue
+	      uint8clamp (gy*y + gu*u + gv*v +g1), //green
+	      uint8clamp (gy*y + gu*u + gv*v +g1) //green
+			     );
 }
 
-static inline void useVsFinishBmp( int width, int height,
+static inline void useVsFinishBmpByFla( int width, int height,
 				   const uint8_t *pVs, uint8_t *pBMbytes)
 {
   width = abs(width); height = abs(height);
@@ -179,7 +183,7 @@ static inline void useVsFinishBmp( int width, int height,
   uint8_t commonU; //For our usually 4 pixels
   uint8_t commonV; //For our usually 4 pixels
   
-  rgbtriple T;
+  bgrtriple T(0,0,0);
   
   /*  Not only does the macro version not compile, but its application code below is WRONG. 
     UVinBmpMainLoop (
@@ -213,7 +217,7 @@ static inline void useVsFinishBmp( int width, int height,
   int nPixRowsToGo = height; /*Count down.  We go down two at a time */ 
   /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
   int iUV = 0; /* index into the V (for us here) uint8_t array in the YUV file*/
-               /* We stored the correponding U values in the RGB array so that we
+               /* We stored the correponding U values in the BGR array so that we
                   might process the Y, then U, then V values in a pipeline.  */
   int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
   while( nPixRowsToGo > 0 )                                              
@@ -227,27 +231,27 @@ static inline void useVsFinishBmp( int width, int height,
 	   commonU = pBMbytes[ iByte0Pix ];
 	   commonV = pVs[iUV];
 
-	   T = tripleFromYUV( pBMbytes[iByte0Pix + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + r ] = T.tr;
-	   pBMbytes[ iByte0Pix + g ] = T.tg;
-	   pBMbytes[ iByte0Pix + b ] = T.tb;
+	   T = tripleFromYUVByFla( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
 
-	   T = tripleFromYUV( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 3 + r ] = T.tr;
-	   pBMbytes[ iByte0Pix + 3 + g ] = T.tg;
-	   pBMbytes[ iByte0Pix + 3 + b ] = T.tb;
+	   T = tripleFromYUVByFla( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
 	 }
 	  { //second of the adjacent pair of rows
 	    int iByte0Pix = 3*width*(row+1) + 3*x;
-	    T = tripleFromYUV( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
-	    pBMbytes[ iByte0Pix + r ] = T.tr;
-	    pBMbytes[ iByte0Pix + g ] = T.tg;
-	    pBMbytes[ iByte0Pix + b ] = T.tb;
+	    T = tripleFromYUVByFla( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	    pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	    pBMbytes[ iByte0Pix + 2 ] = T.tr;
 
-	    T = tripleFromYUV( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	    pBMbytes[ iByte0Pix + 3 + r ] = T.tr;
-	    pBMbytes[ iByte0Pix + 3 + g ] = T.tg;
-	    pBMbytes[ iByte0Pix + 3 + b ] = T.tb;
+	    T = tripleFromYUVByFla( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	    pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	    pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
 	 }
 	iUV++;
 	}
@@ -262,15 +266,164 @@ static inline void useVsFinishBmp( int width, int height,
 	   commonU = pBMbytes[ iByte0Pix ]; 
 	   commonV = pVs[iUV];
 
-	   T = tripleFromYUV( pBMbytes[iByte0Pix + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + r ] = T.tr;
-	   pBMbytes[ iByte0Pix + g ] = T.tg;
-	   pBMbytes[ iByte0Pix + b ] = T.tb;
+	   T = tripleFromYUVByFla( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
 
-	   T = tripleFromYUV( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 3 + r ] = T.tr;
-	   pBMbytes[ iByte0Pix + 3 + g ] = T.tg;
-	   pBMbytes[ iByte0Pix + 3 + b ] = T.tb;
+	   T = tripleFromYUVByFla( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	  }
+	  iUV++;
+	}
+	row += 1;
+	nPixRowsToGo -= 1;
+      }
+    }
+  return ;
+}
+
+
+//globals for YUV->BGR table.  
+uint8_t inMemReferenceBMPFile[54 + 3*4096*4096];
+uint8_t *inMemReferenceBGRs    = 0;
+const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
+
+bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
+{
+  uint8_t *pbgr = inMemReferenceBGRs+(
+    (3*4096/*bytes per row*/)*(16/*Yhs per V*/*V  + (Y>>4)/*yh*/) +  /*Row of GRB byte array*/
+    (3/*bytes per column*/  )*( 16/*Yhs per U*/*U + (Y&0xFF)    )    /*Col of GRB byte array*/
+				      ); /* compute mem addr */
+  return bgrtriple( pbgr[0] /* blue   */,
+		    pbgr[1] /* green  */,
+		    pbgr[2] /* red    */); /* retrieve from mem table */
+}
+
+
+uint8_t *MemReferenceBGRTable()
+{
+  if( inMemReferenceBGRs ) return inMemReferenceBGRs;
+
+  
+  system( "ffmpeg -hide_banner -y -an -video_size 4096x4096 -i I420pRef4096x4096Frame.yuv  -frames:v 1 I420pRef4096x4096Frame.bmp" );
+  // Ugly, inflexible, possibly inconsistent hack of a lazy programmer above.
+  FILE* bmpfp = fopen("I420pRef4096x4096Frame.bmp", "r");
+  size_t retv = fread(inMemReferenceBMPFile, sizeof(inMemReferenceBMPFile), 1, bmpfp);
+  if( retv != 1 )
+    {
+      error(1, errno, "OneYuv2OneBmp:MemReferenceBGRTable() failed to read I420pRef4096x4096Frame.bmp");
+    }
+  inMemReferenceBGRs = inMemReferenceBMPFile + 54;  //I know header length!
+  // see if it looks good
+  // for( int i = 0; i < 500; i++ )  printf("%d ", inMemReferenceBGRs[i]);
+  
+  return inMemReferenceBGRs;
+}
+  
+static inline void useVsFinishBmpByTable( int width, int height,
+				   const uint8_t *pVs, uint8_t *pBMbytes)
+{
+  width = abs(width); height = abs(height);
+  int halfwidth = width/2;
+
+  uint8_t commonU; //For our usually 4 pixels
+  uint8_t commonV; //For our usually 4 pixels
+  
+  bgrtriple T(0,0,0);
+  
+  /*  Not only does the macro version not compile, but its application code below is WRONG. 
+    UVinBmpMainLoop (
+		   { // common{U,V} will be used in 2nd code arg.
+		     commonU = pBMbytes[ 3*4*iUV ];
+		     commonV = pVs[iUV];
+
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 1], commonU, commonV); 
+		     pBMbytes[ 3*2*iUV + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + b ] = T.tb;
+
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3 + 1], commonU, commonV); 
+		     pBMbytes[ 3*2*iUV + 3 + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3 + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3 + b ] = T.tb;
+		   },
+		   {
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 1], commonU, commonV);
+		     pBMbytes[ 3*2*iUV + 3*width + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3*width + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3*width + b ] = T.tb;
+
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 3 + 1], commonU, commonV);
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + b ] = T.tb;
+		   }
+		   )
+  */
+  int nPixRowsToGo = height; /*Count down.  We go down two at a time */ 
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
+  int iUV = 0; /* index into the V (for us here) uint8_t array in the YUV file*/
+               /* We stored the correponding U values in the BGR array so that we
+                  might process the Y, then U, then V values in a pipeline.  */
+  int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
+  while( nPixRowsToGo > 0 )                                              
+    {                                                                    
+      if( nPixRowsToGo != 1 ) {                                          
+	for( int x = 0; x <= width; x += 2 ) {
+	  /* 4 saves: */                                                 
+	  { //first of an adjacent pair of rows
+	    int iByte0Pix = 3*width*row + 3*x;
+	   // common{U,V} will be used in 2nd code arg.
+	   commonU = pBMbytes[ iByte0Pix ];
+	   commonV = pVs[iUV];
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	 }
+	  { //second of the adjacent pair of rows
+	    int iByte0Pix = 3*width*(row+1) + 3*x;
+	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	    pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	    pBMbytes[ iByte0Pix + 2 ] = T.tr;
+
+	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	    pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	    pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	 }
+	iUV++;
+	}
+	row += 2;
+	nPixRowsToGo -= 2;                                               
+      }                                                                  
+      else {
+	for( int x = 0; x <= width; x += 2 ) {                     
+	  /* 2 saves: */                                                 
+	  { int iByte0Pix = 3*width*row + 3*x;
+	   // common{U,V} will be used in 2nd code arg.
+	   commonU = pBMbytes[ iByte0Pix ]; 
+	   commonV = pVs[iUV];
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
 	  }
 	  iUV++;
 	}
@@ -342,7 +495,7 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
 }
 
 
-int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
+int OneYuv2OneBmpByFormula(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMdata)
   /* YUVin points to the YUV I420p data in memory.
    BMdata points to memory for the bitmap byte triples.
@@ -352,16 +505,16 @@ int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
 //
 // Let size=width*height.
   storeYsInBmp( (int) width, (int) height, YUVin, BMdata);
-//  Temporarily store size Y values in the 2nd byte of each of size rgb triples.
+//  Temporarily store size Y values in the 2nd byte of each of size bgr triples.
 //
   storeUsInBmp( (int) width, (int) height, YUVin+width*height, BMdata);
 //    with full yuv in mem at YArray,         ^---= YArray + width*height
-//  Temporarily store given size/4 U values in 1st byte of each of size rgb triples. 
+//  Temporarily store given size/4 U values in 1st byte of each of size bgr triples. 
 //
-  useVsFinishBmp( (int) width, (int) height, YUVin+width*height+(width/2)*(height/2), BMdata);
+  useVsFinishBmpByFla( (int) width, (int) height, YUVin+width*height+(width/2)*(height/2), BMdata);
 //    and then also                          ^--== YArray + width*height+(1/4)*width*height 
 //  Use the stored Ys and Us, and the last size/4 V values,
-//  to compute the size rgb BMP triples were are converting to.
+//  to compute the size bgr BMP bgr triples were are converting to.
 //
 // This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
 // supporting a pipeline to process a sequence of raw image frames.
@@ -369,7 +522,6 @@ int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
 //
   return 0;
 }
-
 int MakeReferenceYUV()
 {
 /*************************************************************** 
@@ -442,7 +594,8 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
   const size_t pcols = 2<<(12-1);  //4096, 0xnumber of pixel columns   
   const size_t rows  = 2<<(12-1);  //4096, number of pixel (and bmp) rows
   
-  const char outfilename[] = "I420pRef4096x4096Frame.yuv";
+  // Unlike in newer langs, globals must be declared outside outside fns.
+  // extern const char RefYUVFileName[];
 
   size_t psize = pcols*rows;  //number of pixels
 
@@ -457,8 +610,8 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
     }
   //byte array for Y followed by the rest of YUV data 
 
-  uint8_t *U = Y + psize; //contains U array
-  uint8_t *V = U + psize/4; //and V array
+  uint8_t *U = Y + psize;   //U and V arrays are after the psize'd U array.
+  uint8_t *V = U + psize/4; //V array is only psize/4.  It's the last in file.
   
   int pixRowParity = 0;
   int iUandV = 0;
@@ -486,6 +639,8 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 		  //	     (4096*(16*iV + (iYh)) + 16*iU + iYl),
 		  //	     (iYh<<4) + iYl);
 		  //}
+		  /* C/C++ bit shift >> is VERY LOW PRECEDENCE!!
+		     resulting in very long time to fix bugs. */
 		  Y[4096*(16*iV + (iYh)) + 16*iU + iYl] = (iYh<<4) + iYl;
 		  if( ((iYh & 0x1)==0) && ((iYl & 0x1)==0) )
 		  {
@@ -508,28 +663,52 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
     }
   assert(iPix == 4096*4096);
 
-  FILE* fp = fopen(outfilename, "w");
+  FILE* fp = fopen(RefYUVFileName, "w");
   if(!fp) {
-    error(1, errno, "Output file %s opening failed.", outfilename);
+    error(1, errno, "Output file %s opening failed.", RefYUVFileName);
   }
   size_t wret = fwrite( Y, yuvFileSize, 1, fp);
   if( wret != 1 )
     {
-      error(1, errno, "Failed or short file %s writing.", outfilename);
+      error(1, errno, "Failed or short file %s writing.", RefYUVFileName);
     }
 
   int cret = fclose(fp);
   if(cret) {
-    error(1, errno, "Closing of %s failed.", outfilename);
+    error(1, errno, "Closing of %s failed.", RefYUVFileName);
   }
 
   return 0;
 
 }
 
-/*
-int main(int argc, char **argv)
+int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
+		  const uint8_t *YUVin, uint8_t *BMdata)
+  /* YUVin points to the YUV I420p data in memory.
+   BMdata points to memory for the bitmap byte triples.
+  */
 {
-  return MakeReferenceYUV();
+  MemReferenceBGRTable();
+//
+//
+// Let size=width*height.
+  storeYsInBmp( (int) width, (int) height, YUVin, BMdata);
+//  Temporarily store size Y values in the 2nd byte of each of size bgr triples.
+//
+  storeUsInBmp( (int) width, (int) height, YUVin+width*height, BMdata);
+//    with full yuv in mem at YArray,         ^---= YArray + width*height
+//  Temporarily store given size/4 U values in 1st byte of each of size bgr triples. 
+//
+  useVsFinishBmpByTable( (int) width, (int) height, YUVin+width*height+(width/2)*(height/2), BMdata);
+//    and then also                          ^--== YArray + width*height+(1/4)*width*height 
+//  Use the stored Ys and Us, and the last size/4 V values,
+//  to compute the size bgr BMP bgr triples were are converting to.
+//
+// This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
+// supporting a pipeline to process a sequence of raw image frames.
+//
+//
+  return 0;
 }
-*/
+
+

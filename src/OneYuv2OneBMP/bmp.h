@@ -158,3 +158,14 @@ typedef struct __attribute__((packed)) BITMAPV5HEADER {
   uint32_t        bV5ProfileSize;
   uint32_t        bV5Reserved;
 } BITMAPV5HEADER;
+
+/*  maybe later..
+class  __attribute__((packed)) GBR
+{
+ public:
+  uint8_t gbyte;
+  uint8_t bbyte;
+  uint8_t rbyte;
+  GBR( uint8_t Y, uint8_t U; uint8_t V );
+};
+*/

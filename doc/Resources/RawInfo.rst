@@ -14,3 +14,9 @@ https://learn.microsoft.com/en-us/windows/win32/medfound/about-yuv-video
 
 https://learn.microsoft.com/en-us/windows/win32/medfound/recommended-8-bit-yuv-formats-for-video-rendering
 
+`GIMP yuv<->rgb plugin <https://github.com/rpeyron/plugin-gimp-yuv>` The source code
+has several formula alternatives.
+(I tried but my gimp doesn't show the plugin..something's wrong.)
+
+
+

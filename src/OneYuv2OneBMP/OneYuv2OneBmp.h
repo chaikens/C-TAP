@@ -34,7 +34,9 @@ static inline void storeYsInBmp( int width, int height,
 				const uint8_t *pYs, uint8_t *pBMbytes);
 static inline void storeUsInBmp( int width, int height,
 				const uint8_t *pUs, uint8_t *pBMbytes);
-static inline void useVsFinishBmp( int width, int height,
+static inline void useVsFinishBmpByFla( int width, int height,
+				   const uint8_t *pVs, uint8_t *pBMbytes);
+static inline void useVsFinishBmpByTable( int width, int height,
 				   const uint8_t *pVs, uint8_t *pBMbytes);
 
 inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
@@ -72,15 +74,11 @@ inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
   
 }
 
-int OneYuv2OneBmp(unsigned int width, unsigned int height,
+int OneYuv2OneBmpByFormula(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMPout);
-int OneYuv2OneBmpFast(unsigned int width, unsigned int height,
+int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMPout);
-int OneYuv2BmpDataFast(unsigned int width, unsigned int height,
-		       const uint8_t *YUVin, uint8_t *BMdata);
-  /* YUVin points to the YUV I420p data in memory.
-   BMdata points to memory for the bitmap byte triples.
-  */
+
 
 
   

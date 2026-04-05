@@ -11,7 +11,7 @@ PATH     := .:$(PATH)
 random_image: random_image.cpp bmp.o
 	$(CXX) $(CXXFLAGS)  $^ -o $@
 
-bmp.o : bmp.cpp
+bmp.o : bmp.cpp bmp.h Makefile
 	$(CXX) $(CXXFLAGS) -c $<
 
 TestOneYuv2OneBmp: bmp.o OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
@@ -47,15 +47,15 @@ install: OneYuv2OneBmp.o
 
 Test: TestOneFrame.yuv TestOneYuv2OneBmp Makefile
 	-./TestOneYuv2OneBmp 3840x2160 TestOneFrame.yuv OldTestResult.bmp
-	-./TestOneYuv2OneBmp --fast 3840x2160 TestOneFrame.yuv FastTestResult.bmp
-	eog OldTestResult.bmp FastTestResult.bmp
+	-./TestOneYuv2OneBmp --table 3840x2160 TestOneFrame.yuv TableTestResult.bmp
+	eog OldTestResult.bmp TableTestResult.bmp
 .PHONY : Test
 
-makeBigReferenceYUV: makeBigReferenceYUV.cpp OneYuv2OneBmp.o
+makeBigReferenceYUV: makeBigReferenceYUV.cpp OneYuv2OneBmp.o Makefile
 	$(CXX) $(CXXFLAGS) makeBigReferenceYUV.cpp OneYuv2OneBmp.o -o makeBigReferenceYUV
 
 
-TestOneFrame.yuv :
+TestOneFrame.yuv : Makefile
 	ffmpeg -hide_banner -y -i ../../DroneCalib1.mp4 -frames:v 1  TestOneFrame.yuv
 
 testbmp : testbmp.cpp bmp.o bmp.h Makefile
@@ -67,19 +67,19 @@ referenceBmp referenceBmp.bmp: referenceBmp.cpp bmp.o bmp.h Makefile
 	-./referenceBmp
 	-eog referenceBmp.bmp
 
-referenceBmp_ffmpeg.yuv : referenceBmp.bmp
+referenceBmp_ffmpeg.yuv : referenceBmp.bmp Makefile
 	ffmpeg -hide_banner -y -i referenceBmp.bmp -pix_fmt yuv420p referenceBmp_ffmpeg.yuv &>referenceBmp_bmp_toyuv_ffmpeg.txt
 
-referenceBmp_yuv_ffmpeg.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp
+referenceBmp_yuv_ffmpeg.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp Makefile
 	./TestOneYuv2OneBmp 64x32 referenceBmp_ffmpeg.yuv referenceBmp_yuv_ffmpeg.bmp 
 
-referenceBmp_yuv_CTAP.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp
+referenceBmp_yuv_CTAP.bmp : referenceBmp_ffmpeg.yuv TestOneYuv2OneBmp Makefile
 	./TestOneYuv2OneBmp --fast 64x32 referenceBmp_ffmpeg.yuv referenceBmp_yuv_CTAP.bmp
 
-I420pRef4096x4096Frame.yuv : makeBigReferenceYUV
+I420pRef4096x4096Frame.yuv : makeBigReferenceYUV Makefile
 	makeBigReferenceYUV
 
-I420pRef4096x4096Frame.bmp : I420pRef4096x4096Frame.yuv makeBigReferenceYUV
+I420pRef4096x4096Frame.bmp : I420pRef4096x4096Frame.yuv makeBigReferenceYUV Makefile
 	ffmpeg -hide_banner -y -an -video_size 4096x4096 -i I420pRef4096x4096Frame.yuv -frames:v 1 I420pRef4096x4096Frame.bmp
 
 depend:
@@ -458,8 +458,9 @@ TestOneYuv2OneBmp.o: TestOneYuv2OneBmp.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
- /usr/include/linux/close_range.h /usr/include/c++/11/stdlib.h \
- /usr/include/c++/11/cstdlib \
+ /usr/include/linux/close_range.h /usr/include/getopt.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_ext.h \
+ /usr/include/c++/11/stdlib.h /usr/include/c++/11/cstdlib \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h \
