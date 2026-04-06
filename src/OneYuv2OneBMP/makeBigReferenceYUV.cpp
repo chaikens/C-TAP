@@ -1,7 +1,8 @@
 
 int MakeReferenceYUV();
-
+void *MemReferenceBGRTable();
 int main(int argc, char **argv)
 {
-  return MakeReferenceYUV();
+  MakeReferenceYUV();
+  MemReferenceBGRTable();
 }
