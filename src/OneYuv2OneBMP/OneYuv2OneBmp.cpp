@@ -28,6 +28,8 @@ If we continue to run 1a on bmp data, a more efficient soln may be better.
 
 #define myerror(message) {fprintf(stderr, "OneYuv2OneBmp.cpp error: %s \n", message); assert(0); }
 
+
+//for debugging bug of too-short yuv stdin stream when redirected from a file.
 #define FGETC(FP) (fgetcCount++, fgetc(FP)) 
 unsigned int fgetcCount;
 
@@ -114,8 +116,9 @@ static inline void storeUsInBmp( int width, int height,
 				) {
   width = abs(width); height = abs(height);
   int halfwidth = width/2;
-  // Do all yuv images have even lengths and heights?
+  // Do all yuv images have even widths and heights?
   // Maybe look this up.
+  // Microsoft .bmp image rows are 4-byte aligned.
   // For now, we'll tolerate an odd number height of rows.
   // In any case, maybe code to exit gracefully instead of crashing.
   assert((width == 2*halfwidth) );
@@ -170,23 +173,12 @@ static inline void storeStreamUsInBmp( int width, int height,
 				) {
   width = abs(width); height = abs(height);
   int halfwidth = width/2;
-  // Do all yuv images have even lengths and heights?
+  // Do all yuv images have even widths and heights?
   // Maybe look this up.
+  // Microsoft .bmp image rows are 4-byte aligned.
   // For now, we'll tolerate an odd number height of rows.
   // In any case, maybe code to exit gracefully instead of crashing.
   assert((width == 2*halfwidth) );
-
-  /* Macro hack doen't work, do by hand below:
-  UVinBmpMainLoop ( {
-		     pBMbytes[ 3*2*iUV + 0 ] =
-		       pBMbytes[ 3*2*iUV + 3 ] = pUs[iUV];
-		   },
-		   {
-		     pBMbytes[ 3*(2*iUV + width) + 0 ] =
-		       pBMbytes[ 3*(2*iUV + width) + 3 ] = pUs[iUV];
-		   }
-		   )
-		   */
 
   { int nPixRowsToGo = height; /*Count down.  We go down two at a time*/ 
   /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
@@ -196,7 +188,7 @@ static inline void storeStreamUsInBmp( int width, int height,
 	for( int iUV = 0; iUV < halfwidth; iUV++ ) {
 	  int Uval = FGETC(YUVinFILE);
 	  if( Uval == EOF ) {
-	    myerror("storeStreamUsInBmp stream read EOF??");
+	    myerror("Failed to get one U for 2 rows in storeStreamUsInBmp stream read EOF??");
 	  }
 
 	  /* 4 saves: */                                                 
@@ -211,11 +203,11 @@ static inline void storeStreamUsInBmp( int width, int height,
 	}                                                                
 	nPixRowsToGo -= 2;                                               
       }                                                                  
-      else {                                                             
+      else { /* Process the last one of an odd number of rows. */                                                             
 	for( int iUV = 0; iUV < halfwidth; iUV++ ) {                     
 	  int Uval = FGETC(YUVinFILE);
 	  if( Uval == EOF ) {
-	    myerror("storeStreamUsInBmp stream read EOF??");
+	    myerror("Last of an odd no. of row's U getting in storeStreamUsInBmp stream read EOF??");
 	  }
 	  /* only 2 saves: */                                            
 	  {
@@ -376,35 +368,49 @@ static inline void useVsFinishBmpByFla( int width, int height,
 }
 
 
-//globals for YUV->BGR table.  
-uint8_t inMemReferenceBMPFile[54 + 3*4096*4096];
-uint8_t *inMemReferenceBGRs    = 0;
-const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
+//globals for YUV->BGR table.  Private for OneYuv2OneBmp.
+//see referenceBMP.rst for documentation.
+
+static uint8_t inMemReferenceBMPFile[54 + 3*4096*4096];
+static uint8_t *inMemReferenceBGRs    = 0; //==0 when not we don't have it.
+static const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
 
 bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
 {
   uint8_t *pbgr = inMemReferenceBGRs+(
-    (3*4096/*bytes per row*/)*(16/*Yhs per V*/*V  + (Y>>4)/*yh*/) +  /*Row of GRB byte array*/
-    (3/*bytes per column*/  )*( 16/*Yhs per U*/*U + (Y&0xFF)    )    /*Col of GRB byte array*/
+    (3*4096/*bytes per row*/)*(16/*Yhs per V*/*V + (Y>>4)/*yh*/  ) +  /*Row of GRB byte array*/
+    (3/*bytes per column*/  )*(16/*Yhs per U*/*U + (Y&0xFF)/*yl*/)    /*Col of GRB byte array*/
 				      ); /* compute mem addr */
   return bgrtriple( pbgr[0] /* blue   */,
 		    pbgr[1] /* green  */,
 		    pbgr[2] /* red    */); /* retrieve from mem table */
+  /* C/C++ lets us return whole data structures, not just builtins or pointers.*/
 }
 
 
 uint8_t *MemReferenceBGRTable()
 {
   if( inMemReferenceBGRs ) return inMemReferenceBGRs;
-
+  // We intend our yuv->bmp conversion function to be
+  // called many times by one process--
+  // Possibly by multiple threads in the future.
   
-  system( "ffmpeg -hide_banner -y -an -video_size 4096x4096 -i I420pRef4096x4096Frame.yuv  -frames:v 1 I420pRef4096x4096Frame.bmp" );
+  //system( "ffmpeg -hide_banner -y -an -video_size 4096x4096 -i I420pRef4096x4096Frame.yuv  -frames:v 1 I420pRef4096x4096Frame.bmp" );
+
   // Ugly, inflexible, possibly inconsistent hack of a lazy programmer above.
-  FILE* bmpfp = fopen("I420pRef4096x4096Frame.bmp", "r");
-  size_t retv = fread(inMemReferenceBMPFile, sizeof(inMemReferenceBMPFile), 1, bmpfp);
-  if( retv != 1 )
+  // but there is no need to make these parameters variable; except perhaps
+  // ffmpeg may have color model parameters (alpha correction?) we might
+  // take advantage of.
+  //
+  // yuv->bmp conversion is still mysterious; prelim experiment showed
+  // 1 non-reversability.
+  FILE* bmpfp;
+  if( (!(bmpfp =  fopen("I420pRef4096x4096Frame.bmp", "r")))
+      ||
+      (1 != fread(inMemReferenceBMPFile, sizeof(inMemReferenceBMPFile), 1, bmpfp) ) )
     {
-      myerror("OneYuv2OneBmp:MemReferenceBGRTable() failed to read I420pRef4096x4096Frame.bmp");
+      myerror("Missing or problem with I420pRef4096x4096Frame.bmp file.\n"
+	      "See and use our Makefile to correct this problem.");
     }
   inMemReferenceBGRs = inMemReferenceBMPFile + 54;  //I know header length!
   // see if it looks good

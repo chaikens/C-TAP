@@ -4,7 +4,7 @@ all: depend
 progs : random_image TestOneYuv2OneBmp analyzeBMP 
 .PHONY : progs
 
-CXXFLAGS = -g
+CXXFLAGS = -g -lduma
 CFLAGS   = -g
 PATH     := .:$(PATH)
 
@@ -21,14 +21,21 @@ OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
 	$(CXX) $(CXXFLAGS) -c OneYuv2OneBmp.cpp
 
 
-YUVToBMPStreamFilter : YUVToBMPStreamFilter.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o Makefile
+YUVToBMPStreamFilter : I420pRef4096x4096Frame.bmp \
+YUVToBMPStreamFilter.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o Makefile
 	$(CXX) $(CXXFLAGS) YUVToBMPStreamFilter.cpp bmp.o OneYuv2OneBmp.o -o YUVToBMPStreamFilter
 
 TestYUVToBMPStreamFilter : YUVToBMPStreamFilter
-	ulimit -c unlimited; ./YUVToBMPStreamFilter 4096 4096 < I420pRef4096x4096Frame.yuv > TestYUVToStreamFilter.bmp
+	ulimit -c unlimited; ./YUVToBMPStreamFilter --fd 3 \
+            4096 4096 \
+            3< I420pRef4096x4096Frame.yuv \
+            > TestYUVToStreamFilter.bmp
 
 TestTinyYUVToBMPStreamFilter : YUVToBMPStreamFilter 2x2.yuv Makefile
-	ulimit -c unlimited; ./YUVToBMPStreamFilter 2 2 < 2x2.yuv > TestTinyYUVToStreamFilter.bmp
+	ulimit -c unlimited; ./YUVToBMPStreamFilter --fd 3 \
+             2 2 \
+             3< 2x2.yuv \
+             > TestTinyYUVToStreamFilter.bmp
 
 2x2.yuv : 2x2yuv Makefile
 	2x2yuv > 2x2.yuv
