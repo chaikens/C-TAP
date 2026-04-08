@@ -1,3 +1,5 @@
+#ifndef CTAP_bmp_included
+#define CTAP_bmp_included
 // we have bmps with bits offsets 54 and 138..
 // Microsoft bitmap images use 1st quadrant Mathamatical Coordinates
 //  (0,0) is image's lower left corner
@@ -169,3 +171,5 @@ class  __attribute__((packed)) GBR
   GBR( uint8_t Y, uint8_t U; uint8_t V );
 };
 */
+
+#endif

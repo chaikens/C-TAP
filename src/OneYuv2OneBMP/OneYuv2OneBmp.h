@@ -1,7 +1,7 @@
 #include "mustbelittleendian.h" //only developed for g++ little endian (like Linux PCs)
 
 #include "bmp.h"
-
+#include <stdio.h>
 #if defined __cplusplus
 #include <cstdint>
 #else
@@ -79,6 +79,11 @@ int OneYuv2OneBmpByFormula(unsigned int width, unsigned int height,
 int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMPout);
 
+int OneYuvStream2OneBmpByTable(unsigned int width, unsigned int height,
+			       FILE *YUVinFILE, uint8_t *BMdata);
+  /* *YUVinFILE is stream of YUV I420p images.
+   BMdata points to memory for the bitmap byte triples.
+  */
 
 
   

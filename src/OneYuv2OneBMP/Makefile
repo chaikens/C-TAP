@@ -21,6 +21,21 @@ OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
 	$(CXX) $(CXXFLAGS) -c OneYuv2OneBmp.cpp
 
 
+YUVToBMPStreamFilter : YUVToBMPStreamFilter.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o Makefile
+	$(CXX) $(CXXFLAGS) YUVToBMPStreamFilter.cpp bmp.o OneYuv2OneBmp.o -o YUVToBMPStreamFilter
+
+TestYUVToBMPStreamFilter : YUVToBMPStreamFilter
+	ulimit -c unlimited; ./YUVToBMPStreamFilter 4096 4096 < I420pRef4096x4096Frame.yuv > TestYUVToStreamFilter.bmp
+
+TestTinyYUVToBMPStreamFilter : YUVToBMPStreamFilter 2x2.yuv Makefile
+	ulimit -c unlimited; ./YUVToBMPStreamFilter 2 2 < 2x2.yuv > TestTinyYUVToStreamFilter.bmp
+
+2x2.yuv : 2x2yuv Makefile
+	2x2yuv > 2x2.yuv
+
+2x2yuv : 2x2yuv.c Makefile
+	$(CC) 2x2yuv.c -o 2x2yuv
+
 SeeOptconvert4toBMP.txt : OneYuv2OneBmp.h SeeOptconvert4toBMP.cpp Makefile
 	$(CXX) $(CXXFLAGS) -O3 -Wno-unused-result -c SeeOptconvert4toBMP.cpp
 	objdump --reloc --disassemble --source SeeOptconvert4toBMP.o > SeeOptconvert4toBMP.txt
@@ -536,6 +551,48 @@ TestOneYuv2OneBmp.o: TestOneYuv2OneBmp.cpp /usr/include/stdc-predef.h \
  /usr/include/linux/falloc.h
 TryMacro.o: TryMacro.cpp /usr/include/stdc-predef.h
 TrymacroExpanded.o: TrymacroExpanded.cpp /usr/include/stdc-predef.h
+YUVToBMPStreamFilter.o: YUVToBMPStreamFilter.cpp \
+ /usr/include/stdc-predef.h OneYuv2OneBmp.h mustbelittleendian.h bmp.h \
+ /usr/include/c++/11/cstdint \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
+ /usr/include/features.h /usr/include/features-time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/bits/timesize.h \
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/long-double.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h \
+ /usr/include/c++/11/pstl/pstl_config.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h /usr/include/stdint.h \
+ /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/time64.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h yuv2bmpConstants.cpp \
+ /usr/include/stdio.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn-common.h /usr/include/error.h \
+ /usr/include/x86_64-linux-gnu/bits/error.h /usr/include/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+ /usr/include/linux/close_range.h
 analyzeBMP.o: analyzeBMP.cpp /usr/include/stdc-predef.h bmp.h \
  mustbelittleendian.h /usr/include/c++/11/cstdint \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \

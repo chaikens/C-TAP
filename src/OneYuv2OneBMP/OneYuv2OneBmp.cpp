@@ -25,6 +25,12 @@ If we continue to run 1a on bmp data, a more efficient soln may be better.
 #include <cstdlib> //for abs()
 #include <iostream>
 
+
+#define myerror(message) {fprintf(stderr, "OneYuv2OneBmp.cpp error: %s \n", message); assert(0); }
+
+#define FGETC(FP) (fgetcCount++, fgetc(FP)) 
+unsigned int fgetcCount;
+
 using namespace std;
 
 //
@@ -60,6 +66,22 @@ static inline void storeYsInBmp( int width, int height,
   return;
 }
 
+static inline void storeStreamYsInBmp( int width, int height,
+				FILE *YUVinFILE, uint8_t *pBMbytes
+				) {
+  width = abs(width); height = abs(height);
+  for (int i = 0; i < width*height; i++) {
+    //i indexes Y values
+    int Yval = FGETC(YUVinFILE);
+    if(Yval == EOF) {
+      myerror("storeStreamYsInBmp stream read EOF??");
+    }
+    pBMbytes[ 3*i + 1 ] = (uint8_t) Yval;  //one green bgr[1] val per Y value 
+  }
+  assert(fgetcCount == width*height);
+  return;
+}
+
 /* This macro was to be used twice below but the compiler didn't like it
    I tried to be clever by substituting code into code */
 
@@ -69,7 +91,7 @@ static inline void storeYsInBmp( int width, int height,
   while( nPixRowsToGo > 0 )                                              \
     {                                                                    \
       if( nPixRowsToGo != 1 ) {                                          \
-	for( int iUV = 0; iUV <= halfwidth iUV++ ) {                     \
+	for( int iUV = 0; iUV < halfwidth iUV++ ) {                     \
 	  /* 4 saves: */                                                 \
          { Save12 }                                                      \
          { Save34 }                                                      \
@@ -77,7 +99,7 @@ static inline void storeYsInBmp( int width, int height,
 	nPixRowsToGo -= 2;                                               \
       }                                                                  \
       else {                                                             \
-	for( int iUV = 0; iUV <= halfwidth iUV++ ) {                     \
+	for( int iUV = 0; iUV < halfwidth iUV++ ) {                     \
 	  /* only 2 saves: */                                            \
 	  { Save12 }						         \
 	  nPixRowsToGo -= 1;                                             \
@@ -115,7 +137,7 @@ static inline void storeUsInBmp( int width, int height,
   while( nPixRowsToGo > 0 )                                              
     {                                                                    
       if( nPixRowsToGo != 1 ) {                                          
-	for( int iUV = 0; iUV <= halfwidth; iUV++ ) {                     
+	for( int iUV = 0; iUV < halfwidth; iUV++ ) {                     
 	  /* 4 saves: */                                                 
          {
 		     pBMbytes[ 3*4*iUV + 0 ] =
@@ -129,7 +151,7 @@ static inline void storeUsInBmp( int width, int height,
 	nPixRowsToGo -= 2;                                               
       }                                                                  
       else {                                                             
-	for( int iUV = 0; iUV <= halfwidth; iUV++ ) {                     
+	for( int iUV = 0; iUV < halfwidth; iUV++ ) {                     
 	  /* only 2 saves: */                                            
 	  {
 	    pBMbytes[ 3*2*iUV + 0 ] =
@@ -142,6 +164,74 @@ static inline void storeUsInBmp( int width, int height,
   }
   return;
 }
+
+static inline void storeStreamUsInBmp( int width, int height,
+				FILE * YUVinFILE, uint8_t *pBMbytes
+				) {
+  width = abs(width); height = abs(height);
+  int halfwidth = width/2;
+  // Do all yuv images have even lengths and heights?
+  // Maybe look this up.
+  // For now, we'll tolerate an odd number height of rows.
+  // In any case, maybe code to exit gracefully instead of crashing.
+  assert((width == 2*halfwidth) );
+
+  /* Macro hack doen't work, do by hand below:
+  UVinBmpMainLoop ( {
+		     pBMbytes[ 3*2*iUV + 0 ] =
+		       pBMbytes[ 3*2*iUV + 3 ] = pUs[iUV];
+		   },
+		   {
+		     pBMbytes[ 3*(2*iUV + width) + 0 ] =
+		       pBMbytes[ 3*(2*iUV + width) + 3 ] = pUs[iUV];
+		   }
+		   )
+		   */
+
+  { int nPixRowsToGo = height; /*Count down.  We go down two at a time*/ 
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
+  while( nPixRowsToGo > 0 )                                              
+    {                                                                    
+      if( nPixRowsToGo != 1 ) {                                          
+	for( int iUV = 0; iUV < halfwidth; iUV++ ) {
+	  int Uval = FGETC(YUVinFILE);
+	  if( Uval == EOF ) {
+	    myerror("storeStreamUsInBmp stream read EOF??");
+	  }
+
+	  /* 4 saves: */                                                 
+         {
+		     pBMbytes[ 3*4*iUV + 0 ] =
+		       pBMbytes[ 3*4*iUV + 3 ] = (uint8_t) Uval;
+	 }
+	 {
+		     pBMbytes[ 3*(4*iUV + width) + 0 ] =
+		       pBMbytes[ 3*(4*iUV + width) + 3 ] = (uint8_t) Uval;
+	 }
+	}                                                                
+	nPixRowsToGo -= 2;                                               
+      }                                                                  
+      else {                                                             
+	for( int iUV = 0; iUV < halfwidth; iUV++ ) {                     
+	  int Uval = FGETC(YUVinFILE);
+	  if( Uval == EOF ) {
+	    myerror("storeStreamUsInBmp stream read EOF??");
+	  }
+	  /* only 2 saves: */                                            
+	  {
+	    pBMbytes[ 3*2*iUV + 0 ] =
+	      pBMbytes[ 3*4*iUV + 3 ] = (uint8_t) Uval;
+	  }						         
+	  nPixRowsToGo -= 1;                                             
+	}                                                                
+      }                                                             
+    }
+  assert(fgetcCount == width*height + width*height/4);
+  }
+  return;
+}
+
+
 // bgr ordering, in reverence to Microsoft
 typedef struct __attribute__((packed)) bgrtriple
 { public:
@@ -223,7 +313,7 @@ static inline void useVsFinishBmpByFla( int width, int height,
   while( nPixRowsToGo > 0 )                                              
     {                                                                    
       if( nPixRowsToGo != 1 ) {                                          
-	for( int x = 0; x <= width; x += 2 ) {
+	for( int x = 0; x < width; x += 2 ) {
 	  /* 4 saves: */                                                 
 	  { //first of an adjacent pair of rows
 	    int iByte0Pix = 3*width*row + 3*x;
@@ -259,7 +349,7 @@ static inline void useVsFinishBmpByFla( int width, int height,
 	nPixRowsToGo -= 2;                                               
       }                                                                  
       else {
-	for( int x = 0; x <= width; x += 2 ) {                     
+	for( int x = 0; x < width; x += 2 ) {                     
 	  /* 2 saves: */                                                 
 	  { int iByte0Pix = 3*width*row + 3*x;
 	   // common{U,V} will be used in 2nd code arg.
@@ -314,7 +404,7 @@ uint8_t *MemReferenceBGRTable()
   size_t retv = fread(inMemReferenceBMPFile, sizeof(inMemReferenceBMPFile), 1, bmpfp);
   if( retv != 1 )
     {
-      error(1, errno, "OneYuv2OneBmp:MemReferenceBGRTable() failed to read I420pRef4096x4096Frame.bmp");
+      myerror("OneYuv2OneBmp:MemReferenceBGRTable() failed to read I420pRef4096x4096Frame.bmp");
     }
   inMemReferenceBGRs = inMemReferenceBMPFile + 54;  //I know header length!
   // see if it looks good
@@ -372,7 +462,7 @@ static inline void useVsFinishBmpByTable( int width, int height,
   while( nPixRowsToGo > 0 )                                              
     {                                                                    
       if( nPixRowsToGo != 1 ) {                                          
-	for( int x = 0; x <= width; x += 2 ) {
+	for( int x = 0; x < width; x += 2 ) {
 	  /* 4 saves: */                                                 
 	  { //first of an adjacent pair of rows
 	    int iByte0Pix = 3*width*row + 3*x;
@@ -408,12 +498,140 @@ static inline void useVsFinishBmpByTable( int width, int height,
 	nPixRowsToGo -= 2;                                               
       }                                                                  
       else {
-	for( int x = 0; x <= width; x += 2 ) {                     
+	for( int x = 0; x < width; x += 2 ) {                     
 	  /* 2 saves: */                                                 
 	  { int iByte0Pix = 3*width*row + 3*x;
 	   // common{U,V} will be used in 2nd code arg.
 	   commonU = pBMbytes[ iByte0Pix ]; 
 	   commonV = pVs[iUV];
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	  }
+	  iUV++;
+	}
+	row += 1;
+	nPixRowsToGo -= 1;
+      }
+    }
+  return ;
+}
+
+
+static inline void useStreamVsFinishBmpByTable( int width, int height,
+				   FILE *YUVinFILE, uint8_t *pBMbytes)
+{
+  width = abs(width); height = abs(height);
+  int halfwidth = width/2;
+
+  uint8_t commonU; //For our usually 4 pixels
+  uint8_t commonV; //For our usually 4 pixels
+  
+  bgrtriple T(0,0,0);
+  
+  /*  Not only does the macro version not compile, but its application code below is WRONG. 
+    UVinBmpMainLoop (
+		   { // common{U,V} will be used in 2nd code arg.
+		     commonU = pBMbytes[ 3*4*iUV ];
+		     commonV = pVs[iUV];
+
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 1], commonU, commonV); 
+		     pBMbytes[ 3*2*iUV + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + b ] = T.tb;
+
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3 + 1], commonU, commonV); 
+		     pBMbytes[ 3*2*iUV + 3 + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3 + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3 + b ] = T.tb;
+		   },
+		   {
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 1], commonU, commonV);
+		     pBMbytes[ 3*2*iUV + 3*width + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3*width + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3*width + b ] = T.tb;
+
+		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 3 + 1], commonU, commonV);
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + r ] = T.tr;
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + g ] = T.tg;
+		     pBMbytes[ 3*2*iUV + 3*width + 3 + b ] = T.tb;
+		   }
+		   )
+  */
+  int nPixRowsToGo = height; /*Count down.  We go down two at a time */ 
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/
+  
+  int iUV = 0; /* index into the V (for us here) uint8_t array in the YUV file*/
+               /* We stored the correponding U values in the BGR array so that we
+                  might process the Y, then U, then V values in a pipeline.  */
+  int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
+  while( nPixRowsToGo > 0 )                                              
+    {                                                                    
+      if( nPixRowsToGo != 1 ) {                                          
+	for( int x = 0; x < width; x += 2 ) {
+	  /* 4 saves: */                                                 
+	  { //first of an adjacent pair of rows
+	    int iByte0Pix = 3*width*row + 3*x;
+	   // common{U,V} will be used in 2nd code arg.
+	   commonU = pBMbytes[ iByte0Pix ];
+	   
+	   { assert( fgetcCount == width*height + width*height/4 + iUV );
+	     int ret = FGETC(YUVinFILE);
+
+	     if(ret == EOF) {
+	       myerror("storeStreamYsInBmp stream read EOF??");
+	     }
+	     commonV = (uint8_t) ret;
+	   }
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
+
+	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	 }
+	  { //second of the adjacent pair of rows
+	    int iByte0Pix = 3*width*(row+1) + 3*x;
+	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 0 ] = T.tb;
+	    pBMbytes[ iByte0Pix + 1 ] = T.tg;
+	    pBMbytes[ iByte0Pix + 2 ] = T.tr;
+
+	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+	    pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+	    pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+	    pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	 }
+	iUV++;
+	}
+	row += 2;
+	nPixRowsToGo -= 2;                                               
+      }                                                                  
+      else {
+	for( int x = 0; x < width; x += 2 ) {                     
+	  /* 2 saves: */                                                 
+
+	  { int iByte0Pix = 3*width*row + 3*x;
+	   // common{U,V} will be used in 2nd code arg.
+	   commonU = pBMbytes[ iByte0Pix ]; 
+
+	   { int ret = FGETC(YUVinFILE);
+	     if(ret == EOF) {
+	       myerror("storeStreamYsInBmp stream read EOF??");
+	     }
+	     commonV = (uint8_t) ret;
+	   }
 
 	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
 	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
@@ -445,7 +663,7 @@ int OneYuv2OneBmp(unsigned int width, unsigned int height,
   int yuvFD = open("OneTemp.yuv", O_CREAT | O_RDWR, S_IRUSR|S_IWUSR);
   if( yuvFD < 0 )
     {
-      error(1, errno, "Open OneTemp.yuv failed.");
+      myerror("Open OneTemp.yuv failed.");
     }
   size_t yuvlen = ( width * height * 3 ) / 2;
   size_t yuvwriteret = write(yuvFD, YUVin, yuvlen);
@@ -474,7 +692,7 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
   size_t bmpreadret = read(bmpFD, p, yuvlen*2+54);
   if( bmpreadret < 0 )
     {
-      error(1, errno, "Read of OneTemp.bmp failed.");
+      myerror("Read of OneTemp.bmp failed.");
     }
   size_t readcount = bmpreadret ;
   while ( readcount < yuvlen*2+54 )
@@ -482,7 +700,7 @@ ffmpeg -hide_banner -an -video_size 3840x2160 -i OneTemp.yuv -frames:v 1 OneTemp
       fprintf(stderr, "error, or just short Read of OneTemp.bmp, we did read %ld bytes.\n", readcount);
       if( bmpreadret < 0 )
 	{
-	  error(1, errno, "Read of OneTemp.bmp failed.");
+	  myerror("Read of OneTemp.bmp failed.");
 	}
       readcount += bmpreadret;
       p += bmpreadret;
@@ -666,16 +884,19 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
   FILE* fp = fopen(RefYUVFileName, "w");
   if(!fp) {
     error(1, errno, "Output file %s opening failed.", RefYUVFileName);
+    assert(0);
   }
   size_t wret = fwrite( Y, yuvFileSize, 1, fp);
   if( wret != 1 )
     {
       error(1, errno, "Failed or short file %s writing.", RefYUVFileName);
+      assert(0);
     }
 
   int cret = fclose(fp);
   if(cret) {
     error(1, errno, "Closing of %s failed.", RefYUVFileName);
+    assert(0); 
   }
 
   return 0;
@@ -712,3 +933,30 @@ int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
 }
 
 
+int OneYuvStream2OneBmpByTable(unsigned int width, unsigned int height,
+		  FILE *YUVinFILE, uint8_t *BMdata)
+  /* *YUVinFILE is stream of YUV I420p images.
+   BMdata points to memory for the bitmap byte triples.
+  */
+{
+  MemReferenceBGRTable();
+//
+  fgetcCount = 0;
+//
+// Let size=width*height.
+  storeStreamYsInBmp( (int) width, (int) height, YUVinFILE, BMdata);
+//  Temporarily store size Y values in the 2nd byte of each of size bgr triples.
+//
+  storeStreamUsInBmp( (int) width, (int) height, YUVinFILE, BMdata);
+//  Temporarily store given size/4 U values in 1st byte of each of size bgr triples. 
+//
+  useStreamVsFinishBmpByTable( (int) width, (int) height, YUVinFILE, BMdata);
+//  Use the stored Ys and Us, and the last size/4 V values,
+//  to compute the size bgr BMP bgr triples were are converting to.
+//
+// This sequence reads the bytes of the I420p YUV raw image SEQUENTIALLY,
+// supporting a pipeline to process a sequence of raw image frames.
+//
+//
+  return 0;
+}

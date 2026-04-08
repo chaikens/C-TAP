@@ -1,0 +1,19 @@
+=== Video Metadata ===
+
+--- File Information ---
+File Name: N884A6_ch1_main_20250117000000_20250117010000.mp4
+File Size: 2.64 GB
+File Type: MP4
+MIME Type: video/mp4
+Last Modified: 3/15/2026, 1:21:39 PM
+
+--- Video Properties ---
+Duration: 01:00:00
+Resolution: 3840x2160
+Aspect Ratio: 16:9
+Video Codec: H.264 (AVC)
+Audio Codec: AAC
+
+--- Metadata Tags ---
+Creation time: 2025-01-17T00:00:00.000000Z
+Encoder: Lavf59.27.100
