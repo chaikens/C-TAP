@@ -4,12 +4,24 @@ all: depend
 progs : random_image TestOneYuv2OneBmp analyzeBMP 
 .PHONY : progs
 
-CXXFLAGS = -Wno-unused-result -O3 #-g -lduma
-CFLAGS   = -Wno-unused-result -O3 #-g
+CXXFLAGS = -Wno-unused-result -O3 -g -lduma
+CFLAGS   = -Wno-unused-result -O3 -g
 PATH     := .:$(PATH)
 
 
 4x2.yuv : 4x2yuv.c
+	$(CC) $(CFLAGS) $< -o $@.exe
+	$@.exe > $@
+
+16x12.yuv : 16x12yuv.c
+	$(CC) $(CFLAGS) $< -o $@.exe
+	$@.exe > $@
+
+48x36.yuv : 48x36yuv.c
+	$(CC) $(CFLAGS) $< -o $@.exe
+	$@.exe > $@
+
+6x6.yuv : 6x6yuv.c
 	$(CC) $(CFLAGS) $< -o $@.exe
 	$@.exe > $@
 
