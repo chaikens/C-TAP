@@ -4,9 +4,15 @@ all: depend
 progs : random_image TestOneYuv2OneBmp analyzeBMP 
 .PHONY : progs
 
-CXXFLAGS = -g -lduma
-CFLAGS   = -g
+CXXFLAGS = -Wno-unused-result -O3 #-g -lduma
+CFLAGS   = -Wno-unused-result -O3 #-g
 PATH     := .:$(PATH)
+
+
+4x2.yuv : 4x2yuv.c
+	$(CC) $(CFLAGS) $< -o $@.exe
+	$@.exe > $@
+
 
 random_image: random_image.cpp bmp.o
 	$(CXX) $(CXXFLAGS)  $^ -o $@
@@ -17,12 +23,11 @@ bmp.o : bmp.cpp bmp.h Makefile
 TestOneYuv2OneBmp: bmp.o OneYuv2OneBmp.o TestOneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
 	$(CXX) $(CXXFLAGS) TestOneYuv2OneBmp.cpp OneYuv2OneBmp.o bmp.o -o TestOneYuv2OneBmp
 
-OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h Makefile
+OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h bmp.h Makefile
 	$(CXX) $(CXXFLAGS) -c OneYuv2OneBmp.cpp
 
 
-YUVToBMPStreamFilter : I420pRef4096x4096Frame.bmp \
-YUVToBMPStreamFilter.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o Makefile
+YUVToBMPStreamFilter : I420pRef4096x4096Frame.bmp YUVToBMPStreamFilter.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o Makefile
 	$(CXX) $(CXXFLAGS) YUVToBMPStreamFilter.cpp bmp.o OneYuv2OneBmp.o -o YUVToBMPStreamFilter
 
 TestYUVToBMPStreamFilter : YUVToBMPStreamFilter

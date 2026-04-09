@@ -30,8 +30,13 @@ If we continue to run 1a on bmp data, a more efficient soln may be better.
 
 
 //for debugging bug of too-short yuv stdin stream when redirected from a file.
-#define FGETC(FP) (fgetcCount++, fgetc(FP)) 
+//#define FGETC(FP) (fgetcCount++, fgetc(FP)) 
+
 unsigned int fgetcCount;
+int FGETC(FILE* FP) {
+  fgetcCount++;
+  return fgetc(FP);
+}
 
 using namespace std;
 
@@ -200,8 +205,8 @@ static inline void storeStreamUsInBmp( int width, int height,
 		     pBMbytes[ 3*(4*iUV + width) + 0 ] =
 		       pBMbytes[ 3*(4*iUV + width) + 3 ] = (uint8_t) Uval;
 	 }
-	}                                                                
-	nPixRowsToGo -= 2;                                               
+	}
+	nPixRowsToGo -= 2;
       }                                                                  
       else { /* Process the last one of an odd number of rows. */                                                             
 	for( int iUV = 0; iUV < halfwidth; iUV++ ) {                     
@@ -214,8 +219,8 @@ static inline void storeStreamUsInBmp( int width, int height,
 	    pBMbytes[ 3*2*iUV + 0 ] =
 	      pBMbytes[ 3*4*iUV + 3 ] = (uint8_t) Uval;
 	  }						         
-	  nPixRowsToGo -= 1;                                             
-	}                                                                
+	}
+	nPixRowsToGo -= 1;                                             
       }                                                             
     }
   assert(fgetcCount == width*height + width*height/4);
@@ -588,7 +593,8 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 	   // common{U,V} will be used in 2nd code arg.
 	   commonU = pBMbytes[ iByte0Pix ];
 	   
-	   { assert( fgetcCount == width*height + width*height/4 + iUV );
+	   {
+	     assert( fgetcCount == width*height + width*height/4 + iUV );
 	     int ret = FGETC(YUVinFILE);
 
 	     if(ret == EOF) {
@@ -619,15 +625,15 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 	    pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
 	    pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
 	 }
-	iUV++;
+	iUV++;	  
 	}
 	row += 2;
-	nPixRowsToGo -= 2;                                               
+	nPixRowsToGo -= 2;
       }                                                                  
-      else {
-	for( int x = 0; x < width; x += 2 ) {                     
+      else
+	{
+	  for( int x = 0; x < width; x += 2 ) {                     
 	  /* 2 saves: */                                                 
-
 	  { int iByte0Pix = 3*width*row + 3*x;
 	   // common{U,V} will be used in 2nd code arg.
 	   commonU = pBMbytes[ iByte0Pix ]; 
@@ -649,11 +655,11 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
 	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
 	  }
+	  }
 	  iUV++;
+	  row += 1;
+	  nPixRowsToGo -= 1;
 	}
-	row += 1;
-	nPixRowsToGo -= 1;
-      }
     }
   return ;
 }
@@ -823,8 +829,8 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 
   size_t psize = pcols*rows;  //number of pixels
 
-  printf("number of pixels=0x%lx\n", psize);
-  printf("yuv file size=0x%lx\n",psize + psize/4 + psize/4);
+  fprintf(stderr, "number of pixels=0x%lx\n", psize);
+  fprintf(stderr, "yuv file size=0x%lx\n",psize + psize/4 + psize/4);
   size_t yuvFileSize = psize + psize/4 + psize/4;
   uint8_t *Y = new uint8_t[yuvFileSize];
   if( Y == 0 )
@@ -948,6 +954,14 @@ int OneYuvStream2OneBmpByTable(unsigned int width, unsigned int height,
   MemReferenceBGRTable();
 //
   fgetcCount = 0;
+  /* 
+     int c; int cnt = 0;
+     fprintf(stderr, "%p \n", YUVinFILE);
+     while( EOF != (c = fgetc(YUVinFILE) ))
+     { fprintf(stderr, "%d %d \n", cnt++, c);
+     }
+  */
+
 //
 // Let size=width*height.
   storeStreamYsInBmp( (int) width, (int) height, YUVinFILE, BMdata);
