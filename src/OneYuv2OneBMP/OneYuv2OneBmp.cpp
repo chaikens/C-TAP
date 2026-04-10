@@ -174,8 +174,8 @@ static inline void storeUsInBmp( int width, int height,
 }
 
 static inline void storeStreamUsInBmp( int width, int height,
-				FILE * YUVinFILE, uint8_t *pBMbytes
-				) {
+				       FILE * YUVinFILE, uint8_t *pBMbytes)
+{
   width = abs(width); height = abs(height);
   int halfwidth = width/2;
   // Do all yuv images have even widths and heights?
@@ -185,58 +185,94 @@ static inline void storeStreamUsInBmp( int width, int height,
   // In any case, maybe code to exit gracefully instead of crashing.
   assert((width == 2*halfwidth) );
 
-  { int nPixRowsToGo = height; /*Count down.  We go down two at a time*/ 
-  /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
-  while( nPixRowsToGo > 0 )                                              
-    {                                                                    
-      if( nPixRowsToGo != 1 ) {                                          
-	for( int iUV = 0; iUV < halfwidth; iUV++ ) {
-	  int Uval = FGETC(YUVinFILE);
-	  if( Uval == EOF ) {
-	    myerror("Failed to get one U for 2 rows in storeStreamUsInBmp stream read EOF??");
-	  }
+  int nPixRowsToGo = height; /*Count down.  We go down two at a time*/ 
+  /*  until we get to 0 and are done or 1 when we do the one last row.*/
+  
+  int irow = 0; /*row number of pixel row to process = num rows finished.*/
 
-	  /* 4 saves: */                                                 
-         {
-		     pBMbytes[ 3*4*iUV + 0 ] =
-		       pBMbytes[ 3*4*iUV + 3 ] = (uint8_t) Uval;
-	 }
-	 {
-		     pBMbytes[ 3*(4*iUV + width) + 0 ] =
-		       pBMbytes[ 3*(4*iUV + width) + 3 ] = (uint8_t) Uval;
-	 }
-	}
-	nPixRowsToGo -= 2;
-      }                                                                  
-      else { /* Process the last one of an odd number of rows. */                                                             
-	for( int iUV = 0; iUV < halfwidth; iUV++ ) {                     
-	  int Uval = FGETC(YUVinFILE);
-	  if( Uval == EOF ) {
-	    myerror("Last of an odd no. of row's U getting in storeStreamUsInBmp stream read EOF??");
+  while( nPixRowsToGo > 0 )                                              
+    { //Process the next pair of rows or the last 1 odd row.
+      if( nPixRowsToGo != 1 )
+	{ //Process the next pair of rows irow and irow+1
+	  //There are halfwidth Us used, each one for 2 bytes in each of the next 2 rows.
+	  for( int iBInRowOfUs = 0; iBInRowOfUs < halfwidth; iBInRowOfUs++ )
+	    {
+	      //we don't use the index into the U array to retrieve U values
+	      //since it is not in memory and its entries are read sequentially.
+	      int Uval = FGETC(YUVinFILE);
+	      if( Uval == EOF ) {
+		myerror("Failed to get one U for 2 rows in storeStreamUsInBmp stream read EOF??");
+	      }
+	      /* 4 saves: */                                                 
+	      pBMbytes[ 3*width*irow   /* 3*npixels above our row */ +
+			3*2*iBInRowOfUs/* 3*npixels before the 1st pixel of our 2x2 block  */
+			+ 0 /* save Uval in the blue pixel */ ] =              
+		pBMbytes[ 3*width*irow +
+			  3*2*iBInRowOfUs
+			  + 3 /* first byte of the 2nd pixel*/
+			  + 0 /* save Uval in the blue pixel */ ] = (uint8_t) Uval;
+
+	      //do the same for the next row after irow
+	      pBMbytes[ 3*width*(irow+1) +
+			3*2*iBInRowOfUs 
+			+ 0 ] =
+		pBMbytes[ 3*width*(irow+1) +
+			  3*2*iBInRowOfUs 
+			  + 3
+			  + 0 ] = (uint8_t) Uval;
+
+		//go on to the next Uval
+	      }
+	    //Finished one pair of rows. 
+	    irow += 2;
+	    nPixRowsToGo -= 2;
+	  }                                                                  
+	else
+	  { //Process last one row, irow, of an odd number of rows.
+	    //There are halfwidth Us used, each one for 2 bytes in each of the next 2 rows.
+	    for( int iBInRowOfUs = 0; iBInRowOfUs < halfwidth; iBInRowOfUs++ )
+	      {
+		//we don't use the index into the U array to retrieve U values
+		//since it is not in memory and its entries are read sequentially.
+		int Uval = FGETC(YUVinFILE);
+		if( Uval == EOF ) {
+		  myerror("Failed to get one U for 2 rows in storeStreamUsInBmp stream read EOF??");
+		}
+		
+		/* 2 saves: */                                                 
+
+		pBMbytes[ 3*width*irow   /* 3*npixels above our row */ +
+			  3*2*iBInRowOfUs/* 3*npixels before the 1st pixel of our 2x2 block  */
+			  + 0 /* save Uval in the blue pixel */ ] =
+		  pBMbytes[ 3*width*irow +
+			    3*2*iBInRowOfUs
+			    + 3 /* first byte of the 2nd pixel*/
+			    + 0 /* save Uval in the blue pixel */ ] = (uint8_t) Uval;
+		//go on to the next Uval
+	      }
+	    //Finished that one last row.
+	    irow += 1;
+	    nPixRowsToGo -= 1;
 	  }
-	  /* only 2 saves: */                                            
-	  {
-	    pBMbytes[ 3*2*iUV + 0 ] =
-	      pBMbytes[ 3*4*iUV + 3 ] = (uint8_t) Uval;
-	  }						         
-	}
-	nPixRowsToGo -= 1;                                             
-      }                                                             
-    }
-  assert(fgetcCount == width*height + width*height/4);
-  }
+      }
+    assert(fgetcCount == width*height + width*height/4);
   return;
 }
 
+//Here are supports for V value processing in which each YUV for each
+// pixel is known and the corresponding GRB value is retrieved from
+// the table and finally stored in the bmp, overwriting the saved Y and Us there.
 
-// bgr ordering, in reverence to Microsoft
-typedef struct __attribute__((packed)) bgrtriple
-{ public:
+// bgr ordering, in reverence to Microsoft Access is programmed bytewise (not int32)
+// so we needn't be concerned with little vs big endian byte orders.
+typedef struct __attribute__((packed)) bgrtriple //just for optimization sake, compiler
+{ public:                              //can pass and return this structure in one 32bit word.
   uint8_t tb; uint8_t tg; uint8_t tr;
   bgrtriple(uint8_t ib, uint8_t ig, uint8_t ir) :
     tb(ib), tg(ig), tr(ir) {  }
 } bgrtriple;
 
+//for FORMULA, not TABLE, version
 static inline uint8_t uint8clamp( float x )
 /* Please check if stricter clamping is needed */
 {
@@ -261,6 +297,8 @@ static inline bgrtriple tripleFromYUVByFla( uint8_t y, uint8_t u, uint8_t v )
 			     );
 }
 
+
+//This may have regressed.
 static inline void useVsFinishBmpByFla( int width, int height,
 				   const uint8_t *pVs, uint8_t *pBMbytes)
 {
@@ -372,7 +410,16 @@ static inline void useVsFinishBmpByFla( int width, int height,
   return ;
 }
 
-
+//back to TABLE version.
+//
+// Soon, there'll be a version where the table is included by as (assembler's) .incbin
+// feature and linked with us as the assembled .o file.  We will refer to it
+// through (I hope)
+// extern uint8_t *inMemReferenceBMPFile
+// uint8_t *inMemReferenceBGRs = inMemReferenceBMPFile + 54
+// Maybe we'll program an application that writes out I420pRef4096x4096Frame.bmp
+// (We have a separate program that constructs I420Ref4096x4096Frame.yuv)
+ 
 //globals for YUV->BGR table.  Private for OneYuv2OneBmp.
 //see referenceBMP.rst for documentation.
 
@@ -517,7 +564,6 @@ static inline void useVsFinishBmpByTable( int width, int height,
   return ;
 }
 
-
 static inline void useStreamVsFinishBmpByTable( int width, int height,
 				   FILE *YUVinFILE, uint8_t *pBMbytes)
 {
@@ -536,30 +582,30 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
                /* We stored the correponding U values in the BGR array so that we
                   might process the Y, then U, then V values in a pipeline.  */
   
-  int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
+  int irow = 0; /* row number of pixel row to process = num rows finished.*/
   
   while( nPixRowsToGo > 0 )                                              
     { //Process one adjacent pair of rows:                                   
       if( nPixRowsToGo != 1 ) //check for last row when #rows is odd, which may never happen.
-	{                                          
+	{ //Process the next pair of rows.                                         
 	  for( int x = 0; x < width; x += 2 ) //loop for the pairs of adjacent pixel columns.
 	    {
 	      /* 4 saves: */                                                 
-	      { //first of an adjacent pair of rows
-		int iByte0Pix = 3*width*row + 3*x;
-		// common{U,V} will be used in 2nd code arg.
-		commonU = pBMbytes[ iByte0Pix ];
-		//retrieve what was temporarilly saved in the
-		// blue byte of the upper left pixel of the block.
-		
-		{ //get our 2x2 pixel block's commonV value from yuv stream.
-		  assert( fgetcCount == width*height + width*height/4 + iUV );
-		  int ret = FGETC(YUVinFILE);
-		  if(ret == EOF) {
-		    myerror("storeStreamYsInBmp stream read EOF??");
-		  }
-		  commonV = (uint8_t) ret;
+	      //first of an adjacent pair of rows
+	      int iByte0Pix = 3*width*irow + 3*x;
+	      // common{U,V} will be used in 2nd code arg.
+	      commonU = pBMbytes[ iByte0Pix + 0 ];
+	      //retrieve what was temporarilly saved in the
+	      // blue byte of the upper left pixel of the block.
+	      
+	      { //get our 2x2 pixel block's commonV value from yuv stream.
+		assert( fgetcCount == width*height + width*height/4 + iUV );
+		int ret = FGETC(YUVinFILE);
+		if(ret == EOF) {
+		  myerror("storeStreamYsInBmp stream read EOF??");
 		}
+		commonV = (uint8_t) ret;
+	      }
 	   
 		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1] /*Y value from the green byte*/,
 					     commonU, commonV);
@@ -573,9 +619,9 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
 		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
 		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	      }
-	      { //second of the adjacent pair of rows
-		int iByte0Pix = 3*width*(row+1) + 3*x;
+	      
+	       //second of the adjacent pair of rows
+		iByte0Pix = 3*width*(irow+1) + 3*x;
 		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
 		pBMbytes[ iByte0Pix + 0 ] = T.tb;
 		pBMbytes[ iByte0Pix + 1 ] = T.tg;
@@ -585,11 +631,11 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
 		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
 		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	      }
+	      
 	      iUV++;	  
 	      // for loop does x += 2.
 	    } // for loop for columns finish
-	  row += 2;
+	  irow += 2;
 	  nPixRowsToGo -= 2;
 	}                                                                  
       else //last and odd row.  We may never have one.
@@ -597,7 +643,7 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 	  for( int x = 0; x < width; x += 2 )
 	    {                     
 	      /* 2 saves: */                                                 
-	      { int iByte0Pix = 3*width*row + 3*x;
+	      { int iByte0Pix = 3*width*irow + 3*x;
 		// common{U,V} will be used in 2nd code arg.
 		commonU = pBMbytes[ iByte0Pix ]; 
 
@@ -620,7 +666,7 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
 	      }
 	    }
 	  iUV++;
-	  row += 1;
+	  irow += 1;
 	  nPixRowsToGo -= 1;
 	}
     }

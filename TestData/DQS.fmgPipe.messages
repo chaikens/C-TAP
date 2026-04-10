@@ -1,0 +1,92 @@
+0
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'DQS.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:00:00.26, start: 0.000000, bitrate: 24165 kb/s
+  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 3840x2160 [SAR 1:1 DAR 16:9], 25076 kb/s, 23.98 fps, 23.98 tbr, 24k tbn, 47.95 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(und): Audio: mp3 (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 349 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> rawvideo (native))
+Press [q] to stop, [?] for help
+Output #0, rawvideo, to 'PIPE.yuv':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #0:0(und): Video: rawvideo (I420 / 0x30323449), yuv420p(progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 2386400 kb/s, 23.98 fps, 23.98 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc58.134.100 rawvideo
+frame=    1 fps=0.0 q=-0.0 size=   12150kB time=00:00:00.04 bitrate=2386419.9kbits/s speed=0.824x    11520+0 records in
+11520+0 records out
+24883200 bytes (25 MB, 24 MiB) copied, 0.328383 s, 75.8 MB/s
+[rawvideo @ 0x599f271f13c0] Estimating duration from bitrate, this may be inaccurate
+Input #0, rawvideo, from 'DQS.fmgPipe.1.yuv':
+  Duration: 00:00:00.08, start: 0.000000, bitrate: 2488320 kb/s
+  Stream #0:0: Video: rawvideo (I420 / 0x30323449), yuv420p, 3840x2160, 2488320 kb/s, 25 tbr, 25 tbn, 25 tbc
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> bmp (native))
+Press [q] to stop, [?] for help
+Output #0, image2, to 'DQS.fmgPipe.1.bmp':
+  Metadata:
+    encoder         : Lavf58.76.100
+  Stream #0:0: Video: bmp, bgr24(pc, gbr/unknown/unknown, progressive), 3840x2160, q=2-31, 200 kb/s, 25 fps, 25 tbn
+    Metadata:
+      encoder         : Lavc58.134.100 bmp
+frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=N/A    frame=    1 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.04 bitrate=N/A speed=0.587x    
+video:24300kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+1
+11520+0 records in
+11520+0 records out
+24883200 bytes (25 MB, 24 MiB) copied, 0.0306648 s, 811 MB/s
+[rawvideo @ 0x5629463573c0] Estimating duration from bitrate, this may be inaccurate
+Input #0, rawvideo, from 'DQS.fmgPipe.2.yuv':
+  Duration: 00:00:00.08, start: 0.000000, bitrate: 2488320 kb/s
+  Stream #0:0: Video: rawvideo (I420 / 0x30323449), yuv420p, 3840x2160, 2488320 kb/s, 25 tbr, 25 tbn, 25 tbc
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> bmp (native))
+Press [q] to stop, [?] for help
+Output #0, image2, to 'DQS.fmgPipe.2.bmp':
+  Metadata:
+    encoder         : Lavf58.76.100
+  Stream #0:0: Video: bmp, bgr24(pc, gbr/unknown/unknown, progressive), 3840x2160, q=2-31, 200 kb/s, 25 fps, 25 tbn
+    Metadata:
+      encoder         : Lavc58.134.100 bmp
+frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=N/A    frame=    1 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.04 bitrate=N/A speed=0.588x    
+video:24300kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+2
+frame=    6 fps=0.0 q=-0.0 Lsize=   72900kB time=00:00:00.25 bitrate=2386400.8kbits/s speed=0.492x    
+video:72900kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000000%
+11520+0 records in
+11520+0 records out
+24883200 bytes (25 MB, 24 MiB) copied, 0.0305001 s, 816 MB/s
+34560+0 records in
+34560+0 records out
+74649600 bytes (75 MB, 71 MiB) copied, 0.510467 s, 146 MB/s
+[rawvideo @ 0x614b6ad5c3c0] Estimating duration from bitrate, this may be inaccurate
+Input #0, rawvideo, from 'DQS.fmgPipe.3.yuv':
+  Duration: 00:00:00.08, start: 0.000000, bitrate: 2488320 kb/s
+  Stream #0:0: Video: rawvideo (I420 / 0x30323449), yuv420p, 3840x2160, 2488320 kb/s, 25 tbr, 25 tbn, 25 tbc
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> bmp (native))
+Press [q] to stop, [?] for help
+Output #0, image2, to 'DQS.fmgPipe.3.bmp':
+  Metadata:
+    encoder         : Lavf58.76.100
+  Stream #0:0: Video: bmp, bgr24(pc, gbr/unknown/unknown, progressive), 3840x2160, q=2-31, 200 kb/s, 25 fps, 25 tbn
+    Metadata:
+      encoder         : Lavc58.134.100 bmp
+frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=N/A    frame=    1 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.04 bitrate=N/A speed=0.576x    
+video:24300kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+3

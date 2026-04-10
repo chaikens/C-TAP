@@ -4,8 +4,8 @@ all: depend
 progs : random_image TestOneYuv2OneBmp analyzeBMP 
 .PHONY : progs
 
-CXXFLAGS = -Wno-unused-result -O3 -g -lduma
-CFLAGS   = -Wno-unused-result -O3 -g
+CXXFLAGS = -Wno-unused-result  -g -lduma
+CFLAGS   = -Wno-unused-result  -g
 PATH     := .:$(PATH)
 
 
