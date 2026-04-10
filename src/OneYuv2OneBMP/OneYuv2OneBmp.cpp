@@ -383,7 +383,7 @@ static const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
 bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
 {
   uint8_t *pbgr = inMemReferenceBGRs+(
-    (3*4096/*bytes per row*/)*(16/*Yhs per V*/*V + (Y>>4)/*yh*/  ) +  /*Row of GRB byte array*/
+    (3*4096/*bytes per row*/)*(4095-(16/*Yhs per V*/*V + (Y>>4)/*yh*/)) +  /*Row of GRB byte array*/
     (3/*bytes per column*/  )*(16/*Yhs per U*/*U + (Y&0xFF)/*yl*/)    /*Col of GRB byte array*/
 				      ); /* compute mem addr */
   return bgrtriple( pbgr[0] /* blue   */,
@@ -392,6 +392,14 @@ bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
   /* C/C++ lets us return whole data structures, not just builtins or pointers.*/
 }
 
+/* We created the YUV Reference file to represent an image so that reading it from
+   top to bottom gives us pixels with increasing Y and V values.  We got that image
+   represented as a Microsoft Classical (54-byte headers) from ffmpeg.  In I420p YUV files
+   increasing offsets represent pixels from top to bottom, and left to right.  ffmpeg
+   duly made a .bmp that looks like that.  However, the more offset pixel rows correspond
+   to image positions more upward.  Therefore, we must reverse the row indexing with
+   the (4095 - ...) code above.
+*/
 
 uint8_t *MemReferenceBGRTable()
 {
@@ -435,35 +443,6 @@ static inline void useVsFinishBmpByTable( int width, int height,
   
   bgrtriple T(0,0,0);
   
-  /*  Not only does the macro version not compile, but its application code below is WRONG. 
-    UVinBmpMainLoop (
-		   { // common{U,V} will be used in 2nd code arg.
-		     commonU = pBMbytes[ 3*4*iUV ];
-		     commonV = pVs[iUV];
-
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 1], commonU, commonV); 
-		     pBMbytes[ 3*2*iUV + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + b ] = T.tb;
-
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3 + 1], commonU, commonV); 
-		     pBMbytes[ 3*2*iUV + 3 + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + 3 + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + 3 + b ] = T.tb;
-		   },
-		   {
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 1], commonU, commonV);
-		     pBMbytes[ 3*2*iUV + 3*width + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + 3*width + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + 3*width + b ] = T.tb;
-
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 3 + 1], commonU, commonV);
-		     pBMbytes[ 3*2*iUV + 3*width + 3 + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + 3*width + 3 + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + 3*width + 3 + b ] = T.tb;
-		   }
-		   )
-  */
   int nPixRowsToGo = height; /*Count down.  We go down two at a time */ 
   /*  until we get to 0 and are done or 1 when we do the one last row.*/ 
   int iUV = 0; /* index into the V (for us here) uint8_t array in the YUV file*/
@@ -472,43 +451,46 @@ static inline void useVsFinishBmpByTable( int width, int height,
   int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
   while( nPixRowsToGo > 0 )                                              
     {                                                                    
-      if( nPixRowsToGo != 1 ) {                                          
-	for( int x = 0; x < width; x += 2 ) {
-	  /* 4 saves: */                                                 
-	  { //first of an adjacent pair of rows
-	    int iByte0Pix = 3*width*row + 3*x;
-	   // common{U,V} will be used in 2nd code arg.
-	   commonU = pBMbytes[ iByte0Pix ];
-	   commonV = pVs[iUV];
+      if( nPixRowsToGo != 1 )
+	{                                          
+	  for( int x = 0; x < width; x += 2 )
+	    {
+	      /* 4 saves: */                                                 
+	      { //first of an adjacent pair of rows
+		int iByte0Pix = 3*width*row + 3*x;
+		// common{U,V} will be used in 2nd code arg.
+		commonU = pBMbytes[ iByte0Pix ];
+		commonV = pVs[iUV];
+		
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 2 ] = T.tr;
+		
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	      }
+	      { //second of the adjacent pair of rows
+		int iByte0Pix = 3*width*(row+1) + 3*x;
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 2 ] = T.tr;
 
-	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
-	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
-	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
-
-	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
-	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
-	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	 }
-	  { //second of the adjacent pair of rows
-	    int iByte0Pix = 3*width*(row+1) + 3*x;
-	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
-	    pBMbytes[ iByte0Pix + 0 ] = T.tb;
-	    pBMbytes[ iByte0Pix + 1 ] = T.tg;
-	    pBMbytes[ iByte0Pix + 2 ] = T.tr;
-
-	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	    pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
-	    pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
-	    pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	 }
-	iUV++;
-	}
-	row += 2;
-	nPixRowsToGo -= 2;                                               
-      }                                                                  
-      else {
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	      }
+	      iUV++;
+	    }
+	  row += 2;
+	  nPixRowsToGo -= 2;                                               
+	}                                                                  
+      else //Last and odd row--may never happen.
+	{
 	for( int x = 0; x < width; x += 2 ) {                     
 	  /* 2 saves: */                                                 
 	  { int iByte0Pix = 3*width*row + 3*x;
@@ -542,120 +524,101 @@ static inline void useStreamVsFinishBmpByTable( int width, int height,
   width = abs(width); height = abs(height);
   int halfwidth = width/2;
 
-  uint8_t commonU; //For our usually 4 pixels
-  uint8_t commonV; //For our usually 4 pixels
+  uint8_t commonU; //For our usually 2x2 pixel block
+  uint8_t commonV; //For our usually 2x2 pixel block
   
   bgrtriple T(0,0,0);
   
-  /*  Not only does the macro version not compile, but its application code below is WRONG. 
-    UVinBmpMainLoop (
-		   { // common{U,V} will be used in 2nd code arg.
-		     commonU = pBMbytes[ 3*4*iUV ];
-		     commonV = pVs[iUV];
-
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 1], commonU, commonV); 
-		     pBMbytes[ 3*2*iUV + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + b ] = T.tb;
-
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3 + 1], commonU, commonV); 
-		     pBMbytes[ 3*2*iUV + 3 + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + 3 + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + 3 + b ] = T.tb;
-		   },
-		   {
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 1], commonU, commonV);
-		     pBMbytes[ 3*2*iUV + 3*width + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + 3*width + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + 3*width + b ] = T.tb;
-
-		     T = tripleFromYUV( pBMbytes[3*2*iUV + 3*width + 3 + 1], commonU, commonV);
-		     pBMbytes[ 3*2*iUV + 3*width + 3 + r ] = T.tr;
-		     pBMbytes[ 3*2*iUV + 3*width + 3 + g ] = T.tg;
-		     pBMbytes[ 3*2*iUV + 3*width + 3 + b ] = T.tb;
-		   }
-		   )
-  */
   int nPixRowsToGo = height; /*Count down.  We go down two at a time */ 
   /*  until we get to 0 and are done or 1 when we do the one last row.*/
   
   int iUV = 0; /* index into the V (for us here) uint8_t array in the YUV file*/
                /* We stored the correponding U values in the BGR array so that we
                   might process the Y, then U, then V values in a pipeline.  */
+  
   int row = 0; /* pixel row we will process next, numbered from 0, also number of  rows finished.*/
+  
   while( nPixRowsToGo > 0 )                                              
-    {                                                                    
-      if( nPixRowsToGo != 1 ) {                                          
-	for( int x = 0; x < width; x += 2 ) {
-	  /* 4 saves: */                                                 
-	  { //first of an adjacent pair of rows
-	    int iByte0Pix = 3*width*row + 3*x;
-	   // common{U,V} will be used in 2nd code arg.
-	   commonU = pBMbytes[ iByte0Pix ];
+    { //Process one adjacent pair of rows:                                   
+      if( nPixRowsToGo != 1 ) //check for last row when #rows is odd, which may never happen.
+	{                                          
+	  for( int x = 0; x < width; x += 2 ) //loop for the pairs of adjacent pixel columns.
+	    {
+	      /* 4 saves: */                                                 
+	      { //first of an adjacent pair of rows
+		int iByte0Pix = 3*width*row + 3*x;
+		// common{U,V} will be used in 2nd code arg.
+		commonU = pBMbytes[ iByte0Pix ];
+		//retrieve what was temporarilly saved in the
+		// blue byte of the upper left pixel of the block.
+		
+		{ //get our 2x2 pixel block's commonV value from yuv stream.
+		  assert( fgetcCount == width*height + width*height/4 + iUV );
+		  int ret = FGETC(YUVinFILE);
+		  if(ret == EOF) {
+		    myerror("storeStreamYsInBmp stream read EOF??");
+		  }
+		  commonV = (uint8_t) ret;
+		}
 	   
-	   {
-	     assert( fgetcCount == width*height + width*height/4 + iUV );
-	     int ret = FGETC(YUVinFILE);
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1] /*Y value from the green byte*/,
+					     commonU, commonV);
+		//upper left of 4x4 (wrt. anti-Microsoft top-to-bottom order concept)
+		pBMbytes[ iByte0Pix + 0 ] = T.tb; //store final bgr pixel byte values ...
+		pBMbytes[ iByte0Pix + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 2 ] = T.tr;
 
-	     if(ret == EOF) {
-	       myerror("storeStreamYsInBmp stream read EOF??");
-	     }
-	     commonV = (uint8_t) ret;
-	   }
-
-	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
-	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
-	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
-
-	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
-	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
-	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	 }
-	  { //second of the adjacent pair of rows
-	    int iByte0Pix = 3*width*(row+1) + 3*x;
-	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
-	    pBMbytes[ iByte0Pix + 0 ] = T.tb;
-	    pBMbytes[ iByte0Pix + 1 ] = T.tg;
-	    pBMbytes[ iByte0Pix + 2 ] = T.tr;
-
-	    T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	    pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
-	    pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
-	    pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	 }
-	iUV++;	  
-	}
-	row += 2;
-	nPixRowsToGo -= 2;
-      }                                                                  
-      else
+		//upper right of 4x4 (wrt. anti-Microsoft top-to-bottom order concept)
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	      }
+	      { //second of the adjacent pair of rows
+		int iByte0Pix = 3*width*(row+1) + 3*x;
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix  + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 2 ] = T.tr;
+		
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	      }
+	      iUV++;	  
+	      // for loop does x += 2.
+	    } // for loop for columns finish
+	  row += 2;
+	  nPixRowsToGo -= 2;
+	}                                                                  
+      else //last and odd row.  We may never have one.
 	{
-	  for( int x = 0; x < width; x += 2 ) {                     
-	  /* 2 saves: */                                                 
-	  { int iByte0Pix = 3*width*row + 3*x;
-	   // common{U,V} will be used in 2nd code arg.
-	   commonU = pBMbytes[ iByte0Pix ]; 
+	  for( int x = 0; x < width; x += 2 )
+	    {                     
+	      /* 2 saves: */                                                 
+	      { int iByte0Pix = 3*width*row + 3*x;
+		// common{U,V} will be used in 2nd code arg.
+		commonU = pBMbytes[ iByte0Pix ]; 
 
-	   { int ret = FGETC(YUVinFILE);
-	     if(ret == EOF) {
-	       myerror("storeStreamYsInBmp stream read EOF??");
-	     }
-	     commonV = (uint8_t) ret;
-	   }
+		{ int ret = FGETC(YUVinFILE);
+		  if(ret == EOF) {
+		    myerror("storeStreamYsInBmp stream read EOF??");
+		  }
+		  commonV = (uint8_t) ret;
+		}
 
-	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 0 ] = T.tb;
-	   pBMbytes[ iByte0Pix + 1 ] = T.tg;
-	   pBMbytes[ iByte0Pix + 2 ] = T.tr;
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 2 ] = T.tr;
 
-	   T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
-	   pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
-	   pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
-	   pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
-	  }
-	  }
+		T = bgrtripleFromYUVByTable( pBMbytes[iByte0Pix + 3 + 1], commonU, commonV); 
+		pBMbytes[ iByte0Pix + 3 + 0 ] = T.tb;
+		pBMbytes[ iByte0Pix + 3 + 1 ] = T.tg;
+		pBMbytes[ iByte0Pix + 3 + 2 ] = T.tr;
+	      }
+	    }
 	  iUV++;
 	  row += 1;
 	  nPixRowsToGo -= 1;
