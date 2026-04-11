@@ -6,7 +6,12 @@ progs : random_image TestOneYuv2OneBmp analyzeBMP
 
 CXXFLAGS = -Wno-unused-result  -g -lduma
 #CXXFLAGS = -DNDEBUG -Wno-unused-result -O3
-CFLAGS   = -Wno-unused-result  -g
+
+# duma library https://github.com/johnsonjh/duma
+# Detect Unintended Memory Access
+# package in Ubuntu Linux
+
+CFLAGS   = -Wno-unused-result  -g -lduma
 #CFLAGS = -DNDEBUG -Wno-unused-result -O3
 PATH     := .:$(PATH)
 
