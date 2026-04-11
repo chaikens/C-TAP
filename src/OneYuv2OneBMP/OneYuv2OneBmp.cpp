@@ -458,10 +458,22 @@ static const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
 
 bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
 {
-  uint8_t *pbgr = inMemReferenceBGRs+(
-    (3*4096/*bytes per row*/)*(4095-(16/*Yhs per V*/*V + (Y>>4)/*yh*/)) +  /*Row of GRB byte array*/
-    (3/*bytes per column*/  )*(16/*Yhs per U*/*U + (Y&0xFF)/*yl*/)    /*Col of GRB byte array*/
-				      ); /* compute mem addr */
+  //We must avoid overflow in the index calc; don't do it in 8 bit arith!
+  signed int iY = (signed int) Y;
+  signed int iU = (signed int) U;
+  signed int iV = (signed int) V;
+  //signed int iI = (
+  //  (3*4096/*bytes per row*/)*(4095-(16/*Yhs per V*/*iV + (iY>>4)/*yh*/)) +  /*Row of GRB byte array*/
+  //  (3/*bytes per column*/  )*(16/*Yhs per U*/*iU + (iY&0xFF)/*yl*/)    /*Col of GRB byte array*/
+  //		     );
+  signed int iI = 3 * (
+		   (4096)*( 4095 - ((16*iV) + (iY>>4)) ) + 16*iU + (iY & 0xFF)
+			    );
+  //uint8_t *pbgr = inMemReferenceBGRs+(
+  //  (3*4096/*bytes per row*/)*(4095-(16/*Yhs per V*/*V + (Y>>4)/*yh*/)) +  /*Row of GRB byte array*/
+  //  (3/*bytes per column*/  )*(16/*Yhs per U*/*U + (Y&0xFF)/*yl*/)    /*Col of GRB byte array*/
+  //				      ); /* compute mem addr */
+  uint8_t *pbgr = inMemReferenceBGRs + iI;
   return bgrtriple( pbgr[0] /* blue   */,
 		    pbgr[1] /* green  */,
 		    pbgr[2] /* red    */); /* retrieve from mem table */

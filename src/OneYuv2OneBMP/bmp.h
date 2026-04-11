@@ -172,7 +172,7 @@ class  __attribute__((packed)) GBR
 
 // bgr ordering, in reverence to Microsoft Access is programmed bytewise (not int32)
 // so we needn't be concerned with little vs big endian byte orders.
-struct __attribute__((packed)) bgrtriple //just for optimization sake, compiler
+struct  __attribute__((packed)) bgrtriple //just for optimization sake, compiler
 { public:                              //can pass and return this structure in one 32bit word.
   uint8_t tb; uint8_t tg; uint8_t tr;
   bgrtriple(uint8_t ib, uint8_t ig, uint8_t ir) :
