@@ -202,8 +202,8 @@ class BMclass
 
   uint8_t *pR( uint32_t row )
   {
-    return pD + // sizeofRow(height - row - 1);
-      sizeofRow*row;  //for regression testing during refactoring.. 
+    return pD + sizeofRow*(height - row - 1);
+      //sizeofRow*row;  //for regression testing during refactoring.. 
   }
 
   uint8_t *pPix( uint32_t row, uint32_t col )
