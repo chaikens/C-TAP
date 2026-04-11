@@ -47,6 +47,12 @@ DQS.fmg.*.bmp : DQS.rawMovie.yuv
 DQS.fmgPipe* : DQS.mp4 TestPipelineDQSToYUVsToBmps.sh
 	bash -c "TestPipelineDQSToYUVsToBmps.sh &>> DQS.fmgPipe.messages"
 
+
+I420pRef.FromYUVToBMPStreamFilter.bmp : I420pRef4096x4096Frame.yuv I420pRef4096x4096Frame.bmp Makefile YUVToBMPStreamFilter
+	YUVToBMPStreamFilter 4096 4096 < I420pRef4096x4096Frame.yuv > I420pRef.FromYUVToBMPStreamFilter.bmp
+
+
+
 clean:
 	rm -f DQS.ffmpeg.*.bmp DQS.fmgPipe.*.bmp DQS.fmgPipe.*.yuv PIPE.yuv *.messages
 	touch DQS.mp4
