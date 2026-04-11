@@ -5,7 +5,9 @@ progs : random_image TestOneYuv2OneBmp analyzeBMP
 .PHONY : progs
 
 CXXFLAGS = -Wno-unused-result  -g -lduma
+#CXXFLAGS = -DNDEBUG -Wno-unused-result -O3
 CFLAGS   = -Wno-unused-result  -g
+#CFLAGS = -DNDEBUG -Wno-unused-result -O3
 PATH     := .:$(PATH)
 
 
@@ -47,6 +49,7 @@ TestYUVToBMPStreamFilter : YUVToBMPStreamFilter
             4096 4096 \
             3< I420pRef4096x4096Frame.yuv \
             > TestYUVToStreamFilter.bmp
+	eog TestYUVToStreamFilter.bmp
 
 TestTinyYUVToBMPStreamFilter : YUVToBMPStreamFilter 2x2.yuv Makefile
 	ulimit -c unlimited; ./YUVToBMPStreamFilter --fd 3 \
