@@ -8,11 +8,8 @@
 #include "mustbelittleendian.h"
 //only developed for g++ little endian (like Linux PCs)
 
-#if defined __cplusplus
 #include <cstdint>
-#else
-#include <stdint.h>
-#endif
+#include <cstddef>
 
 typedef struct __attribute__((packed)) BITMAP_FILEHEADER {
   unsigned char Signature[2];
@@ -171,5 +168,65 @@ class  __attribute__((packed)) GBR
   GBR( uint8_t Y, uint8_t U; uint8_t V );
 };
 */
+
+
+// bgr ordering, in reverence to Microsoft Access is programmed bytewise (not int32)
+// so we needn't be concerned with little vs big endian byte orders.
+struct __attribute__((packed)) bgrtriple //just for optimization sake, compiler
+{ public:                              //can pass and return this structure in one 32bit word.
+  uint8_t tb; uint8_t tg; uint8_t tr;
+  bgrtriple(uint8_t ib, uint8_t ig, uint8_t ir) :
+    tb(ib), tg(ig), tr(ir) {  }
+};
+
+
+
+
+
+class BMclass
+{
+ public:
+  uint32_t width;
+  uint32_t height;
+  uint32_t sizeofRow;
+  uint32_t WH;
+  uint8_t *pD;
+  uint8_t *pHs;
+
+  BMclass( uint32_t w, uint32_t h, uint8_t *pDin, uint8_t *pHs = NULL )
+    {
+      width = w; height = h; pD = pDin; pHs = pHs;
+      WH = width*height;
+      sizeofRow = 3*width;
+    }
+
+  uint8_t *pR( uint32_t row )
+  {
+    return pD + // sizeofRow(height - row - 1);
+      sizeofRow*row;  //for regression testing during refactoring.. 
+  }
+
+  uint8_t *pPix( uint32_t row, uint32_t col )
+  {
+    return pR(row) + 3*col;
+  }
+
+  uint8_t b(uint8_t row, uint32_t col)
+  {
+    return *(pPix(row, col) + 0);
+  }
+
+  uint8_t g(uint8_t row, uint32_t col)
+  {
+    return *(pPix(row, col) + 1);
+  }
+
+  uint8_t r(uint8_t row, uint8_t col)
+  {
+    return *(pPix(row, col) + 2);
+  }
+
+};
+
 
 #endif

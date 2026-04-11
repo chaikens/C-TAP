@@ -75,12 +75,12 @@ inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
 }
 
 int OneYuv2OneBmpByFormula(unsigned int width, unsigned int height,
-		  const uint8_t *YUVin, uint8_t *BMPout);
+			   const uint8_t *YUVin, uint8_t *BMPout);
 int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMPout);
 
 int OneYuvStream2OneBmpByTable(unsigned int width, unsigned int height,
-			       FILE *YUVinFILE, uint8_t *BMdata);
+			       FILE *YUVinFILE, uint8_t *BMdata, BMclass *pBM);
   /* *YUVinFILE is stream of YUV I420p images.
    BMdata points to memory for the bitmap byte triples.
   */
