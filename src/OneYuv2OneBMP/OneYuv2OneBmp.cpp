@@ -459,14 +459,14 @@ static const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
 bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
 {
   //We must avoid overflow in the index calc; don't do it in 8 bit arith!
-  signed int iY = (signed int) Y;
-  signed int iU = (signed int) U;
-  signed int iV = (signed int) V;
+  unsigned int iY = (unsigned int) Y;
+  unsigned int iU = (unsigned int) U;
+  unsigned int iV = (unsigned int) V;
   //signed int iI = (
   //  (3*4096/*bytes per row*/)*(4095-(16/*Yhs per V*/*iV + (iY>>4)/*yh*/)) +  /*Row of GRB byte array*/
   //  (3/*bytes per column*/  )*(16/*Yhs per U*/*iU + (iY&0xFF)/*yl*/)    /*Col of GRB byte array*/
   //		     );
-  signed int iI = 3 * (
+  unsigned int iI = 3 * (
 		   (4096)*( 4095 - ((16*iV) + (iY>>4)) ) + 16*iU + (iY & 0xFF)
 			    );
   //uint8_t *pbgr = inMemReferenceBGRs+(
@@ -508,7 +508,9 @@ uint8_t *MemReferenceBGRTable()
   FILE* bmpfp;
   if( (!(bmpfp =  fopen("I420pRef4096x4096Frame.bmp", "r")))
       ||
-      (1 != fread(inMemReferenceBMPFile, sizeof(inMemReferenceBMPFile), 1, bmpfp) ) )
+      (1 != fread(inMemReferenceBMPFile,
+		  54 + 3*4096*4096 /*sizeof(inMemReferenceBMPFile)*/, 1, bmpfp) ) )
+    //Didn't help!
     {
       myerror("Missing or problem with I420pRef4096x4096Frame.bmp file.\n"
 	      "See and use our Makefile to correct this problem.");
@@ -1017,7 +1019,7 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 		  Y[4096*(16*iV + (iYh)) + 16*iU + iYl] = (iYh<<4) + iYl;
 		  if( ((iYh & 0x1)==0) && ((iYl & 0x1)==0) )
 		  {
-		    size_t where = 1024*(16*iV + iYh)+ 8*iU + (iYl>>1);
+		    size_t where = 1024*(16*iV + iYh)+ 8*iU + (((unsigned int) iYl)>>1);
 		    // had been 2048
 		    // had been 8, is this correct?----^ 
 		    assert( where < psize/4 );
