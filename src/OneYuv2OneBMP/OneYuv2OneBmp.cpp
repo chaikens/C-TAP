@@ -1027,6 +1027,37 @@ The U or V array is indexed to evenly located 2x2 blocks of pixels
 		    V[where] = iV;
 		    //assert( iU == 0 );
 		    //assert( iV == 0 );
+
+		    //code from NewMakeUYUV.cpp to compare
+		    unsigned int Y = (iYh << 4) + iYl;
+		    unsigned int U = iU;
+		    unsigned int V = iV;
+		    
+		    size_t px = 16*U + (Y & 0xFF);
+		    size_t py = 16*V + (Y >>   4);
+		    assert( where == ((4096/2)*(py/2) + (px/2)) );
+// running makeBigReferenceYUV
+// assertion sprang:
+// (gdb) p Y
+// $3 = 32
+// (gdb) p U
+// $4 = 0
+// (gdb) p V
+// $5 = 0
+// (gdb) p px
+// $6 = 32
+// (gdb) p py
+// $7 = 2
+// (gdb) p where
+// $8 = 2048
+// (gdb) print ((4096/2)*(py/2) + (px/2))
+// $9 = 2064
+// (gdb) p iPix
+// $10 = 8193
+// (gdb) 
+
+
+		    
 		  }
 		 //end of iYl loop  
 		}
