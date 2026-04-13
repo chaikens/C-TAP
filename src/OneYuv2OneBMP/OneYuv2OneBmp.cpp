@@ -452,8 +452,19 @@ static inline void useVsFinishBmpByFla( int width, int height,
 //globals for YUV->BGR table.  Private for OneYuv2OneBmp.
 //see referenceBMP.rst for documentation.
 
+// This symbol and data located following it
+// come from UnivI420pUnc4096x4096.s, where it is .incbin'ed from
+// UnivI420pUnc4096x4096.bmp
+// This and its predecessors are created by commands in our Makefile.
+// IE., it will be hard-included in applications linked with OneYuv2OneBmp.o 
+
+extern const uint8_t UnivI420pUnc4096x4096BMP;
+const uint8_t *pUBMP = &UnivI420pUnc4096x4096BMP;
+const size_t UBMPsize = 54 + 3*4096*4096;  //to lazy to code it automatedly
+const uint8_t *inMemReferenceBGRs    = pUBMP + 54;
+
 static uint8_t inMemReferenceBMPFile[54 + 3*4096*4096];
-static uint8_t *inMemReferenceBGRs    = 0; //==0 when not we don't have it.
+//static uint8_t *inMemReferenceBGRs    = 0; //==0 when not we don't have it.
 static const char *RefYUVFileName = "I420pRef4096x4096Frame.yuv";
 
 bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
@@ -473,7 +484,7 @@ bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
   //  (3*4096/*bytes per row*/)*(4095-(16/*Yhs per V*/*V + (Y>>4)/*yh*/)) +  /*Row of GRB byte array*/
   //  (3/*bytes per column*/  )*(16/*Yhs per U*/*U + (Y&0xFF)/*yl*/)    /*Col of GRB byte array*/
   //				      ); /* compute mem addr */
-  uint8_t *pbgr = inMemReferenceBGRs + iI;
+  const uint8_t *pbgr = inMemReferenceBGRs + iI;
   return bgrtriple( pbgr[0] /* blue   */,
 		    pbgr[1] /* green  */,
 		    pbgr[2] /* red    */); /* retrieve from mem table */
@@ -489,39 +500,6 @@ bgrtriple bgrtripleFromYUVByTable( uint8_t Y, uint8_t U, uint8_t V)
    the (4095 - ...) code above.
 */
 
-uint8_t *MemReferenceBGRTable()
-{
-  if( inMemReferenceBGRs ) return inMemReferenceBGRs;
-  // We intend our yuv->bmp conversion function to be
-  // called many times by one process--
-  // Possibly by multiple threads in the future.
-  
-  //system( "ffmpeg -hide_banner -y -an -video_size 4096x4096 -i I420pRef4096x4096Frame.yuv  -frames:v 1 I420pRef4096x4096Frame.bmp" );
-
-  // Ugly, inflexible, possibly inconsistent hack of a lazy programmer above.
-  // but there is no need to make these parameters variable; except perhaps
-  // ffmpeg may have color model parameters (alpha correction?) we might
-  // take advantage of.
-  //
-  // yuv->bmp conversion is still mysterious; prelim experiment showed
-  // 1 non-reversability.
-  FILE* bmpfp;
-  if( (!(bmpfp =  fopen("I420pRef4096x4096Frame.bmp", "r")))
-      ||
-      (1 != fread(inMemReferenceBMPFile,
-		  54 + 3*4096*4096 /*sizeof(inMemReferenceBMPFile)*/, 1, bmpfp) ) )
-    //Didn't help!
-    {
-      myerror("Missing or problem with I420pRef4096x4096Frame.bmp file.\n"
-	      "See and use our Makefile to correct this problem.");
-    }
-  inMemReferenceBGRs = inMemReferenceBMPFile + 54;  //I know header length!
-  // see if it looks good
-  // for( int i = 0; i < 500; i++ )  printf("%d ", inMemReferenceBGRs[i]);
-  
-  return inMemReferenceBGRs;
-}
-  
 static inline void useVsFinishBmpByTable( int width, int height,
 				   const uint8_t *pVs, uint8_t *pBMbytes)
 {
@@ -1066,7 +1044,6 @@ int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
    BMdata points to memory for the bitmap byte triples.
   */
 {
-  MemReferenceBGRTable();
 //
 //
 // Let size=width*height.
@@ -1096,7 +1073,6 @@ int OneYuvStream2OneBmpByTable(unsigned int width, unsigned int height,
    BMdata points to memory for the bitmap byte triples.
   */
 {
-  MemReferenceBGRTable();
 //
   fgetcCount = 0;
   /* 
