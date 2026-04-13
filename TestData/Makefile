@@ -1,7 +1,7 @@
 
 PATH := .:$(PATH)
 
-all:  clean DQS.fmg.*.bmp  DQS.fmgPipe*
+all:  clean DQS.fmg.*.bmp  DQS.fmgPipe* UnivTest.bmp
 
 .PRECIOUS : DroneCalib1.mp4 DroneShort1.mp4 DQS.mp4 *.messages
 # I think (not sure) this prevents that make deletes *.messages
@@ -48,8 +48,8 @@ DQS.fmgPipe* : DQS.mp4 TestPipelineDQSToYUVsToBmps.sh
 	bash -c "TestPipelineDQSToYUVsToBmps.sh &>> DQS.fmgPipe.messages"
 
 
-I420pRef.FromYUVToBMPStreamFilter.bmp : I420pRef4096x4096Frame.yuv I420pRef4096x4096Frame.bmp Makefile YUVToBMPStreamFilter
-	YUVToBMPStreamFilter 4096 4096 < I420pRef4096x4096Frame.yuv > I420pRef.FromYUVToBMPStreamFilter.bmp
+UnivTest.bmp : UnivI420pUnc4096x4096.yuv UnivI420pUnc4096x4096.bmp Makefile YUVToBMPStreamFilter
+	YUVToBMPStreamFilter 4096 4096 < UnivI420pUnc4096x4096.yuv > UnivTest.bmp
 
 
 

@@ -27,36 +27,5 @@ Output #0, image2, to 'DQS.ffmpeg.%02d.bmp':
       handler_name    : VideoHandler
       vendor_id       : [0][0][0][0]
       encoder         : Lavc58.134.100 bmp
-frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=0.815x    frame=    6 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.25 bitrate=N/A speed=0.836x    
-video:145800kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'DQS.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf58.76.100
-  Duration: 00:00:00.26, start: 0.000000, bitrate: 24165 kb/s
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 3840x2160 [SAR 1:1 DAR 16:9], 25076 kb/s, 23.98 fps, 23.98 tbr, 24k tbn, 47.95 tbc (default)
-    Metadata:
-      handler_name    : VideoHandler
-      vendor_id       : [0][0][0][0]
-  Stream #0:1(und): Audio: mp3 (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 349 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-      vendor_id       : [0][0][0][0]
-Stream mapping:
-  Stream #0:0 -> #0:0 (h264 (native) -> bmp (native))
-Press [q] to stop, [?] for help
-Output #0, image2, to 'DQS.ffmpeg.%02d.bmp':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf58.76.100
-  Stream #0:0(und): Video: bmp, bgr24(pc, gbr/unknown/unknown, progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 23.98 fps, 23.98 tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      vendor_id       : [0][0][0][0]
-      encoder         : Lavc58.134.100 bmp
-frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=0.788x    frame=    6 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.25 bitrate=N/A speed=0.669x    
+frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=0.883x    frame=    6 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.25 bitrate=N/A speed=0.926x    
 video:145800kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
