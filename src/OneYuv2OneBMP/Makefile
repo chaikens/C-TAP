@@ -36,6 +36,10 @@ PATH     := .:$(PATH)
 random_image: random_image.cpp bmp.o
 	$(CXX) $(CXXFLAGS)  $^ -o $@
 
+MakeUnivI420pUnc : MakeUnivI420pUnc.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+
 bmp.o : bmp.cpp bmp.h Makefile
 	$(CXX) $(CXXFLAGS) -c $<
 
