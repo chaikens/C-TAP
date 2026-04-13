@@ -1,3 +1,5 @@
+Please render this as code::
+
 4096x4096 = (2^12)*(2^12) = (2^8)*(2^8)*(2*8) = 16777216 = 0x1000000
 pixels, one for each 8-bit GRB value.
 
