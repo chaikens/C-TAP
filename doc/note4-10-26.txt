@@ -1,0 +1,6 @@
+ffmpeg mp4 -> bmp frame seq drops (seemingly?) identical frames.  Those
+appear identical when viewing the original movie in flowblade.
+
+Experiment to do: Same when ffmpeg mp4 -> yuv raw movie?  Could be checked
+ by analyzing the .yuv filesize.
+
