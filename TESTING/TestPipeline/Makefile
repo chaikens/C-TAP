@@ -21,6 +21,6 @@ CATS2.bmp : CATS/CATS.bmp
 	cat CATS/CATS.bmp CATS/CATS.bmp > CATS/CATS2.bmp
 
 TestPipeFromBmpFile :
-	Phase1aPipe 0 10 < CATS/CATS2.bmp > CATS2.bmp.result
+	Phase1aPipe --verbose 0 10 < CATS/CATS2.bmp > CATS2.bmp.result
 	echo See Our Result
 	cat CATS2.bmp.result

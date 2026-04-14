@@ -27,5 +27,5 @@ Output #0, image2, to 'DQS.ffmpeg.%02d.bmp':
       handler_name    : VideoHandler
       vendor_id       : [0][0][0][0]
       encoder         : Lavc58.134.100 bmp
-frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=0.883x    frame=    6 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.25 bitrate=N/A speed=0.926x    
+frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.04 bitrate=N/A speed=0.829x    frame=    6 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.25 bitrate=N/A speed=0.913x    
 video:145800kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown

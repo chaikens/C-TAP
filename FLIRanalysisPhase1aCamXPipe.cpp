@@ -1,10 +1,13 @@
 /**
-   This version reads a concatenation of .bmp files from stdin
+   This version reads a concatenation of .bmp files from fd 0
 */
 
-// int stdinfreads = 0; //for debugging
+int stdinfreads = 0; //for debugging
+int verbose = 0;
+
 
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,6 +17,8 @@
 #include <math.h>
 #include <sstream>
 #include <vector>
+
+FILE* fd0 = 0;
 
 typedef unsigned short pixCoord; 
 
@@ -87,7 +92,9 @@ static int frameCnt = -1;
 int readFirstBMPToAandAllocB()
 {
   int i;
-  FILE* f = stdin;
+  /* GLOBAL! */
+  fd0 = //stdin;
+    fdopen(0, "r");
   // in case we make the pipe input more flexible and check errors.
   // if( !f ) {
   //   error(1, errno, "Opening first frame %s failed.", filename);
@@ -95,9 +102,11 @@ int readFirstBMPToAandAllocB()
   unsigned char info[54];
   size_t readret;
   // read the 54-byte header
-  fread(info, 54, 1, f);
-  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
-
+  fread(info, 54, 1, fd0);
+  if(verbose) {
+    stdinfreads++; fprintf(stderr, "%dth read\n", stdinfreads);
+  }
+  
   // extract image height and width from header
   width = *(int*)&info[18];
   height = *(int*)&info[22];
@@ -109,8 +118,10 @@ int readFirstBMPToAandAllocB()
   BMP_B = new unsigned char[imgsizeb];
 
   // read the rest of the data at once
-  readret = fread(BMP_A, imgsizeb, 1, f);
-  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
+  readret = fread(BMP_A, imgsizeb, 1, fd0);
+  if(verbose) {
+    stdinfreads++; fprintf(stderr, "%dth read.\n", stdinfreads);
+  }
   if( 1 != readret ){
     if( readret < 0 ) {
       error(1, errno, "First frame: Reading stdin failed.");
@@ -119,7 +130,7 @@ int readFirstBMPToAandAllocB()
 	error(1, errno, "First frame: When reading image data, only %ld of %u read.", readret, imgsizeb);
       }
     }
-  // don't close f!
+  // don't close fd0!
   frameCnt = 1;
   
   for(int i = 0; i < imgsizeb; i += 3)
@@ -135,27 +146,31 @@ int readFirstBMPToAandAllocB()
 
 int readSubsequentBMP(unsigned char *dest)
 {
-  FILE* f = stdin;
-  //if( !f ) {
+  //FILE* fd0 = stdin;
+  //fd0 is now global
+  //if( !fd0 ) {
   //  error(1, errno, "Opening %dth frame %s failed.", frameCnt+1, filename);
   //}
   unsigned char info[54];
   size_t readret;
 
-  // printf("readSubs for header after %dth read, ftell=%ld\n", stdinfreads, ftell(f));
+  if(verbose) fprintf(stderr, "readSubs for header after %dth read\n", stdinfreads);
   
   // read the 54-byte header or detect EOF! feof != 0 means EOF.
-  readret = fread(info, 54, 1, f);
-  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
+  readret = fread(info, 54, 1, fd0);
+  if(verbose){
+    stdinfreads++; fprintf(stderr, "%dth read, \n", stdinfreads);
+  }
   if( readret != 1){
-    if( feof(stdin) != 0 ) {
+    if(verbose) fprintf(stderr, "readret!=1, = %ld\n", readret);
+    if( feof(fd0) != 0 ) {
       //There are no more bitmaps to process.
       // Should we clear the error?  I think so
       // since I hope we can process multiple movies
       // this way, which will entail replacing the
       // ffmpeg movie->bitmaps process and our pipe
       // from it.
-      clearerr(stdin);
+      clearerr(fd0);
       return 1;
     }
     if( readret < 0 ) {
@@ -178,8 +193,10 @@ int readSubsequentBMP(unsigned char *dest)
   }
   
   // read the rest of the data at once
-  readret = fread(dest, imgsizeb, 1, f);
-  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
+  readret = fread(dest, imgsizeb, 1, fd0);
+  if(verbose) {
+    stdinfreads++; fprintf(stderr,"%dth read\n", stdinfreads);
+  }
   if( 1 != readret ){
     if( readret < 0 ) {
       error(1, errno, "Subsequent frames: Reading a whole bitmaps data failed.");
@@ -321,7 +338,8 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
   Warning: This program modifies CamSett.txt by appending
   the camera name.
 
-*/ 
+*/
+
 int main ( int argc, char** argv ) {
 
   int camera_index = 0;
@@ -331,7 +349,17 @@ int main ( int argc, char** argv ) {
   if(argc < 2) {
     error(1, 0, "Phase1aPipe startnumber howmanyframes [Cloud Cover, not used].");
   }
-  
+
+  if(0 == strcmp(argv[1], "--verbose")) {
+    verbose = 1;
+    argc--;
+    argv++; //yes, it's a hack
+  }
+      
+  if(verbose) {
+    fprintf(stderr, "Phase1aFilter Starting\n");
+  }
+    
   unsigned long start = (unsigned long)atof(argv[1]);
   unsigned long end = start + (unsigned long)atof(argv[2]);
   //arg[3] is unused!
