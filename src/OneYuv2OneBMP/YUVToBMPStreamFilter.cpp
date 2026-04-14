@@ -7,6 +7,11 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <iostream>
+
+using namespace std;
+
+int verbose = 0;
 
 int main(int argc, char *argv[])
 {
@@ -17,11 +22,15 @@ int main(int argc, char *argv[])
   while(1) {
     static struct option long_options[] = {
       {"fd", required_argument, 0, 0 },
+      {"verbose", no_argument, &verbose, 1 },
       { 0, 0, 0, 0 }
     };
-      c = getopt_long(argc, argv, "", long_options, 0);
+    int longindex;
+      c = getopt_long(argc, argv, "", long_options, &longindex);
       if( c == -1 ) break;
-    filedescriptor = atoi(optarg);
+      if( longindex == 0 ) {
+      filedescriptor = atoi(optarg);
+      }
   }
 
   if( (1 != sscanf(argv[argc-2], "%lu", &width) ) ||
@@ -30,6 +39,8 @@ int main(int argc, char *argv[])
       error(1, 0, "YUVToBMPStreamFilter <width> <height> [--fd <Unix file descr>] \n: (stdin, stream of YUV I420p) --> (stdout, stream of classical bmp)");
     }
 
+  if(verbose) cerr << "Starting YUVToBMPStreamFilter" << endl;
+  
   const size_t BMPsize = 54 + 3*width*height;  //reuse for each image
   uint8_t *pBMP = (uint8_t *) makeClassicBitmap(width, height);
   //allocates memory and checks errors.
@@ -65,6 +76,9 @@ int main(int argc, char *argv[])
 	error(1, errno, "YUVToBMPStreamFilter write bmp to stdout failed??");
       }
       imgCount++;
+      if(verbose) {
+	fprintf(stderr, "\rImage%d", imgCount);
+      }
     }
 
   fprintf(stderr, "YUVToBMPStreamFilter transformed %u images.\n", imgCount);
