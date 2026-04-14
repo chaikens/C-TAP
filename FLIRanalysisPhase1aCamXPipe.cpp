@@ -1,6 +1,9 @@
 /**
    This version reads a concatenation of .bmp files from stdin
 */
+
+// int stdinfreads = 0; //for debugging
+
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -75,7 +78,7 @@ using namespace std;
 
 int Ret[2] = { 505, 85 };
 int diffs[3] = { 0, 0, 0 };
-unsigned int width, height, imgsize;
+unsigned int width, height, imgsizeb;
 
 static unsigned char *BMP_A;
 static unsigned char *BMP_B;
@@ -93,6 +96,7 @@ int readFirstBMPToAandAllocB()
   size_t readret;
   // read the 54-byte header
   fread(info, 54, 1, f);
+  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
 
   // extract image height and width from header
   width = *(int*)&info[18];
@@ -100,24 +104,25 @@ int readFirstBMPToAandAllocB()
   //cerr << width << " " << height << endl;
 
   // allocate three bytes per pixel
-  imgsize = 3 * width * height;
-  BMP_A = new unsigned char[imgsize];
-  BMP_B = new unsigned char[imgsize];
+  imgsizeb = 3 * width * height;
+  BMP_A = new unsigned char[imgsizeb];
+  BMP_B = new unsigned char[imgsizeb];
 
   // read the rest of the data at once
-  readret = fread(BMP_A, imgsize, 1, f);
+  readret = fread(BMP_A, imgsizeb, 1, f);
+  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
   if( 1 != readret ){
     if( readret < 0 ) {
-      error(1, errno, "Reading stdin failed.");
+      error(1, errno, "First frame: Reading stdin failed.");
     }
       else {
-	error(1, 0, "Only %ld of %u read, wrong bitmap fmt ", readret, imgsize);
+	error(1, errno, "First frame: When reading image data, only %ld of %u read.", readret, imgsizeb);
       }
     }
   // don't close f!
   frameCnt = 1;
   
-  for(int i = 0; i < imgsize; i += 3)
+  for(int i = 0; i < imgsizeb; i += 3)
     {
       // flip the order of every 3 bytes
       unsigned char tmp = BMP_A[i];
@@ -137,8 +142,11 @@ int readSubsequentBMP(unsigned char *dest)
   unsigned char info[54];
   size_t readret;
 
+  // printf("readSubs for header after %dth read, ftell=%ld\n", stdinfreads, ftell(f));
+  
   // read the 54-byte header or detect EOF! feof != 0 means EOF.
   readret = fread(info, 54, 1, f);
+  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
   if( readret != 1){
     if( feof(stdin) != 0 ) {
       //There are no more bitmaps to process.
@@ -151,10 +159,10 @@ int readSubsequentBMP(unsigned char *dest)
       return 1;
     }
     if( readret < 0 ) {
-      error(1, errno, "Reading header from stdin failed but NOT from EOF!");
+      error(1, errno, "Subsequent frames: Reading header from stdin failed but NOT from EOF!");
     }
     else {
-	error(1, 0, "Only %ld of %u read, wrong bitmap fmt? ", readret, 54);
+	error(1, errno, "Subsequent frames: On reading header, only %ld of %u read.", readret, 54);
       }
     }
   
@@ -170,20 +178,20 @@ int readSubsequentBMP(unsigned char *dest)
   }
   
   // read the rest of the data at once
-  readret = fread(dest, imgsize, 1, f);
-  if( readret != imgsize){
+  readret = fread(dest, imgsizeb, 1, f);
+  // stdinfreads++; printf("%dth read, ftell=%ld\n", stdinfreads, ftell(f));
+  if( 1 != readret ){
     if( readret < 0 ) {
-      error(1, errno, "Reading a whole bitmaps data failed.");
+      error(1, errno, "Subsequent frames: Reading a whole bitmaps data failed.");
     }
     else {
-	error(1, 0, "Only %ld of %u read, wrong bitmap fmt", readret, imgsize);
+	error(1, errno, "Subsequent frames: Only %ld of %u read, wrong bitmap fmt", readret, imgsizeb);
       }
     }
-  fclose(f);
 
   frameCnt++;
   
-  for(int i = 0; i < imgsize; i += 3)
+  for(int i = 0; i < imgsizeb; i += 3)
     {
       // flip the order of every 3 bytes
       unsigned char tmp = dest[i];
@@ -296,26 +304,45 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
     ezCamB1, ezCamB2, ezCamB3, ezCamB4 };
 
 /**
-  $ Phase1APipe start_frame_no. number_of_frames \
+  FLIRanalysisPhase1aCamXPipe.cpp, compiled to Phase1aPipe
+
+  $ Phase1APipe start_frame_no. number_of_frames_to_process \
     < (pipe or file containing a concatenation of bitmaps).
 
   It writes to stdout a one line report for each adjacent 
-  pairs of frames.
+  pairs of frames. The index at each line beginning
+  is of the 2nd frame of the pair, so the first index
+  is start_frame_no. + 1.  At present, our start_frame_no.
+  is 0.
+
+  If there are more frames than number_of_frames_to_process,
+  processing stops after the last frame.
+
+  Warning: This program modifies CamSett.txt by appending
+  the camera name.
+
 */ 
 int main ( int argc, char** argv ) {
 
   int camera_index = 0;
   inExclusionZone = cameras[camera_index].ezFun;
   /* make it point to the right function */
+
+  if(argc < 2) {
+    error(1, 0, "Phase1aPipe startnumber howmanyframes [Cloud Cover, not used].");
+  }
   
   unsigned long start = (unsigned long)atof(argv[1]);
   unsigned long end = start + (unsigned long)atof(argv[2]);
   //arg[3] is unused!
-  if( argc >= 3 ) {
+  if( argc >= 4 ) {
     bool CC = atoi(argv[3]); //CC is unused??
   }  
   char line[80]; double temp; vector<double> CamSett;
   FILE *file = fopen("CamSett.txt","r");
+  if( !file ) {
+    error(1, errno, "CamSett.txt file missing from CWDir.");
+  }
   for ( unsigned short k = 0; k < 20; ++k ) {
     fscanf ( file, "%s %lf", line, &temp );
     CamSett.push_back(temp);
