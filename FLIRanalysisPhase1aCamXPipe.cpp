@@ -102,9 +102,10 @@ int readFirstBMPToAandAllocB()
   unsigned char info[54];
   size_t readret;
   // read the 54-byte header
-  fread(info, 54, 1, fd0);
+  readret = fread(info, 54, 1, fd0);
   if(verbose) {
-    stdinfreads++; fprintf(stderr, "%dth read\n", stdinfreads);
+    stdinfreads++;
+    fprintf(stderr, "%dth read. readret=%ld.\n", stdinfreads, readret);
   }
   
   // extract image height and width from header
@@ -118,9 +119,11 @@ int readFirstBMPToAandAllocB()
   BMP_B = new unsigned char[imgsizeb];
 
   // read the rest of the data at once
+  // MYSTERY WE GET EOF HERE!!
   readret = fread(BMP_A, imgsizeb, 1, fd0);
   if(verbose) {
-    stdinfreads++; fprintf(stderr, "%dth read.\n", stdinfreads);
+    stdinfreads++;
+    fprintf(stderr, "%dth read. readret=%ld. errno=%d feof=%d\n", stdinfreads, readret, errno, feof(fd0));
   }
   if( 1 != readret ){
     if( readret < 0 ) {
