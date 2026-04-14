@@ -32,7 +32,10 @@ coproc YUVER {  ffmpeg -hide_banner -y -i $MOVIE_FILE PIPE.yuv &> ffmpeg.log &\
 #We use a pipe because ffmpeg expects filename for its output destination.
 #YUVER's output fd=${YUVER[0]}
 
- ./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} > BIG.bmp
+./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} > BIG.bmp
+# this works, at least we get the first frame (haven't looked at the others)
+# but what it should be, below, fails:
+#./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} | ./Phase1aPipe 0 99999
 
 
 
