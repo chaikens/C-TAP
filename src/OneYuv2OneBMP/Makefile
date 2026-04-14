@@ -92,8 +92,8 @@ CTAPsBPManalysis.txt: analyzeBMP Makefile
 	echo >> CTAPsBMPanalysis.txt
 	./analyzeBMP < ../../bitmaps/pic000038.bmp >> CTAPsBMPanalysis.txt
 
-install: OneYuv2OneBmp.o UnivI420pUnc4096x4096.o
-	cp OneYuv2OneBmp.o UnivI420pUnc4096x4096.o OneYuv2OneBmp.h ../..
+install: YUVToBMPStreamFilter
+	cp YUVToBMPStreamFilter  ../..
 .PHONY : install
 
 Test: TestOneFrame.yuv TestOneYuv2OneBmp Makefile
