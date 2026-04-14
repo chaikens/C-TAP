@@ -38,6 +38,9 @@ coproc YUVER {  ffmpeg -hide_banner -y -i $MOVIE_FILE PIPE.yuv &> ffmpeg.log &\
 
 ./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} | ./Phase1aPipe --verbose 0 99999
 
+#./YUVToBMPStreamFilter $width $height --verbose <& ${YUVER[0]} | cat > BIG.bmp
+#does't work !
+
 
 
 
