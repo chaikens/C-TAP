@@ -34,10 +34,10 @@ static inline void storeYsInBmp( int width, int height,
 				const uint8_t *pYs, uint8_t *pBMbytes);
 static inline void storeUsInBmp( int width, int height,
 				const uint8_t *pUs, uint8_t *pBMbytes);
-static inline void useVsFinishBmpByFla( int width, int height,
-				   const uint8_t *pVs, uint8_t *pBMbytes);
-static inline void useVsFinishBmpByTable( int width, int height,
-				   const uint8_t *pVs, uint8_t *pBMbytes);
+//static inline void useVsFinishBmpByFormula( int width, int height,
+//				   const uint8_t *pVs, uint8_t *pBMbytes);
+//static inline void useVsFinishBmpByTable( int width, int height,
+//				   const uint8_t *pVs, uint8_t *pBMbytes);
 
 inline void convert4toBMP(uint8_t *firstBMPPair, uint8_t *secondBMPPair,
 	      const uint8_t *firstYPair, const uint8_t *secondYPair,
@@ -80,6 +80,9 @@ int OneYuv2OneBmpByTable(unsigned int width, unsigned int height,
 		  const uint8_t *YUVin, uint8_t *BMPout);
 
 int OneYuvStream2OneBmpByTable(unsigned int width, unsigned int height,
+			       FILE *YUVinFILE, uint8_t *BMdata, BMclass *pBM);
+
+int OneYuvStream2OneBmpByFormula(unsigned int width, unsigned int height,
 			       FILE *YUVinFILE, uint8_t *BMdata, BMclass *pBM);
   /* *YUVinFILE is stream of YUV I420p images.
    BMdata points to memory for the bitmap byte triples.

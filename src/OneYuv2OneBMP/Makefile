@@ -1,4 +1,4 @@
-all: depend YUVToBMPStreamFilter install
+all: depend YUVToBMPStreamFilter YUVtoBMPStreamFilterByFormula install
 .PHONY : all
 
 progs : random_image TestOneYuv2OneBmp analyzeBMP 
@@ -53,6 +53,9 @@ OneYuv2OneBmp.o:  OneYuv2OneBmp.cpp OneYuv2OneBmp.h bmp.h Makefile
 YUVToBMPStreamFilter : I420pRef4096x4096Frame.bmp YUVToBMPStreamFilter.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o  UnivI420pUnc4096x4096.o Makefile
 	$(CXX) $(CXXFLAGS) YUVToBMPStreamFilter.cpp bmp.o OneYuv2OneBmp.o  UnivI420pUnc4096x4096.o -o YUVToBMPStreamFilter
 
+YUVToBMPStreamFilterByFormula : I420pRef4096x4096Frame.bmp YUVToBMPStreamFilterByFormula.cpp OneYuv2OneBmp.h bmp.h OneYuv2OneBmp.o bmp.o  UnivI420pUnc4096x4096.o Makefile
+	$(CXX) $(CXXFLAGS) YUVToBMPStreamFilterByFormula.cpp bmp.o OneYuv2OneBmp.o  UnivI420pUnc4096x4096.o -o YUVToBMPStreamFilterByFormula
+
 TestYUVToBMPStreamFilter : YUVToBMPStreamFilter
 	ulimit -c unlimited; ./YUVToBMPStreamFilter --fd 3 \
             4096 4096 \
@@ -92,8 +95,8 @@ CTAPsBPManalysis.txt: analyzeBMP Makefile
 	echo >> CTAPsBMPanalysis.txt
 	./analyzeBMP < ../../bitmaps/pic000038.bmp >> CTAPsBMPanalysis.txt
 
-install: YUVToBMPStreamFilter
-	cp YUVToBMPStreamFilter  ../..
+install: YUVToBMPStreamFilter YUVToBMPStreamFilterByFormula
+	cp YUVToBMPStreamFilter  YUVToBMPStreamFilterByFormula ../..
 .PHONY : install
 
 Test: TestOneFrame.yuv TestOneYuv2OneBmp Makefile
