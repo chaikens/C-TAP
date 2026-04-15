@@ -1,0 +1,12 @@
+from https://ffmpeg.org/ffmpeg-filters.html
+
+A special syntax implemented in the ffmpeg CLI tool allows loading
+option values from files. This is done be prepending a slash ’/’ to
+the option name, then the supplied value is interpreted as a path from
+which the actual value is loaded. E.g.
+
+ffmpeg -i <INPUT> -vf drawtext=/text=/tmp/some_text <OUTPUT>
+
+will load the text to be drawn from /tmp/some_text. API users wishing
+to implement a similar feature should use the
+avfilter_graph_segment_*() functions together with custom IO code.
