@@ -36,7 +36,14 @@ coproc YUVER {  ffmpeg -hide_banner -y -i $MOVIE_FILE PIPE.yuv &> ffmpeg.log &\
 # this works, at least we get the first frame (haven't looked at the others)
 # but what it should be, below, fails:
 
-./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} | ./Phase1aPipe --verbose 0 99999
+rm -f PIPE2
+mknod PIPE2 p
+
+./Phase1aPipe 0 99999 < PIPE2 > ${MOVIE_FILE%.*}.int &
+
+#./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} | ./Phase1aPipe --verbose 0 99999
+
+./YUVToBMPStreamFilter $width $height <& ${YUVER[0]} > PIPE2 
 
 #./YUVToBMPStreamFilter $width $height --verbose <& ${YUVER[0]} | cat > BIG.bmp
 #does't work !

@@ -1,0 +1,8 @@
+time ./Phase1aPipeBMP.BAD.sh N884A6_ch1_main_20250117000000_20250117010000.mp4 
+width=3840 height=2160 yuvsizeb=12441600
+Phase1aPipeBMP.sh Processing 3840x2160 N884A6_ch1_main_20250117000000_20250117010000.mp4
+
+real	145m41.852s
+user	122m38.214s
+sys	22m3.833s
+
