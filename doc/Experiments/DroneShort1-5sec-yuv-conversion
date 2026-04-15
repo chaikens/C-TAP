@@ -1,0 +1,47 @@
+
+(base) seth@turtle:/data/GIT/C-TAP$ ffmpeg -hide_banner -i DroneShort1.mp4 -t 5 DroneShort1.yuv
+
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'DroneShort1.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:02:00.12, start: 0.000000, bitrate: 8340 kb/s
+  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 3840x2160 [SAR 1:1 DAR 16:9], 8015 kb/s, 23.98 fps, 23.98 tbr, 24k tbn, 47.95 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(und): Audio: mp3 (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 320 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> rawvideo (native))
+Press [q] to stop, [?] for help
+
+Output #0, rawvideo, to 'DroneShort1.yuv':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #0:0(und): Video: rawvideo (I420 / 0x30323449), yuv420p(progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 2386400 kb/s, 23.98 fps, 23.98 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc58.134.100 rawvideo
+frame=  120 fps= 88 q=-0.0 Lsize= 1458000kB time=00:00:05.00 bitrate=2386400.8kbits/s speed=3.67x    
+video:1458000kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.000000%
+(base) seth@turtle:/data/GIT/C-TAP$ ls -l DroneShort1.yuv
+-rw-rw-r-- 1 seth seth 1492992000 Mar 16 17:06 DroneShort1.yuv
+(base) seth@turtle:/data/GIT/C-TAP$ exit
+exit
+
+Process shell finished
+1.5*3840*2160=1244160
+1492992000/1244160=120
+I think we have 1.5 bytes/pixel:
+1 Y byte, 2 bytes for every 4 pixels for U,V
+This is confirmed by the report frame=  120
+

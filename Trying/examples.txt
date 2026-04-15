@@ -1,0 +1,92 @@
+ffmpeg -hide_banner -an -i DroneShort1.mp4 -filter_complex 'extractplanes=y+u+v[y][u][v]' -f rawvideo -map '[y]' Out.Y -f rawvideo -map '[u]' Out.U -f rawvideo -map '[v]' Out.V
+
+$ ffmpeg -hide_banner -an -i DroneShort1.mp4 -filter_complex 'extractplanes=y+u+v[y][u][v]' -f rawvideo -map '[y]' Out.Y -f rawvideo -map '[u]' Out.U -f rawvideo -map '[v]' Out.V
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'DroneShort1.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:02:00.12, start: 0.000000, bitrate: 8340 kb/s
+  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 3840x2160 [SAR 1:1 DAR 16:9], 8015 kb/s, 23.98 fps, 23.98 tbr, 24k tbn, 47.95 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(und): Audio: mp3 (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 320 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 (h264) -> extractplanes
+  extractplanes:out0 -> Stream #0:0 (rawvideo)
+  extractplanes:out1 -> Stream #1:0 (rawvideo)
+  extractplanes:out2 -> Stream #2:0 (rawvideo)
+Press [q] to stop, [?] for help
+Output #0, rawvideo, to 'Out.Y':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #0:0: Video: rawvideo (Y800 / 0x30303859), gray(progressive), 3840x2160 [SAR 1:1 DAR 16:9], q=2-31, 1590933 kb/s, 23.98 fps, 23.98 tbn (default)
+    Metadata:
+      encoder         : Lavc58.134.100 rawvideo
+Output #1, rawvideo, to 'Out.U':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #1:0: Video: rawvideo (Y800 / 0x30303859), gray(progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 397733 kb/s, 23.98 fps, 23.98 tbn (default)
+    Metadata:
+      encoder         : Lavc58.134.100 rawvideo
+Output #2, rawvideo, to 'Out.V':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #2:0: Video: rawvideo (Y800 / 0x30303859), gray(progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 397733 kb/s, 23.98 fps, 23.98 tbn (default)
+    Metadata:
+      encoder         : Lavc58.134.100 rawvideo
+frame= 2880 fps= 81 q=-0.0 Lq=-0.0 q=-0.0 size=23328000kB time=00:02:00.12 bitrate=1590933.9kbits/s speed=3.38x    
+video:34992000kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+
+
+$ ls -l Out.*
+-rw-rw-r-- 1 seth seth  5971968000 Mar 17 15:15 Out.U
+-rw-rw-r-- 1 seth seth  5971968000 Mar 17 15:15 Out.V
+-rw-rw-r-- 1 seth seth 23887872000 Mar 17 15:15 Out.Y
+
+ 2880*1920*1080
+	5971968000
+
+
+---------------------------
+
+
+ffplay -video_size 1440x1080 -framerate 29.97 -i pfenning5-2.yuv
+
+--------------------------
+
+ffmpeg -hide_banner -y -video_size 3840x2160 -i DroneShort1.yuv -frames:v 1 foo.bmp
+
+--------------------------
+
+
+coproc FOO { yes; }
+dd <&${FOO[0]} bs=10 count=1 of=ten
+cat ten (5 lines of y)
+
+
+--------------------------------
+
+
+
+
+coproc YUVER { ffmpeg -hide_banner -y -i DroneShort1.mp4 PIPE.yuv &>YUVER.messages & cat PIPE.yuv; }
+
+dd bs=1 count=1000000 <&${YUVER[0]} of=f4
+
+WORKED!!
+

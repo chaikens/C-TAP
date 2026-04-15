@@ -3,12 +3,29 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <error.h>
+#include <errno.h>
 #include <cmath>
 #include <math.h>
 #include <sstream>
 #include <vector>
 
+typedef unsigned short pixCoord; 
+
 #define Custom
+/* When Custom is defined, 
+   (1) global variable std::string camera = "Custom"
+
+   (2) code in main() unconditionally 
+       sets CROP_{X,Y}{I,F} from Camsett.txt
+
+   (3) Mysterious (buggy?) line which does nothing is compiled
+       before computing the differences:
+   
+      #ifdef Custom
+	if ( false ) ExclusionZone = true;
+      #endif
+*/ 
 
 #ifdef Custom
 unsigned int CROP_YI = 0; //left edge
@@ -17,12 +34,12 @@ unsigned int CROP_XI = 0; //top edge
 unsigned int CROP_YI = 15;
 unsigned int CROP_XI = 10;
 #endif
+
 #ifdef CamB1
 unsigned int CROP_YF = 1275;
 #else
 unsigned int CROP_YF = 1249; //right edge (UFODAP: 1920)
 #endif
-
 #ifdef CamA1 //bottom edge is crop_xf. High num to catch boat: 635 MIN. 650 for mult frames
 unsigned int CROP_XF = 590; static const std::string camera = "A1";
 #endif
@@ -48,21 +65,31 @@ unsigned int CROP_XF = 575; static const std::string camera = "B3";
 unsigned int CROP_XF = 590; static const std::string camera = "B4";
 #endif
 #ifdef Custom
-unsigned int CROP_XF = 1080; /*default: UFODAP*/ static const std::string camera = "Custom";
+unsigned int CROP_XF = 1080; /*default: UFODAP*/
+static const std::string camera = "Custom";
 #endif
 
 using namespace std;
 
 int Ret[2] = { 505, 85 };
 int diffs[3] = { 0, 0, 0 };
-int width, height;
+unsigned int width, height, imgsize;
 
-unsigned char* readBMP(char* filename)
+static char * bmfilename( int f );
+
+static unsigned char *BMP_A;
+static unsigned char *BMP_B;
+static int frameCnt = -1;
+
+void readFirstBMPToAandAllocB(char* filename)
 {
   int i;
   FILE* f = fopen(filename, "rb");
+  if( !f ) {
+    error(1, errno, "Opening first frame %s failed.", filename);
+  }
   unsigned char info[54];
-
+  size_t readret;
   // read the 54-byte header
   fread(info, sizeof(unsigned char), 54, f);
 
@@ -72,80 +99,219 @@ unsigned char* readBMP(char* filename)
   //cerr << width << " " << height << endl;
 
   // allocate three bytes per pixel
-  int size = 3 * width * height;
-  unsigned char* data = new unsigned char[size];
+  imgsize = 3 * width * height;
+  BMP_A = new unsigned char[imgsize];
+  BMP_B = new unsigned char[imgsize];
 
   // read the rest of the data at once
-  fread(data, sizeof(unsigned char), size, f);
+  readret = fread(BMP_A, sizeof(unsigned char), imgsize, f);
+  if( readret != imgsize){
+    if( readret < 0 ) {
+      error(1, errno, "Reading %s failed.", filename);
+    }
+      else {
+	error(1, 0, "Only %ld of %u read, wrong bitmap fmt %s", readret, imgsize, filename);
+      }
+    }
   fclose(f);
-
-  for(i = 0; i < size; i += 3)
+  frameCnt = 1;
+  
+  for(int i = 0; i < imgsize; i += 3)
     {
       // flip the order of every 3 bytes
-      unsigned char tmp = data[i];
-      data[i] = data[i+2]; data[i+2] = tmp;
+      unsigned char tmp = BMP_A[i];
+      BMP_A[i] = BMP_A[i+2]; BMP_A[i+2] = tmp;
     }
 
-  return data;
-
+  return ;
 }
 
+
+void readSubsequentBMP(char* filename, unsigned char *dest)
+{
+  size_t readret;
+  FILE* f = fopen(filename, "rb");
+  if( !f ) {
+    error(1, errno, "Opening %dth frame %s failed.", frameCnt+1, filename);
+  }
+  unsigned char info[54];
+
+  // read the 54-byte header
+  readret = fread(info, sizeof(unsigned char), 54, f);
+  if( readret != 54){
+    if( readret < 0 ) {
+      error(1, errno, "Reading header from %s failed.", filename);
+    }
+    else {
+	error(1, 0, "Only %ld of %u read, wrong bitmap fmt? %s", readret, 54, filename);
+      }
+    }
+  
+  // extract image height and width from header
+  if( width   != *(int*)&info[18] ||
+      height  != *(int*)&info[22]  ) {
+    cerr << "DIFFERENT DIM of Subsequent bitmap " << filename << endl;
+    cerr << "First had width=" << width
+	 << " height=" << height << endl;
+    cerr << "But now!  width=" << *(int*)&info[18]
+	 << " height=" << *(int*)&info[22] << endl;
+    exit(1);
+  }
+  
+  // read the rest of the data at once
+  readret = fread(dest, sizeof(unsigned char), imgsize, f);
+  if( readret != imgsize){
+    if( readret < 0 ) {
+      error(1, errno, "Reading %s failed.", filename);
+    }
+    else {
+	error(1, 0, "Only %ld of %u read, wrong bitmap fmt %s", readret, imgsize, filename);
+      }
+    }
+  fclose(f);
+
+  frameCnt++;
+  
+  for(int i = 0; i < imgsize; i += 3)
+    {
+      // flip the order of every 3 bytes
+      unsigned char tmp = dest[i];
+      dest[i] = dest[i+2]; dest[i+2] = tmp;
+    }
+
+  return ;
+}
+
+
+
+//
+// Below, code any bool predicates for camera exclusion zones.
+//
+// Then, use it by assigning the function pointer variable
+// inExclusionZone (static declared and defined to &ezNone below.
+//
+
+static bool ezNone( pixCoord ii, pixCoord jj ) {
+  return false;
+}
+
+static bool ezCamA1( pixCoord ii, pixCoord jj ) {
+  return
+    ( abs(jj-1205) < 40
+      || (abs(jj-138) < 100 && abs(ii-30) < 25)
+      || (abs(jj-1128) < 130 && abs(ii-70) < 70)
+      || ((jj-637)*(jj-637)+(ii-363)*(ii-363)) < 10000
+      );
+}
+static bool ezCamA2( pixCoord ii, pixCoord jj ) {
+  return
+    ( abs(jj-1120) < 100
+      || (abs(jj-323) < 280 && abs(ii-39) < 40)
+      || (abs(jj-1055) < 170 && abs(ii-49) < 50)
+      || (abs(jj-650) < 115 && abs(ii-353) < 75)
+      || ((jj-640)*(jj-640)+(ii-130)*(ii-130)) < 10000 );
+}
+static bool ezCamA3( pixCoord ii, pixCoord jj ) {
+  return
+    ( abs(jj-1163) < 100
+      || (abs(jj-133) < 100 && abs(ii-30) < 25)
+      || (abs(jj-1128) < 130 && abs(ii-36) < 35)
+      || ((jj-635)*(jj-635)+(ii-357)*(ii-357)) < 10000 );
+}
+static bool ezCamA4( pixCoord ii, pixCoord jj ) {
+  return
+  ( abs(jj-1123) < 100
+    || (abs(jj-323) < 278 && abs(ii-39) < 40)
+    || (abs(jj-1055) < 170 && abs(ii-48) < 50)
+    || ((jj-630)*(jj-630)+(ii-351)*(ii-351)) < 10000 );
+}
+static bool ezCamB1( pixCoord ii, pixCoord jj ) {
+  return
+    ( abs(jj-1123) < 98
+      || (abs(jj-650) < 340 && abs(ii-Ret[0]) < Ret[1])
+      || (abs(jj-323) < 278 && abs(ii-38) < 37)
+      || ( jj > 1025 && ii > 565 )
+      || (abs(jj-1058) < 163 && abs(ii-50) < 50)
+      || ((jj-649)*(jj-649)+(ii-362)*(ii-362)) < 6400
+      || ((jj-885)*(jj-885)+(ii-205)*(ii-205)) < 900
+      || ((jj-408)*(jj-408)+(ii-205)*(ii-205)) < 529 );
+}
+static bool ezCamB2( pixCoord ii, pixCoord jj ) {
+  return
+    ( abs(jj-1205) < 45
+      || (abs(jj-135) < 100 && abs(ii-28) < 27)
+      || (abs(jj-1163) < 100 && abs(ii-37) < 34) );
+}
+static bool ezCamB3( pixCoord ii, pixCoord jj ) {
+  return
+  ( abs(jj-1135) < 85
+    || (abs(jj-323) < 278 && abs(ii-40) < 36)
+    || (abs(jj-1058) < 170 && abs(ii-70) < 25)
+    || (abs(jj-640) < 115 && abs(ii-358) < 75) );
+}
+static bool ezCamB4( pixCoord ii, pixCoord jj ) {
+  return
+    (
+     abs(jj-1203) < 45
+     || (abs(jj-138) < 100 && abs(ii-30) < 25)
+     || (abs(jj-1128) < 130 && abs(ii-65) < 65)
+     || ((jj-637)*(jj-637)+(ii-364)*(ii-364)) < 11000 );
+}
+
+static bool (*inExclusionZone)( pixCoord ii, pixCoord jj );
+// One can code this variable be set when the program runs 
+// by copying the pointer from the array below.
+
+static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
+  { ezNone, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
+    ezCamB1, ezCamB2, ezCamB3, ezCamA4 };
+
+
 int main ( int argc, char** argv ) {
+
+  int camera_index = 0;
+  inExclusionZone = ezFunArray[camera_index];
+  /* make it point to the right function */
   
   unsigned long start = (unsigned long)atof(argv[1]);
   unsigned long end = start + (unsigned long)atof(argv[2]);
-  bool CC = atoi(argv[3]);
-  
+  //arg[3] is unused!
+  if( argc >= 3 ) {
+    bool CC = atoi(argv[3]);
+  }  
   char line[80]; double temp; vector<double> CamSett;
   FILE *file = fopen("CamSett.txt","r");
   for ( unsigned short k = 0; k < 20; ++k ) {
     fscanf ( file, "%s %lf", line, &temp );
     CamSett.push_back(temp);
-  } fscanf ( file, "%s", line ); fclose(file);
+  }
+  fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   if ( line[0] != 'c' ) {
     file = fopen("CamSett.txt","a");
     fprintf(file, "cameraName= %s\n", camera.c_str());
     fclose(file);
   }
+
 #ifdef Custom
   CROP_XI = (unsigned int)CamSett[15];
   CROP_XF = (unsigned int)CamSett[16];
   CROP_YI = (unsigned int)CamSett[17];
   CROP_YF = (unsigned int)CamSett[18];
 #endif
+
+  unsigned long k = start;
+
+  readFirstBMPToAandAllocB( bmfilename(k+1) );
+  unsigned char* dataOld = BMP_B;
+  unsigned char* dataNew = BMP_A;
+
   
-  for ( unsigned long k = start; k < end; ++k ) {
-    
-    char* fileNameNew;
-    stringstream temp; //stringstream().swap(temp);
-    if ( k < 9 ) temp << "bitmaps/thumb00000" << (k+1) << ".bmp";
-    else if ( k < 99 ) temp << "bitmaps/thumb0000" << (k+1) << ".bmp";
-    else if ( k < 999 ) temp << "bitmaps/thumb000" << (k+1) << ".bmp";
-    else if ( k < 9999 ) temp << "bitmaps/thumb00" << (k+1) << ".bmp";
-    else if ( k < 99999 ) temp << "bitmaps/thumb0" << (k+1) << ".bmp";
-    else temp << "bitmaps/thumb" << (k+1) << ".bmp";
-     string name;
-    temp >> name;
-    fileNameNew = &name[0];
-    unsigned char* dataNew = readBMP ( fileNameNew );
-    unsigned char* dataOld;
-    
-    if ( k > start ) {
-       char* fileNameOld;
-      stringstream temp2; //stringstream().swap(temp);
-      if ( k < 10 ) temp2 << "bitmaps/thumb00000" << k << ".bmp";
-      else if ( k < 100 ) temp2 << "bitmaps/thumb0000" << k << ".bmp";
-      else if ( k < 1000 ) temp2 << "bitmaps/thumb000" << k << ".bmp";
-      else if ( k < 10000 ) temp2 << "bitmaps/thumb00" << k << ".bmp";
-      else if ( k < 100000 ) temp2 << "bitmaps/thumb0" << k << ".bmp";
-      else temp2 << "bitmaps/thumb" << k << ".bmp";
-       name.clear();
-      temp2 >> name;
-      fileNameOld = &name[0];
-      dataOld = readBMP ( fileNameOld );
-    }
-    
+  for ( k = start+1; k < end; ++k ) {
+    unsigned char* tem = dataOld; dataOld = dataNew; dataNew = tem; 
+
+    readSubsequentBMP ( bmfilename(k+1), dataNew );
+
     int maximum[3] = {-1,-1,-1}; int minimum[3] = {256,256,256}; int maxLoc[3][2] = {0}; int minLoc[3][2] = {0};
     int NumPixAbvThr[3][2] = {0};
     int NumPixAbvSubThrSum = 0, CloudCover = 100;
@@ -155,16 +321,11 @@ int main ( int argc, char** argv ) {
 	
 	int rgbColorNew[3], rgbColorOld[3];
 	
-	if ( k == start ) {
-	  rgbColorOld[0] = 0;
-          rgbColorOld[1] = 0;
-          rgbColorOld[2] = 0;
-        }
-	else {
-	  rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0];
-	  rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1];
-	  rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2];
-	}
+	
+	rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0];
+	rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1];
+	rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2];
+	
 	
 	rgbColorNew[0] = (int)dataNew[3 * (i * width + j) + 0];
         rgbColorNew[1] = (int)dataNew[3 * (i * width + j) + 1];
@@ -176,39 +337,7 @@ int main ( int argc, char** argv ) {
 	int jj = j;
 	int ii = height - 1 - i;
 	
-	bool ExclusionZone = false;
-	
-#ifdef CamA1
-	if ( abs(jj-1205) < 40 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-70) < 70) || ((jj-637)*(jj-637)+(ii-363)*(ii-363)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamA2
-	if ( abs(jj-1120) < 100 || (abs(jj-323) < 280 && abs(ii-39) < 40) || (abs(jj-1055) < 170 && abs(ii-49) < 50) || (abs(jj-650) < 115 && abs(ii-353) < 75) ||
-	     ((jj-640)*(jj-640)+(ii-130)*(ii-130)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamA3
-	if ( abs(jj-1163) < 100 || (abs(jj-133) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-36) < 35) || ((jj-635)*(jj-635)+(ii-357)*(ii-357)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamA4
-	if ( abs(jj-1123) < 100 || (abs(jj-323) < 278 && abs(ii-39) < 40) || (abs(jj-1055) < 170 && abs(ii-48) < 50) || ((jj-630)*(jj-630)+(ii-351)*(ii-351)) < 10000 ) ExclusionZone = true;
-#endif
-#ifdef CamB1
-	if ( abs(jj-1123) < 98 || (abs(jj-650) < 340 && abs(ii-Ret[0]) < Ret[1]) || (abs(jj-323) < 278 && abs(ii-38) < 37) || ( jj > 1025 && ii > 565 ) || (abs(jj-1058) < 163 && abs(ii-50) < 50) ||
-             ((jj-649)*(jj-649)+(ii-362)*(ii-362)) < 6400 || ((jj-885)*(jj-885)+(ii-205)*(ii-205)) < 900 || ((jj-408)*(jj-408)+(ii-205)*(ii-205)) < 529 ) ExclusionZone = true;
-#endif
-#ifdef CamB2
-	if ( abs(jj-1205) < 45 || (abs(jj-135) < 100 && abs(ii-28) < 27) || (abs(jj-1163) < 100 && abs(ii-37) < 34) ) ExclusionZone = true;
-#endif
-#ifdef CamB3
-	if ( abs(jj-1135) < 85 || (abs(jj-323) < 278 && abs(ii-40) < 36) || (abs(jj-1058) < 170 && abs(ii-70) < 25) || (abs(jj-640) < 115 && abs(ii-358) < 75) ) ExclusionZone = true;
-#endif
-#ifdef CamB4
-	if ( abs(jj-1203) < 45 || (abs(jj-138) < 100 && abs(ii-30) < 25) || (abs(jj-1128) < 130 && abs(ii-65) < 65) || ((jj-637)*(jj-637)+(ii-364)*(ii-364)) < 11000 ) ExclusionZone = true;
-#endif
-#ifdef Custom
-	if ( false ) ExclusionZone = true;
-#endif
-	
-	if ( !ExclusionZone || k == start ) {
+	if ( !(*inExclusionZone)(ii, jj) || k == start ) {
 	  if ( diffs[0] > maximum[0] )
 	    { maximum[0] = diffs[0]; maxLoc[0][0] = ii; maxLoc[0][1] = jj; if ( maximum[0] > MinThr ) ++NumPixAbvThr[0][0]; if ( maximum[0] > SubThr ) ++NumPixAbvSubThrSum; }
 	  if ( diffs[1] > maximum[1] )
@@ -223,33 +352,35 @@ int main ( int argc, char** argv ) {
 	    { minimum[2] = diffs[2]; minLoc[2][0] = ii; minLoc[2][1] = jj; if ( minimum[2] <-MinThr ) ++NumPixAbvThr[2][1]; if ( minimum[2] <-SubThr ) ++NumPixAbvSubThrSum; }
 	}
 	
-      }
-    }
+      } /* end pixel y loop */
+    } /* end pixel x loop */
     
-    if ( k > start )
-      fprintf(stdout,"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",k,
-	     maximum[0],maxLoc[0][1],maxLoc[0][0],maximum[1],maxLoc[1][1],maxLoc[1][0],maximum[2],maxLoc[2][1],maxLoc[2][0],
-	     minimum[0],minLoc[0][1],minLoc[0][0],minimum[1],minLoc[1][1],minLoc[1][0],minimum[2],minLoc[2][1],minLoc[2][0],
-	     NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
-	     NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],NumPixAbvSubThrSum);
-    else {
-      /*fprintf(stderr,
-	      "The absolute (no subt) details from the first frame:\n%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",k,
-             maximum[0],maxLoc[0][1],maxLoc[0][0],maximum[1],maxLoc[1][1],maxLoc[1][0],maximum[2],maxLoc[2][1],maxLoc[2][0],
-             minimum[0],minLoc[0][1],minLoc[0][0],minimum[1],minLoc[1][1],minLoc[1][0],minimum[2],minLoc[2][1],minLoc[2][0],
-             NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
-             NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],NumPixAbvSubThrSum);*/
-#ifdef CamB1
-      cerr << NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0] << endl;
-      if ( (NumPixAbvThr[0][0]+NumPixAbvThr[1][0]+NumPixAbvThr[2][0]) > CloudCover || CC )
-	{ Ret[0] = 360; Ret[1] = 230; }
-#else
-      cerr << CloudCover - CloudCover << endl;
-#endif
-    }
+
+      fprintf(stdout,"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
+	      k,
+	      maximum[0],maxLoc[0][1],maxLoc[0][0],
+	      maximum[1],maxLoc[1][1],maxLoc[1][0],
+	      maximum[2],maxLoc[2][1],maxLoc[2][0],
+	      minimum[0],minLoc[0][1],minLoc[0][0],
+	      minimum[1],minLoc[1][1],minLoc[1][0],
+	      minimum[2],minLoc[2][1],minLoc[2][0],
+	      NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
+	      NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],
+	      NumPixAbvSubThrSum);
+
     
-  }
+  } /* end of frame loop */
   
   return 0;
-  
+  /* We don't free BMP_A and BMP_B memory since we exit 1a's process right away.*/
+  /* Yes, we will skip frames when the caller asks for a partial job! */
+  /* Each output line is numbered by it's OLD frame. */
+} /* end of main */
+
+
+static char * bmfilename( int f )
+{
+  static char fn[] = "bitmaps/thumb000000.bmpXXXXXXXXXXXXXXXXXXXXXX";
+  sprintf(fn,"bitmaps/thumb0%05d.bmp", f);
+  return fn;
 }
