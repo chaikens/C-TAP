@@ -1,4 +1,38 @@
 #!/bin/bash
+#batch processing of multiple movies
+#
+# Except for movie location and selection configuration
+# demo, this C-TAP.moviedir.sh is identical to C-TAP.sh
+#
+# In our system, the relevent external drive directory
+# has pathname /media/seth/CTAP/ShortTests/Movies
+# and the movies therein are named movie00[1-5].mp4
+# You will have to reconfigure this.
+# (These were artifically constructed by combining
+# approx 1 sec. fragments from three of our C-TAP project
+#  movies. See README.md for getting copies.
+#
+# C-TAP.moviedir.sh here is a revision of C-TAP.sh
+# in which features not demonstrated in our C-TAP.sh
+# are tested.
+# (1) Processing a batch of movies from one directory
+#     (or shell globbing pattern--such targeting multiple
+#      dirs has not been tested.)
+# (2) Detecting if the movie dir is not in the same filesystem
+#     as the software.  If so, the selected movies
+#     are processed one at a time as follows:
+#     (a) The movie is copied into $(pwd)/TMPMOVIEDIR
+#     (b) accessed from there by ffmpeg
+#          (to make frame .bmp files in $(pwd)/bitmaps)
+#     (c) single movie processing:
+#         Phase1a, its result <movieBaseName>.int put in RESULTS,
+#         Phase1b, its result <movieBaseName>.out put in RESULTS,
+#         THUMB*.bmp frames are then selected, a circle is
+#         drawn in each, and those results (PIC*) are combined
+#         into the "baby movie" named <movieBaseName>.MOV
+#         stored in RESULTS.
+#     (d) The copy in $(pwd)/TMPMOVIEDIR is deleted.
+#         
 #
 # manual settings
 #
@@ -16,7 +50,8 @@ DEBUG=true
 # putting it (or a symlink) in the same
 # dir as the script.
 #
-SLOW_MOVIE_DIR=$(pwd)
+#SLOW_MOVIE_DIR=$(pwd)
+SLOW_MOVIE_DIR="/media/seth/CTAP/ShortTests/Movies"
 
 #
 # One of our functions is to copy (using rsync)
@@ -35,20 +70,23 @@ ext=mp4
 #the dir (say on a slow external drive) that contains
 #a family of movies, say taken by one session of camera shooting.
 # 
+#
+#movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
+
+movie_files="${SLOW_MOVIE_DIR}/movie*.$ext"
+
+#
+#
 # Put a shell globbing pattern in the quotes above to select the list
 # of full pathnames of one or more movie files.
 #
 # Some movie file names incorporate the camera name, so we can select
 # from one camera, eg ..$path/*_A1.
 #
-#This script is pre-programmed to test/demonstrate on
-#movie DroneShort1.mp4.  See README.md for getting a copy to
-#this 125MB movie.  It's short and results in a clear true
-#positive case detection..a purposely flown drone in daytime.
 #
-#movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 #
-movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"  
+#
+#movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"  
 
 # CWD we should be in when calling our programs from this script
 SOFTWARE_DIR=$(pwd)
