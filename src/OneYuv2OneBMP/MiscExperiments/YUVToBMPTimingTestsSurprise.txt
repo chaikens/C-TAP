@@ -1,0 +1,41 @@
+The current formula in OneYuv2OneBMP(->YUVToBMPStreamFilterByFormula)
+give us Univ. .bmp picture and Frame1.* results that look "kinda dull".
+
+Surprise: Integer arith
+(long int multiplications and shifts then < for [0-255] rounding)
+beats mem table lookup just a little. Float calc is take 3x amount of
+as mem lookup!
+
+Use of exhaustive in-memory (0-255)^3 -->(0-255)^3 Table
+(Obtained as ffmpeg's conversion of
+our UnivI420pUnc4096x4096.yuv --> UnivI420pUnc4096x4096.bmp)
+
+$ time ../YUVToBMPStreamFilter 3840 2160 < BIGYUV.yuv > /dev/null
+YUVToBMPStreamFilter transformed 1769 images.
+
+real	1m39.456s
+user	1m29.781s
+sys	0m9.553s
+
+Implementation of Jack's formula (See OneYuv2OneBmp.cpp)
+in default floating arith:
+$ time ../YUVToBMPStreamFilterByFormula 3840 2160 < BIGYUV.yuv > /dev/null
+YUVToBMPStreamFilter transformed 1769 images.
+
+real	4m48.355s
+user	4m38.589s
+sys	0m9.592s
+
+
+OneYuv2OneBmp.cpp rewritten to do long int arith then div by 2^13.
+$ time ../../../YUVToBMPStreamFilterByFormula 3840 2160 < BIGYUV.yuv > /dev/null
+YUVToBMPStreamFilter transformed 1769 images.
+
+real	1m30.128s
+user	1m20.463s
+sys	0m9.591s
+
+Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
+bogomips: 5399.81
+cpu MHz	: 1298.952
+

@@ -317,13 +317,119 @@ static inline uint8_t uint8clamp( float x )
 
 
 static inline bgrtriple bgrtripleFromYUVByFormula( uint8_t y, uint8_t u, uint8_t v )
-{
-  return bgrtriple( uint8clamp (y + 1.816*(u - 128)), //blue
-		    uint8clamp (y - 0.459*(v - 128) - 0.813*(u - 128)), //green
-		    uint8clamp (y + 1.540*(v - 128)) //red
-			     );
-}
+// formula from page 20-21, 
 
+// Video Demystified
+// A Handbook
+// for the
+// Digital Engineer
+// Fifth Edition
+// by Keith Jack
+// C 2007 Newnes is an imprint of Elsevier
+// ISBN: 978-0-7506-8395-1
+
+//   RGB-YCbCr Equations: HDTV
+// RGB to YCbCr: Analog Equations
+// Many specifications assume the source is
+// analog R´G´B´ with a normalized range of 0–1.
+// This is first converted to analog YPbPr:
+// Y = 0.213R´ + 0.715G´ + 0.072B´
+// Pb = –0.115R´ – 0.385G´ + 0.500B´
+// Pr = 0.500R´ – 0.454G´ – 0.046B´
+// To generate 8-bit YCbCr with the proper
+// values, YPbPr is then quantized to 8 bits:
+// Y = round[219Y + 16]
+// Cb = round[224Pb + 128]
+// Cr = round[224Pr + 128]
+
+//   RGB to YCbCr: Digital Equations
+
+// To convert 8-bit digital R´G´B´ data with a
+// 16–235 nominal range (Studio R´G´B´) to
+// YCbCr, the analog equations may be simplified to:
+// Y = 0.213R´ + 0.715G´ + 0.072B´
+// Cb = –0.117R´ – 0.394G´ + 0.511B´ + 128
+// Cr = 0.511R´ – 0.464G´ – 0.047B´ + 128
+
+//   YCbCr to RGB: Analog Equations
+// Many specifications assume the source is
+// analog YPbPr. This is first converted to analog
+// R´G´B´:
+
+//   R´ = Y + 1.575Pr
+//   G´ = Y – 0.468Pr – 0.187Pb
+//   B´ = Y + 1.856Pb
+
+//   To generate 8-bit R´G´B´ with a 16–235
+// nominal range (Studio R´G´B´), R´G´B´ is then
+// quantized to 8 bits:
+// out´ = round[219in´ + 16]
+
+//   YCbCr to RGB: Digital Equations
+// To convert 8-bit YCbCr to R´G´B´ data with
+// a 16–235 nominal range (Studio R´G´B´), the
+// analog equations may be simplified to:
+	      
+//    R´ = Y + 1.540(Cr – 128)
+//    G´ = Y – 0.459(Cr – 128) – 0.183(Cb – 128)
+//    B´ = Y + 1.816(Cb – 128)
+
+//   YCbCr to RGB: General Considerations
+// When performing YCbCr to R´G´B´ con-
+// version, the resulting R´G´B´ values have a
+// nominal range of 16–235, with possible occa-
+// sional excursions into the 0–15 and 236–255
+// values. This is due to Y and CbCr occasionally
+// going outside the 16–235 and 16–240 ranges,
+// respectively, due to video processing and
+// noise. Note that 8-bit YCbCr and R´G´B´ data
+// should be saturated at the 0 and 255 levels to
+// avoid underflow and overflow wrap-around
+// problems.
+
+// Table 3.2 lists the YCbCr values for 75%
+// amplitude, 100% saturated color bars,
+// a common video test signal.
+
+//see also https://en.wikipedia.org/wiki/YCbCr for
+// different approaches and references (we should try), incl.
+//  https://github.com/google/skia/commit/c7d01d3e1d3621907c27b283fb7f8b6e177c629d
+// in repository
+//  https://github.com/google/skia/tree/c7d01d3e1d3621907c27b283fb7f8b6e177c629d
+
+// {
+//   return bgrtriple( uint8clamp (y + 1.816*(u - 128)), //blue
+// 		    uint8clamp (y - 0.459*(v - 128) - 0.813*(u - 128)), //green
+// 		    uint8clamp (y + 1.540*(v - 128)) //red
+// 			     );
+// }
+{
+// ; 1.816*2^13
+// 	14876.672
+// ; 0.459*2^13
+// 	3760.128
+// ; 0.813*2^13
+// 	6660.096
+// ; 1.540*2^13
+// 	12615.68
+// ; 
+// ; 2^13
+// 	8192
+
+  long int Y = y; long int U = u; long int V = v;
+  long int YE = Y<<13;
+  long int B = (((YE) + 1487*(U - 128)))>>13;
+  long int G = (((YE) - 3760*(V - 128) - 6660*(U - 128)))>>13;
+  long int R = (((YE) + 12616*(V - 128)))>>13;
+  if(R < 0) R = 0;
+  if(R > 255) R = 255;
+  if(G < 0 )  G = 0;
+  if(G > 255) G = 255;
+  if(B < 0 ) B = 0;
+  if(B > 255) B = 255;
+
+  return bgrtriple(B, G, R);
+}
 
 //back to TABLE version.
 //
