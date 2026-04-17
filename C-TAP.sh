@@ -56,6 +56,25 @@ SOFTWARE_DIR=$(pwd)
 # where our results are written
 RESULTS_DIR="`pwd`/RESULTS"
 
+# RESULTS:
+#
+# movieprefix.in (result of Phase1a)
+#
+# movieprefix.out (result of Phase1b)
+#
+# movieprefix.MOV "baby movie" made by code below
+# by drawing a circle into each frame listed by frame number
+# given by entry 2 of each line in movieprefix.out.
+#
+# Notes for V2.0 we hope (with pipelining instead of file stores): 
+# We will assume and then check the frame number is exactly
+# number of frames up to this one extracted by our input-to-phase1a input
+# from ffmpeg, i.e. those ffmpeg with our command didn't skip.
+# We hope this assumption will allow us to retrieve those frames
+# (instead of using the expensive-to-write-and-keep thumb*.bmps)
+# by running the same ffmpeg extraction to a stream of yuvs
+# again.
+
 
 # (from original comments, edited)
 # PRE-REQ: FFMPEG (any v) +ImageMagick (Win: command prompt not enough)
@@ -267,8 +286,9 @@ do
 
     RESULT_OF_1a_BASE="${moviePrefix}.int"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
-    #Phase1a will be run multiple times, appending each time,
-    # we must start with nothing.
+    #Phase1a used to be will run multiple times, appending each time,
+    # (but the script now only does one run.)
+    # If we did staged runs, we must start with nothing.
 
     cd $BITMAPS_PARENT_DIR
     #That's where the C++ image processors expect us to be
@@ -423,6 +443,17 @@ do
     EXT="MOV" #NOT same as ext above!
     #mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
     ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${EXT}
+
+    #ffmpeg docs:
+    #
+    # -f image2 -pattern_type glob -i 'pic*.bmp'
+    # is for "demultiplexing" a collection identical format images selected by the filename glob.
+    #
+    # -vcodec libx264 -crf 25
+    #
+    # -pix_fmt yuv420p 
+    #
+    
     #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
     # We're done with I/O thru the bitmaps dir
