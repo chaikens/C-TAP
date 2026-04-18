@@ -1,4 +1,5 @@
-# C-TAP
+# C-TAP Intro
+Please check out Section 3.2.1 on image analysis for UAP research starting on page 11 of https://arxiv.org/pdf/2312.00558
 # C-TAP
 To try this out, get the 125Mb movie named DroneShort1.mp4 from
 Google drive folder https://drive.google.com/drive/folders/15EOdKlvIPG9ORDVy3WBh5rX8cFSmmVQ7 .  
