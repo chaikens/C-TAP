@@ -244,9 +244,15 @@ do
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
 
-    echo "Calling ffmpeg to extract bitmap frames..to watch this, run in another window:"
-    echo "tail -f $RESULTS_DIR/ffmpeg.outputs"
-    echo
+    
+    #below made obsolete by xterm job below. Someone may want to restore
+    #for use in non-windowing computers
+    #echo "Calling ffmpeg to extract bitmap frames..to watch this, run in another window:"
+    #echo "tail -f $RESULTS_DIR/ffmpeg.outputs"
+    #echo
+
+
+    
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
     
     # try below doesn't work.
@@ -271,7 +277,10 @@ do
            -vf \
 	    "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
 	   thumb%06d.bmp \
-	   &> $RESULTS_DIR/ffmpeg.outputs 
+	   &> $RESULTS_DIR/ffmpeg.outputs &
+	xterm -geometry 170x30+0+0 -e tail -f $RESULTS_DIR/ffmpeg.outputs &
+	wait %ffmpeg
+	kill %xterm
     else
 	echo
 	echo "We're reusing movie bitmaps for debugging speed."
