@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #/*
-# Phase1aDoOneMovie.sh MOVIEFILENAME.mp4
+# Phase1aDoOneMovie.sh (or variant of this scriptname) MOVIEFILENAME.mp4
 #
 # All files should be in or symbolically linked
 # in the CWD.
@@ -26,16 +26,16 @@ function heightOfMovie() {
 
 
 MOVIE_FILE=$1
-if [ ! -r ${MOVIE_FILE} ];then echo Cant read movie file; exit; fi
+if [ ! -r ${MOVIE_FILE} ];then echo Cant read movie file ${MOVIE_FILE}; exit; fi
 
-width=$(widthOfMovie ${MOVIE_FILE})
-height=$(heightOfMovie ${MOVIE_FILE})
+width=$(widthOfMovie ${MOVIE_FILE})   #halfing because ffmpeg below
+height=$(heightOfMovie ${MOVIE_FILE}) #does this.
 
-yuvsizeb=$(( (width*height*3)/2 ))
+yuvsizeb=$(( (width*height*3)/2 )) 
 
 echo width=${width} height=${height} yuvsizeb=${yuvsizeb}
 
-echo Phase1aDoOneMovie.sh Processing ${width}x${height} $MOVIE_FILE
+echo $0 Processing ${width}x${height} $MOVIE_FILE
 
 rm -f PIPE.yuv
 mknod PIPE.yuv p
@@ -43,17 +43,32 @@ mknod PIPE.yuv p
 rm -f PIPE.bmp
 mknod PIPE.bmp p
 
- ffmpeg -hide_banner -y -i $MOVIE_FILE PIPE.yuv &> ffmpeg.log &
+ #ffmpeg -hide_banner -y -i $MOVIE_FILE PIPE.yuv &> ffmpeg.log &
  #Will experiment with more parameters.  The original C-TAP
  # cut back the resolution.
+#ffmpeg  -threads 0 -hide_banner -y -an     \
+#       -i $MOVIE_FILE                      \
+#       -vf                                 \
+#       "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
+#       PIPE.yuv &> ffmpeg.log
 
+ffmpeg  -hide_banner -y -an     \
+       -i $MOVIE_FILE                      \
+        -vf                                \
+        "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
+       PIPE.yuv &> ffmpeg.log &
+
+
+
+width=$(( width / 2 ))
+height=$(( height / 2 ))
  
-./YUVToBMPStreamFilter   $width $height < PIPE.yuv > PIPE.bmp &
+./YUVToBMPStreamFilter  $width $height < PIPE.yuv > PIPE.bmp &
 # width and height are necessary since yuv frames are raw.
 # so we have to take care if ffmpeg outputs differently sized
 # frames from the movie original.
 
-./Phase1aPipe  0 1000000 < PIPE.bmp > ${MOVIE_FILE%.*}.int
+./Phase1aPipe   0 1000000 < PIPE.bmp > ${MOVIE_FILE%.*}.int
 #1000000 is a large number so all the number of frame from the
 #movie are processed.  0 causes the frame numbers at the
 #start of report lines to begin with 1, for the comparison
