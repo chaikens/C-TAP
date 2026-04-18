@@ -380,42 +380,34 @@ do
 	then
 	    echo "Part deux: electric boogaloo... First try found 0 frames with objects."
 	    echo "We will redo Phase1a"
-	    u=0; v=0
-	    w=30
-            t=$((nframes/w))
-            while [ $u -lt $nframes ]
-            do
-		./$Phase1a $u $t 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null 
-		((++v))
-		echo Phase 1Bs 1A redo: Part $v of $w Done
-		if [ $v -gt $w ]
-		then
-                    echo "Don't panic -- there was a remainder from the division!"
-		fi
-		u=$((u+t))
-		if [ $((u+t)) -gt $nframes ]
-		then
-                    t=$((nframes-u))
-		fi
-            done
-	fi
-	#rm $Output
-	if ./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
-	   then
-	       n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
-	       echo "Phase 1B: Re-Done reports $n frames with objects."
 
+	    ./$Phase1a $u $nframes 1 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2> /dev/null 
+	    echo Phase 1Bs 1A redo done.
+	fi
+
+	./$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+	RET=$?
+	if [ $RET == 0 ]
+	then
+	    n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
+	    echo "Phase 1B: Re-Done reports $n frames with objects."
+	else
+	    echo "Phase 1B reported error return code = " "$RET"
+	    echo "On the the next movie, if any"
+	    continue
 	fi
     fi
     
     # don't waste time on empty file OR overloading your HD
+    # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
+
     if [ $n -gt 465000 ] || [ $n -eq 0 ]
     then
 	echo "Either too many or too few objects..."
 	echo "On to the next movie, if any"
 	continue #top level movie loop
     fi
-    # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
+
     
     echo "Logging range, deploying Little Green Men.."
     cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | while read evt frame extr x y prob
