@@ -1,27 +1,105 @@
 #!/bin/bash
+#
+# manual settings
+#
+#settings for debugging or not.
+DEBUG=true
+#DEBUG=false
+#Also, set debugging or not in our Makefile
 
+#
+# Please code below where you would like us to
+# find 1 or more movies to process, plus
+# one name or a pattern for them all.
+#
+# We test on our single, short movie by
+# putting it (or a symlink) in the same
+# dir as the script.
+#
+SLOW_MOVIE_DIR=$(pwd)
+
+#
+# One of our functions is to copy (using rsync)
+# movies from a slow filesystem to the one containing the script,
+# presumedly a faster one.
+# The script detects if the filesystems are the same and
+# in that case, skips the copying.  So, when we're out
+# of the box (and you put DroneShort1.mp4 alongside the
+# script, copying is not done.
+#
+
+#file extension our movies have
+ext=mp4
+
+#example where we use SLOW_MOVIE_DIR to specify
+#the dir (say on a slow external drive) that contains
+#a family of movies, say taken by one session of camera shooting.
+# 
+# Put a shell globbing pattern in the quotes above to select the list
+# of full pathnames of one or more movie files.
+#
+# Some movie file names incorporate the camera name, so we can select
+# from one camera, eg ..$path/*_A1.
+#
+#This script is pre-programmed to test/demonstrate on
+#movie DroneShort1.mp4.  See README.md for getting a copy to
+#this 125MB movie.  It's short and results in a clear true
+#positive case detection..a purposely flown drone in daytime.
+#
+#movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
+#
+movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"  
+
+# CWD we should be in when calling our programs from this script
+SOFTWARE_DIR=$(pwd)
+
+# where our results are written
+RESULTS_DIR="`pwd`/RESULTS"
+
+# RESULTS:
+#
+# movieprefix.in (result of Phase1a)
+#
+# movieprefix.out (result of Phase1b)
+#
+# movieprefix.MOV "baby movie" made by code below
+# by drawing a circle into each frame listed by frame number
+# given by entry 2 of each line in movieprefix.out.
+#
+# Notes for V2.0 we hope (with pipelining instead of file stores): 
+# We will assume and then check the frame number is exactly
+# number of frames up to this one extracted by our input-to-phase1a input
+# from ffmpeg, i.e. those ffmpeg with our command didn't skip.
+# We hope this assumption will allow us to retrieve those frames
+# (instead of using the expensive-to-write-and-keep thumb*.bmps)
+# by running the same ffmpeg extraction to a stream of yuvs
+# again.
+
+
+# (from original comments, edited)
 # PRE-REQ: FFMPEG (any v) +ImageMagick (Win: command prompt not enough)
 # General directions (ReadMe!):
-# Change path below to proper path for your machine (Unix style though)
+
 # Make sure you have a minimum of 780GB free on your HD (internal!)
 # If impossible: you can still use the code but it will be much slower
-# Choose the camera you want to run (A1,A2,A3,A4,B1,B2,B3,B4) in file=
+# Choose the camera you want to run (A1,A2,A3,A4,B1,B2,B3,B4)
+# by setting the movie name or pattern as described above.
+#
 # Follow that up by altering the tops of FLIRanalysisPhase1aCamX.cpp
 # and FLIRanalysisPhase1bCamX.cpp to match the SAME CAMERA NAME (KEY!)
-# After editing those source code files, you must save them, although
-# since this script compiles them you won't need to manually recompile
-# source C-TAP.sh to run (OR exec or . instead of source, OS-dependent)
+# After editing those source code files, you must of course save them.
+# We now have a Makefile and the script calls make to compile them
+# if necsssary.
+# The script file comes in executable mode, so in Unix, etc
+# systems run it with the command:
+# ./C-TAP.sh
+# (might be different in some systems).
+# The script should be run in its own process, not the parent shell,
+# so DONT use source (or . (dot) ).
 
 # UFODAP: path, type avi, file, w=1, 360->800, don't make new vid and mv
 # instructions for Windows users, if you have errors, go to the bottom:
 
-#movie_dir=`pwd`/..  #Please set full pathname.
-# set below details of how movies are named, including filename "extension".
-#ext="MOV"  # case-sensitive extension
-
-#settings for debugging or not.
-DEBUG=true
-#DEBUG=false
 if [ $DEBUG = "true" ]
 then
     echo
@@ -36,17 +114,19 @@ else
     MAKE_DEBUG=no  #not used yet
 fi
 
-SLOW_MOVIE_DIR=$(pwd)
-ext=mp4
-
-SOFTWARE_DIR=$(pwd)
 cd $SOFTWARE_DIR
 
-Phase1a=Phase1a
+# our 2 programs the script calls.
+# We've retained their original source file names, the exe names
+# below come from our Makefile.
+Phase1a=Phase1a  #compiled from FLIRanalysisPhase1aCamX.cpp, alongside us.
 make Phase1a
-Phase1b=Phase1b
+Phase1b=Phase1b  #compiled from FLIRanalysisPhase1bCamX.cpp, alongside us.
 make Phase1b
 
+# v1.0 uses ./bitmaps for .bmps
+# (1) extracted from movies
+# (2) created by this script when making the "baby movie"
 
 BITMAPS_PARENT_DIR=$(pwd)
 BITMAPS_DIR="$BITMAPS_PARENT_DIR/bitmaps"
@@ -56,7 +136,6 @@ then
     exit
 fi
 
-RESULTS_DIR="`pwd`/RESULTS"
 if ! mkdir -p $RESULTS_DIR
 then
     echo "Cant make RESULTS_DIR"
@@ -112,8 +191,9 @@ do
 	then
 	    echo 'They are the same'
 	else
-	    echo 'Copying (rsync) one movie from slow to fast filesystem.' 
-	    if [ ! rsync -pH --progress $movie_file $FAST_MOVIE_DIR ]
+	    echo 'Copying (rsync) one movie from slow to fast filesystem.'
+	    rsync -pH --progress $movie_file $FAST_MOVIE_DIR 
+	    if [ $? != 0 ]
 	    then
 		echo 'Copying (rsync) failed.  exiting.'
 	    fi
@@ -125,7 +205,7 @@ do
 	moviePrefix=`basename ${movie_file%.$ext}`
 	echo '(debugging)'
 	echo "our movie_file:"
-	echo $movie_file
+	echo ${movie_file}
     fi
  
     echo "Making Mick West redundant, processing ONI FOIA files..."
@@ -165,10 +245,13 @@ do
     else
 	echo
 	echo "We're reusing movie bitmaps for debugging speed."
-	rm -f pic*.bmp
+	echo
+	rm -f pic*.bmp #only delete images used to make the previous "baby movie"
     fi
-      
     
+    #
+    # ffmpeg usage explanation for command ABOVE
+    #
     # &> redirects both stdout and stderr to save temporarilly.
     # because the FLIRanalysisPhase1aCamX.cpp processes all files in the cwd.
     #
@@ -182,21 +265,8 @@ do
     #  setpts changes the presentation timestamp (pts)
     #    N is the input frame count
     #    TB is the Time Base of the input timestamps (usually 1/framerate)
-    
+    #
 
-    if [ ! $? ]
-    then
-	echo
-	echo ffmpeg error
-	echo opening emacs on ffmpeg output
-	emacs $RESULTS_DIR/ffmpeg.outputs &
-	echo exiting
-	exit
-    fi
-
-    echo "ffmpeg done."
-    echo
-    
     nframes=`ls  | wc -l`
     echo "$nframes frames captured"
 
@@ -213,8 +283,9 @@ do
 
     RESULT_OF_1a_BASE="${moviePrefix}.int"
     rm -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
-    #Phase1a will be run multiple times, appending each time,
-    # we must start with nothing.
+    #Phase1a used to be will run multiple times, appending each time,
+    # (but the script now only does one run.)
+    # If we did staged runs, we must start with nothing.
 
     cd $BITMAPS_PARENT_DIR
     #That's where the C++ image processors expect us to be
@@ -224,8 +295,14 @@ do
     then
 	# run Phase1 once on all the frames
 	./$Phase1a 0 $nframes 0 > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+	#first 0 = first frame number
+	#2nd 0 = CC (Cloud Cover) parameter; not used.
     else
+	#
 	# orig. code runs Phase1 in stages
+	# we must consult Matt Sz. to see if we should get rid of this.
+	# One frame pair comparison is lost for each new stage.
+	# 
 	u=0; v=0
 	w=30
 	t=$((f/w))
@@ -363,6 +440,17 @@ do
     EXT="MOV" #NOT same as ext above!
     #mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
     ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${EXT}
+
+    #ffmpeg docs:
+    #
+    # -f image2 -pattern_type glob -i 'pic*.bmp'
+    # is for "demultiplexing" a collection identical format images selected by the filename glob.
+    #
+    # -vcodec libx264 -crf 25
+    #
+    # -pix_fmt yuv420p 
+    #
+    
     #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
     # We're done with I/O thru the bitmaps dir
@@ -370,10 +458,7 @@ do
 
     # save the result movie
 
-    
-
     echo "Cleaning detritus..."
-
 
     #rm -rf *.cpp~ *.sh~ *.txt~ *.err bitmaps/
     # sdc: Keep old bitmaps BUT the script removes them early next time
@@ -385,8 +470,7 @@ do
     then
 	echo "about to delete input movie"
 	echo $movie_file
-	echo
-	echo "not done yet"
+	rm $movie_file
     fi
     
     echo "Cosmic consciousness has been achieved!!"
