@@ -16,9 +16,16 @@ DEBUG=true
 # putting it (or a symlink) in the same
 # dir as the script.
 #
+#######################################################
+#    CODE HERE WHERE YOUR MOVIES ARE                  #
+#  and their FILENAME EXTENSION (also see below)      #
+#                                                     #
 SLOW_MOVIE_DIR=$(pwd)
+#                                                     #
+ext=mp4
+#It must be standard and correct for ffmpeg to use.   #
+#######################################################
 
-#
 # One of our functions is to copy (using rsync)
 # movies from a slow filesystem to the one containing the script,
 # presumedly a faster one.
@@ -27,28 +34,38 @@ SLOW_MOVIE_DIR=$(pwd)
 # of the box (and you put DroneShort1.mp4 alongside the
 # script, copying is not done.
 #
-
-#file extension our movies have
-ext=mp4
-
-#example where we use SLOW_MOVIE_DIR to specify
+# Example where we use SLOW_MOVIE_DIR to specify
 #the dir (say on a slow external drive) that contains
 #a family of movies, say taken by one session of camera shooting.
-# 
-# Put a shell globbing pattern in the quotes above to select the list
-# of full pathnames of one or more movie files.
+#
+# Whence (after USB hotplugging),
+#/data/GIT/C-TAP$ ls /media/seth/CTAP/2025-01-17/
+# N884A6_ch1_main_20250117000000_20250117010000.mp4
+# N884A6_ch1_main_20250117040000_20250117050000.mp4  
+# N884A6_ch1_main_20250117200000_20250117210000.mp4
+#
+# We code the shell globbing pattern in quotes:
+# SLOW_MOVIE_DIR=/media/seth/CTAP/2025-01-17/
+# ext=mp4
+# movie_files="SLOW_MOVIE_DIR/N884A6_ch1_main_*.${ext}"
 #
 # Some movie file names incorporate the camera name, so we can select
 # from one camera, eg ..$path/*_A1.
 #
 #This script is pre-programmed to test/demonstrate on
-#movie DroneShort1.mp4.  See README.md for getting a copy to
-#this 125MB movie.  It's short and results in a clear true
-#positive case detection..a purposely flown drone in daytime.
+#125MB test movie DroneShort1.mp4.  See README.md for getting a copy.
+#It results in a clear true
+#positive case detection of a purposely flown drone in daytime.
 #
-#movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 #
+##############################################################
+#   SPECIFY YOUR MOVIE FILES HERE FOR THE SCRIPT TO PROCESS  #
+#   THEM ALL, RUNNING THE ANALYSES ONE AT A TIME FOR EACH,   #
+#   and putting the RESULTS in SEPARATE FILES.               #
+#                                                            #
 movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"  
+#                                                            #
+##############################################################
 
 # CWD we should be in when calling our programs from this script
 SOFTWARE_DIR=$(pwd)
@@ -107,12 +124,32 @@ then
     echo
     ulimit -c unlimited
     MAKE_DEBUG=yes #not used yet
-    #deal with this manually for now.
+    #In pipeline versions, there are no Phase1a disk file
+    #.bmps or other saved frame images.
+    #I plan to pipeline that after Phase1b, frames
+    # are selected circles drawn into them, and
+    # they are combined by ffmpeg to make the baby movie.
+    #
+    #Manually deal with this saving for now,
+    # when saving is actually done for regression and
+    # old version conparisons.
     REUSE_BMPS=no
 else
     ulimit -c 0
-    MAKE_DEBUG=no  #not used yet
+    MAKE_DEBUG=no  #not used yet Remember to comment earlier
+    #that optimized compiling should be used except for debugging.
+    # script can do make ...  DEBUGGING=false or
+    #  make ...  CXXFLAGS=-03 (overriding -g )
+    # But we like -Wno-unused-variables to stop warnings make will convey
+    # when we use -O3  ... We should use a custom control like DEBUGGING
+    # rather than override I think.
 fi
+
+################################################################
+#                                                              #
+#  END OF REGION FOR USER CONFIGURATION EDITS                  #
+#                                                              #
+################################################################
 
 cd $SOFTWARE_DIR
 
@@ -158,16 +195,6 @@ else
     FAST_MOVIE_DIR="$(pwd)/TMPMOVIEDIR"
     mkdir -p $FAST_MOVIE_DIR
 fi
-
-# Put a shell globbing in the quotes below here get the list
-# of full pathnames of one or more movie files, for example
-# movie_files="$movie_dir/N884A6_ch1_main_202409*.$type"
-# Some movie file names incorporate the camera name, so we can select
-# from one camera, eg ..$path/*_A1.
-
-
-#movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
-movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"
 
 numMovieFiles=`ls $movie_files | wc -l`
 
