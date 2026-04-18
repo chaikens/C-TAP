@@ -444,20 +444,21 @@ do
 	then
 	    # echo '$y -lt 800 yes branch'
 	    BITMAP_EDIT_CMD=\
-"convert bitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
+"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
 	else
 	    # echo  '$y -lt 800 no branch'
 	    BITMAP_EDIT_CMD=\
-"convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
+"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
 	fi
 	# ..echo 'We will eval' $BITMAP_EDIT_CMD
 	eval $BITMAP_EDIT_CMD
     done
     
     echo "Breaking Lue's NDA..."
-    cd bitmaps/
+    cd ${BITMAPS_DIR}
     EXT="MOV" #NOT same as ext above!
     #mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
+    #  'pic*.bmp' must use single quotes so bash itself doesn't do filename extpansion 
     ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${EXT}
 
     #ffmpeg docs:
@@ -473,17 +474,25 @@ do
     #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
     # We're done with I/O thru the bitmaps dir
-    cd ..
+    cd ${SOFTWARE_DIR}
 
-    # save the result movie
+    # RESULT movie was written to during generation.
+    echo "Buy us a beer and see the latest result movie:"
+    echo ${RESULTS_DIR}/${moviePrefix}.${EXT}
 
-    echo "Cleaning detritus..."
+    # make system should do that..
+    # echo "Cleaning detritus..."
 
+    # We keep old bitmaps BUT the script removes them early next time
+    # because the C++ programs (used to?) process all files in their cwd.
+    # Review these assuptions in new version development.
+    #
+    # We should review .err file generation and development use.
+
+    
     #rm -rf *.cpp~ *.sh~ *.txt~ *.err bitmaps/
-    # sdc: Keep old bitmaps BUT the script removes them early next time
-    # because the C++ programs process all files in their cwd.
 
-    rm -f *.cpp~ *.sh~ *.txt~ 
+    #rm -f *.cpp~ *.sh~ *.txt~ 
 
     if [ $COPYMOVIES ]
     then
