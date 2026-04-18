@@ -1,4 +1,5 @@
-# C-TAP
+# C-TAP Intro
+Please check out Section 3.2.1 on image analysis for UAP research starting on page 11 of https://arxiv.org/pdf/2312.00558
 # C-TAP
 You're on the devel-pipeline branch.
 
