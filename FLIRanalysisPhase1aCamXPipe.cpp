@@ -1,5 +1,41 @@
 /**
-   This version reads a concatenation of .bmp files from fd 0
+  FLIRanalysisPhase1aCamXPipe.cpp, compiled to Phase1aPipe
+
+  $ Phase1APipe [--verbose] start_frame_no. number_of_frames_to_process \
+    < (pipe or file containing a concatenation of bitmaps).
+
+  It reads parameters from CamSett.txt for in its current working dir.
+  and modifies it by appending the camera name.
+
+  It writes to stdout a one line report for each adjacent 
+  pairs of frames. The index at each line beginning
+  is of the 2nd frame of the pair, so the first index
+  is start_frame_no. + 1.  The current script calls this
+  program once (per movie) with start_frame_no. = 0.
+
+  --verbose does writing to stdout (cerr).
+
+  If there are more frames than number_of_frames_to_process,
+  processing stops after the last frame.
+
+   This version reads a concatenation of .bmp (54 byte header) files 
+   from fd 0.  It finishes either after processing 
+   NumberOfFrames or EOF on fd 0. A double buffered (although 
+   single thread) strategy is used, so each image is read only once.
+   Memory use does not grow with number of frames.
+
+   It gets the (width)x(height) resolution from the first image and fails
+   if a subsequent image has different resolution.
+
+   Phase1aPipe [--verbose] StartFrameNumber NumberOfFrames CloudCover(not used)
+
+   Camera Cropping is included but not enabled, see #define Custom below.
+
+   Support for exclusion zones and original exclusion predicates
+   with run time selection is included but it is not enabled, there is 
+   no interface yet.  See the code below.
+
+   There are no other external non-standard dependencies or effects.
 */
 
 int stdinfreads = 0; //for debugging
@@ -323,26 +359,6 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
   { ezNone, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
     ezCamB1, ezCamB2, ezCamB3, ezCamB4 };
 
-/**
-  FLIRanalysisPhase1aCamXPipe.cpp, compiled to Phase1aPipe
-
-  $ Phase1APipe start_frame_no. number_of_frames_to_process \
-    < (pipe or file containing a concatenation of bitmaps).
-
-  It writes to stdout a one line report for each adjacent 
-  pairs of frames. The index at each line beginning
-  is of the 2nd frame of the pair, so the first index
-  is start_frame_no. + 1.  At present, our start_frame_no.
-  is 0.
-
-  If there are more frames than number_of_frames_to_process,
-  processing stops after the last frame.
-
-  Warning: This program modifies CamSett.txt by appending
-  the camera name.
-
-*/
-
 int main ( int argc, char** argv ) {
 
   int camera_index = 0;
@@ -356,7 +372,7 @@ int main ( int argc, char** argv ) {
   if(0 == strcmp(argv[1], "--verbose")) {
     verbose = 1;
     argc--;
-    argv++; //yes, it's a hack
+    argv++; //yes, it's a hack.  --verbose must be a first positional param.
   }
       
   if(verbose) {

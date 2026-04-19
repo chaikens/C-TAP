@@ -8,7 +8,7 @@ moviebase=${MOVIE_FILE%.*}
      ./Phase1aDoOneMovieHalfedDecimated.sh \
      $MOVIE_FILE &
 
-xterm -geometry 125x30+0+0 -e tail -f ffmpeg.log &
+xterm -geometry 132x30+0+0 -e tail -f ffmpeg.log &
 xterm -geometry 180x30+0+180 -e tail -f $moviebase.int &
 
 wait %/usr/bin/time
