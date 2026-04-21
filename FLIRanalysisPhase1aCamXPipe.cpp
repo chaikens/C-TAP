@@ -13,7 +13,9 @@
   is start_frame_no. + 1.  The current script calls this
   program once (per movie) with start_frame_no. = 0.
 
-  --verbose does writing to stdout (cerr).
+  --verbose does writing to stderr (cerr).
+
+  Also, error reports written to stderr before exit.
 
   If there are more frames than number_of_frames_to_process,
   processing stops after the last frame.
