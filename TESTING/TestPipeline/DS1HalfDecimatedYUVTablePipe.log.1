@@ -1,0 +1,34 @@
+./runthis.halfdecimated.sh
+Tue Apr 21 06:05:04 PM EDT 2026
+commit 5283856c
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+make: Entering directory '/data/GIT/C-TAP'
+make: Nothing to be done for 'all'.
+make: Leaving directory '/data/GIT/C-TAP'
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw 
+(our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe)
+ (redirects to/from files) > movie.int > (Phase1bPipe) > file.out 
+This is coded by DoOneMovieHalfDecimated1ab.sh
+Running ./DoOneMovieHalfDecimated1ab.sh DS1HalfDecimatedYUVTablePipe.mp4 DS1HalfDecimatedYUVTablePipe.log.1
+Extracted frames width=1920 height=1080 yuvsizeb=3110400
+Processing 1920x1080 frames from DS1HalfDecimatedYUVTablePipe.mp4
+STARTED ffmpeg at /proc/uptime=
+296389.12 2257794.27
+STARTED YUVToBMPStreamFilter at /proc/uptime=
+296389.13 2257794.29
+./DoOneMovieHalfDecimated1ab.sh STARTED Phase1aPipe /proc/uptime=
+296389.13 2257794.30 , will block
+YUVToBMPStreamFilter transformed 444 images.
+./DoOneMovieHalfDecimated1ab.sh FINISHED returned 0, /proc/uptime=
+296428.71 2257990.45
+Find Phase1a results in DS1HalfDecimatedYUVTablePipe.int
+./Phase1bPipe /data/GIT/C-TAP/TESTING/TestPipeline/DS1HalfDecimatedYUVTablePipe.int 1000000 0.5 > /data/GIT/C-TAP/TESTING/TestPipeline/
+/data/GIT/C-TAP/TESTING/TestPipeline/DS1HalfDecimatedYUVTablePipe.int file reading line limit reached NumFrames=1000000  NumFramesRead=443
+Grey(8-bit) pixel diff mu and sigma of 81.0 +/- 1.88 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 82 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 30.49 +/- 13.56
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 32
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
+Find the 149 Phase1b results in DS1HalfDecimatedYUVTablePipe.out

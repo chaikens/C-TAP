@@ -1,0 +1,34 @@
+./runthis.fullframe.sh
+Tue Apr 21 06:08:23 PM EDT 2026
+commit 5283856c
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+make: Entering directory '/data/GIT/C-TAP'
+make: Nothing to be done for 'all'.
+make: Leaving directory '/data/GIT/C-TAP'
+ffmpeg .mp4---->Full frame (default) .yuv raw 
+(our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe)
+ (redirects to/from files) > movie.int > (Phase1bPipe) > file.out 
+This is coded by DoOneMovieFullFrames1ab.sh
+Running ./DoOneMovieFullFrames1ab.sh DS1FullFrameYUVTablePipe.mp4 DS1FullFrameYUVTablePipe.log.1
+Extracted frames width=3840 height=2160 yuvsizeb=12441600
+Processing 3840x2160 frames from DS1FullFrameYUVTablePipe.mp4
+STARTED ffmpeg at /proc/uptime=
+296587.99 2259200.08
+STARTED YUVToBMPStreamFilter at /proc/uptime=
+296587.99 2259200.09
+./DoOneMovieFullFrames1ab.sh STARTED Phase1aPipe /proc/uptime=
+296588.00 2259200.11 , will block
+YUVToBMPStreamFilter transformed 2880 images.
+./DoOneMovieFullFrames1ab.sh FINISHED returned 0, /proc/uptime=
+296824.48 2260714.57
+Find Phase1a results in DS1FullFrameYUVTablePipe.int
+./Phase1bPipe /data/GIT/C-TAP/TESTING/TestPipeline/DS1FullFrameYUVTablePipe.int 1000000 0.5 > /data/GIT/C-TAP/TESTING/TestPipeline/
+/data/GIT/C-TAP/TESTING/TestPipeline/DS1FullFrameYUVTablePipe.int file reading line limit reached NumFrames=1000000  NumFramesRead=2879
+Grey(8-bit) pixel diff mu and sigma of 47.8 +/- 2.10 (units of 0-255)
+So, setting a minimum threshold of 2.0 SIGMA = 51 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 17.97 +/- 16.27
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 19
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
+Find the 553 Phase1b results in DS1FullFrameYUVTablePipe.out

@@ -1,0 +1,46 @@
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeline$ ./runthis.halfdecimated.sh 
+Running ./DoOneMovieHalfDecimated1ab.sh.
+All echos go to
+    DS1HalfDecimatedYUVTablePipe.log.1
+except for exiting errors.
+
+Time Report
+real    109.28
+user  0:40.08
+sys      4.03
+
+In case of errors, (update maybe and)
+use ./killLeftovers.sh to kill our residual processes.
+
+View the log and results in xterm windows
+(Get rid of them by typing q, or closing the window)
+
+See measages from this run in
+DS1HalfDecimatedYUVTablePipe.log.1
+
+Goodbye.  That felt good.  Thanks for the run.  See you next time.
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeline$ ./runthis.fullframe.sh 
+Running ./DoOneMovieFullFrames1ab.sh.
+All echos go to
+    DS1FullFrameYUVTablePipe.log.1
+except for exiting errors.
+To see progress logs, run
+less ffmpeg.log, and/or
+less DS1FullFrameYUVTablePipe.int
+
+Time Report
+real    270.98
+user  3:57.02
+sys      48.35
+
+In case of errors, (update maybe and)
+use ./killLeftovers.sh to kill our residual processes.
+
+View the log and results in xterm windows
+(Get rid of them by typing q, or closing the window)
+
+See measages from this run in
+DS1FullFrameYUVTablePipe.log.1
+
+Goodbye.  That felt good.  Thanks for the run.  See you next time.
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeline$ 
