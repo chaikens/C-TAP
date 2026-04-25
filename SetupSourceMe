@@ -1,35 +1,51 @@
-function gswitch()
-{
-  if [ $1"" = "" ]
-  then
-      git branch
-      echo Please do
-      echo gswitch some_branch
-  else
-      nb=$1
-      if ! git switch $nb
-      then
-	  echo git switch failed
-      else
-	  GITBRANCH=$nb
-	  PS1="($GITBRANCH) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
-      fi
-  fi
-}
+# this file should be ran by your shell, not executed in its own shell
+#
+#What I did is define this in my account's bash startup (like .bashrc)
+#function CT()
+#{
+#	source /data/GIT/C-TAP/SetupSourceMe
+#}
 
-GITBRANCH=$(git branch --show-current 2>&1)
+CTAROOT=/data/GIT/C-TAP
+cd $CTAROOT
 
-PS1="($GITBRANCH) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
-
-ulimit -c unlimited
-echo If you can we use sudo to configure crash cores to go into CWD.
-if   sudo src/ezcores.sh 
+if [ $CTAPDevelSetupDone"" != "yes" ]
+#if it is, we do nothing of below
 then
-echo Unlimited dumps go in cwd core file
-else
-echo Dont worry
-fi
+	CTAPDevelSetupDone=yes
+	function gswitch()
+	{
+	    if [ $1"" = "" ]
+	    then
+		git branch
+		echo Please do
+		echo gswitch some_branch
+	    else
+		nb=$1
+		if ! git switch $nb
+		then
+		    echo git switch failed
+		else
+		    GITBRANCH=$nb
+		    PS1="($GITBRANCH) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+		fi
+	    fi
+	}
+	
+	GITBRANCH=$(git branch --show-current 2>&1)
 
-emacs -title "C-TAP DEVELOPMENT AND TESTING" -g 100x50 $(pwd) &
+	PS1="($GITBRANCH) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+
+	ulimit -c unlimited
+	echo If you can we use sudo to configure crash cores to go into CWD.
+	if sudo src/ezcores.sh 
+	then
+	    echo Unlimited dumps go in cwd core file
+	else
+	    echo Dont worry
+	fi
+
+	emacs -title "C-TAP DEVELOPMENT AND TESTING" -g 100x50 $(pwd) &
+fi
 
 
