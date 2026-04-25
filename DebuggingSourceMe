@@ -1,0 +1,7 @@
+ulimit -c unlimited
+sudo src/ezcores.sh
+ret=$?
+if [ $ret != 0 ]
+then
+echo Dont worry. Sudo only needed to configure crash cores to go into CWD.
+fi

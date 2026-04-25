@@ -1,0 +1,9 @@
+ulimit -c unlimited
+echo If you can we use sudo to configure crash cores to go into CWD.
+if   sudo src/ezcores.sh 
+then
+echo Unlimited dumps go in cwd core file
+else
+echo Dont worry
+fi
+

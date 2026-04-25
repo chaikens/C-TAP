@@ -9,15 +9,15 @@
 #include <math.h>
 #include <sstream>
 #include <vector>
-
-typedef unsigned short pixCoord; 
+#include <getopt.h>
+using namespace std;
 
 #define Custom
 /* When Custom is defined, 
    (1) global variable std::string camera = "Custom"
 
    (2) code in main() unconditionally 
-       sets CROP_{X,Y}{I,F} from Camsett.txt
+       sets CROP_{X,Y}{I,F} from CamSett.txt
 
    (3) Mysterious (buggy?) line which does nothing is compiled
        before computing the differences:
@@ -69,7 +69,7 @@ unsigned int CROP_XF = 1080; /*default: UFODAP*/
 static const std::string camera = "Custom";
 #endif
 
-using namespace std;
+typedef unsigned short pixCoord; 
 
 int Ret[2] = { 505, 85 };
 int diffs[3] = { 0, 0, 0 };
@@ -267,7 +267,19 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
     ezCamB1, ezCamB2, ezCamB3, ezCamA4 };
 
 
+static const char *bitmaps_dir = 0;
+static const char *CamSett_file = 0;
+static const char default_bitmaps_dir[] = "bitmaps";
+static const char default_CamSett_file[] = "CamSett.txt";
+
+static int get_our_options( int *argc, char **argv[]);
+
 int main ( int argc, char** argv ) {
+
+  get_our_options( & argc, & argv);
+  // --bitmaps-dir and --CamSett-file are really options.
+  // if not supplied, the original defaults that work when
+  // these files are in cwd are used.
 
   int camera_index = 0;
   inExclusionZone = ezFunArray[camera_index];
@@ -280,7 +292,7 @@ int main ( int argc, char** argv ) {
     bool CC = atoi(argv[3]);
   }  
   char line[80]; double temp; vector<double> CamSett;
-  FILE *file = fopen("CamSett.txt","r");
+  FILE *file = fopen(CamSett_file,"r");
   for ( unsigned short k = 0; k < 20; ++k ) {
     fscanf ( file, "%s %lf", line, &temp );
     CamSett.push_back(temp);
@@ -288,7 +300,7 @@ int main ( int argc, char** argv ) {
   fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   if ( line[0] != 'c' ) {
-    file = fopen("CamSett.txt","a");
+    file = fopen(CamSett_file,"a");
     fprintf(file, "cameraName= %s\n", camera.c_str());
     fclose(file);
   }
@@ -356,7 +368,7 @@ int main ( int argc, char** argv ) {
     } /* end pixel x loop */
     
 
-      fprintf(stdout,"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
+      printf("%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
 	      k,
 	      maximum[0],maxLoc[0][1],maxLoc[0][0],
 	      maximum[1],maxLoc[1][1],maxLoc[1][0],
@@ -377,10 +389,84 @@ int main ( int argc, char** argv ) {
   /* Each output line is numbered by it's OLD frame. */
 } /* end of main */
 
+string bmp_file_printf_format_string; //set by get_our_options
+const char *bmp_file_printf_format_cstring; //set by get_our_options
+
+string bmpfilename_string;             //set by get_our_options
+string thumb_format = "thumb0%05d.bmp";
+char *bmpfilename_buffer;              //set by get_our_options
 
 static char * bmfilename( int f )
 {
-  static char fn[] = "bitmaps/thumb000000.bmpXXXXXXXXXXXXXXXXXXXXXX";
-  sprintf(fn,"bitmaps/thumb0%05d.bmp", f);
-  return fn;
+  //static char fn[] = "bitmaps/thumb000000.bmpXXXXXXXXXXXXXXXXXXXXXX";
+  //sprintf(fn,"bitmaps/thumb0%05d.bmp", f);
+  //return fn;
+  sprintf(bmpfilename_buffer, bmp_file_printf_format_cstring, f);
+  return bmpfilename_buffer;
+}
+
+
+static int get_our_options( int *argc, char **argv[])
+{
+  extern char *optarg; //globals from getopt and getopt_long
+  extern int optind, opterr, optopt;
+
+  int c;
+  int digit_optind = 0;
+  int num_args_gotten = 0; //for updating *argc and *argv
+  //so original argument getting works
+
+  //Logic here adapted from man 3 getopt
+  while (1) {
+    int this_option_optind = optind ? optind : 1;
+    int option_index = 0;
+    static struct option long_options[] = {
+      {"bitmaps-dir", required_argument,   0,  0 },
+      {"CamSett-file", required_argument, 0,  0 },
+      {0,         0,                 0,  0 }
+    };
+    c = getopt_long( *argc, *argv, "",
+		    long_options, &option_index);
+    if (c == -1)
+      break;
+
+    switch (c) {
+    case 0:
+      switch (option_index) {
+      case 0: bitmaps_dir = optarg;
+	num_args_gotten += 2;
+	break;
+      case 1: CamSett_file = optarg;
+	num_args_gotten += 2;
+      }
+    }
+  }
+
+  char *cmd = (*argv)[0];
+  *argc = *argc - (optind - 1);
+  *argv = *argv + (optind - 1);
+  (*argv)[0] = cmd;
+
+  if(bitmaps_dir) {
+    fprintf(stderr, "new_bitmaps_dir %s\n", bitmaps_dir);
+  }
+  else {
+    bitmaps_dir = default_bitmaps_dir;
+  }
+  
+  if(CamSett_file) {
+  //  fprintf(stderr, "new_CamSett_file %s\n", CamSett_file);
+  }
+  else {
+    CamSett_file = default_CamSett_file;
+  }
+
+  string bitmaps_dir_string = bitmaps_dir;
+  bmp_file_printf_format_string = bitmaps_dir_string + "/" + thumb_format;
+  bmp_file_printf_format_cstring = bmp_file_printf_format_string.c_str();
+  bmpfilename_buffer =
+    new char[bmp_file_printf_format_string.length()
+	     + 2*5/*for safe paranoia*/];
+
+  return 0;
 }

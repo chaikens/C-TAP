@@ -7,14 +7,32 @@
 #include <cmath>
 #include <math.h>
 #include <vector>
-
+#include <string>
+#include <getopt.h>
 using namespace std;
 
 vector<bool> SignalTruth;
 double prob[555000];
 
+
+// Code below to modify CamSett.txt is buggy
+// and commented out until Matt advises on a
+// better Camera property management system.
+
+static const char *CamSett_file = "CamSett.txt";
+//static const char *CamSett_file_tmp = "CamSett.txt.tmp";
+static const char *new_CamSett_file = 0;
+//static const char *SYS_CamSettMOVE ="mv CamSett.txt.tmp CamSett.txt";
+
+static int get_our_options( int *argc, char **argv[]);
+
 int main ( int argc, char** argv ) {
   
+  get_our_options( & argc, & argv);
+  // --CamSett-file is really an option.
+  // if not supplied, the original defaults that work when
+  // these files are in cwd are used.
+
   double data[26]; vector<double> store[26]; vector<short> extrema;
   unsigned long i = 0;
   signed short j = 0;
@@ -23,60 +41,86 @@ int main ( int argc, char** argv ) {
   
   char line[80];
   double temp;
+  //Read CamSett.txt -- keep.
   vector<double> CamSett;
   int RewFram, ForFram, FramBefNew, SubThr;
-  FILE *file = fopen("CamSett.txt","r");
-  FILE *note = fopen("CamSett.tmp","w");
+  FILE *file = fopen(CamSett_file,"r");
+  //FILE *note = fopen(CamSett_file_tmp,"w");
+  cerr << "endl" << "Reading " << CamSett_file << endl;
   for ( j = 0; j < 20; ++j ) {
     fscanf ( file, "%s %lf", line, &temp );
     CamSett.push_back(temp);
+    cerr << "Line" << j << " Value=" << temp << "(ignored Key =" << line << ")" << endl;
   }
-  char camName[3];
+  char camName[80];  //used to be [3], caused buffer overflow!
   fscanf ( file, "%s %s", line, camName );
   string camera(camName);
-  rewind(file);
-  for ( j = 0; j < 20; ++j ) {
-    fgets(line, sizeof(line), file);
-    fputs(line, note);
-  }
+  cerr << "Last read:" << line << " camName=" << camName << " C++string=" << camera << endl;
+  //rewind(file);
+  //for ( j = 0; j < 20; ++j ) {
+  //fgets(line, sizeof(line), file);
+  //fputs(line, note);
+  // }
   fclose(file);
-  fclose(note);
-  system("mv CamSett.tmp CamSett.txt");
+  //fclose(note);
+  //fprintf(stderr, "Before calling system, SYS_CamSettMOVE=%s\n", SYS_CamSettMOVE);
+  //system(SYS_CamSettMOVE);
+  string CapParams = "(initial value)";
   if ( camera == "Custom" ) {
     SubThr = (int)CamSett[10];
     RewFram= (int)CamSett[11];
     ForFram =(int)CamSett[12];
     FramBefNew = (int)CamSett[13];
     FracYes = (float)CamSett[14];
+    CapParams = "From Custom";
   }
-  else { RewFram = 100; ForFram = 320; FramBefNew = 320; SubThr = 20; FracYes = 0.07; }
-  
+  else { CapParams = "From defaults";
+    RewFram = 100; ForFram = 320; FramBefNew = 320; SubThr = 20; FracYes = 0.07; }
+
+  string boundsParams = "(initial value)";
   int smallestThr, biggestThr, smallestPix, biggestPix;
   if ( camera == "B1" || camera == "A3" ) { // "bad" camera
     smallestThr = 34;
     biggestThr = 54;
     smallestPix = 3;
     biggestPix = 30;
+    boundsParams = "From camera B1 or A3, bad camera";
   }
   else if ( camera == "B3" || camera == "B4" ) { // "medium"-quality cam
     smallestThr = 0;
     biggestThr = 254;
     smallestPix = 0;
     biggestPix = 69; //set to min allowed for catching object starting at frame 41935 in camB3 (14_00-59-40). Line 197 makes this hist
+    boundsParams = "From camera B3 or B4, medium quality";
   }
   else if ( camera == "A1" || camera == "A2" || camera == "A4" || camera == "B2" ) { // "good" camera
     smallestThr = 0;
     biggestThr = 254;
     smallestPix	= 0;
     biggestPix = 300; //200 is min allowed to catch object at 09:20:48-50am in CamA4 (July 15)
+    boundsParams = "From camera A1 or A2 or A4 or B2, good camera";
   }
   else {
     smallestThr = (int)CamSett[0];
     biggestThr = (int)CamSett[1];
     smallestPix = (int)CamSett[2];
     biggestPix = (int)CamSett[3];
+    boundsParams = "From CamSett.txt";
   }
-  
+
+  cerr << endl << "Phase1b Capitalized Params: " << CapParams << endl;
+  cerr << "SubThr=" << SubThr << endl;
+  cerr << "RewFram=" << RewFram << endl;
+  cerr << "ForFram=" << ForFram << endl;
+  cerr << "FramBefNew=" << FramBefNew << endl;
+  cerr << "FracYes=" << FracYes << endl;
+  cerr << endl;
+  cerr << "Phase1b bounds Params: " << boundsParams << endl;
+  cerr << "smallestThr" << smallestThr << endl;
+  cerr << "biggestThr=" << biggestThr << endl;
+  cerr << "smallestPix=" << smallestPix << endl;
+  cerr << "biggestPix=" << biggestPix << endl;
+  cerr << endl;
   ifstream ifp(argv[1]); long NumFrames = atol(argv[2]); double level = atof(argv[3]);
   if ( level >= 0.979 && camera != "B1" ) {
     if ( camera == "B2" ) level = 0.999999999999; // the minimum allowed that doesn't make B2 collect too many events (16_21-57-25)
@@ -257,4 +301,66 @@ int main ( int argc, char** argv ) {
   
   return 0;
   
+}
+
+
+static int get_our_options( int *argc, char **argv[])
+{
+  extern char *optarg; //globals from getopt and getopt_long
+  extern int optind, opterr, optopt;
+
+  int c;
+  int digit_optind = 0;
+
+  //Logic here adapted from man 3 getopt
+  while (1) {
+    int this_option_optind = optind ? optind : 1;
+    int option_index = 0;
+    static struct option long_options[] = {
+      {"CamSett-file", required_argument, 0,  0 },
+      {0,         0,                 0,  0 }
+    };
+    c = getopt_long( *argc, *argv, "",
+		    long_options, &option_index);
+    if (c == -1)
+      break;
+
+    switch (c) {
+    case 0:
+      switch (option_index) {
+      case 0: new_CamSett_file = optarg;
+	break;
+      }
+    }
+  }
+
+  char *cmd = (*argv)[0];
+  *argc = *argc - (optind - 1);
+  *argv = *argv + (optind - 1);
+  (*argv)[0] = cmd;
+
+  if(new_CamSett_file) {
+    //fprintf(stderr, "new_CamSett_file %s\n", CamSett_file);
+    
+    CamSett_file = new_CamSett_file;
+    //string CamSett_file_string = CamSett_file;
+    //string tstr = string(CamSett_file) + ".tmp ";
+    //string mv = "mv ";
+    //string mvCmd = mv + tstr + CamSett_file_string;
+    //cerr << "move command=" << mvCmd << endl;
+
+    //SYS_CamSettMOVE = mvCmd.c_str();
+    //fprintf(stderr, "from mvCmd.c_str():%s\n", SYS_CamSettMOVE);
+
+  }
+
+
+  //string bitmaps_dir_string = bitmaps_dir;
+  //bmp_file_printf_format_string = bitmaps_dir_string + "/" + thumb_format;
+  //bmp_file_printf_format_cstring = bmp_file_printf_format_string.c_str();
+  //bmpfilename_buffer =
+  //  new char[bmp_file_printf_format_string.length()
+  //	     + 2*5/*for safe paranoia*/];
+
+  return 0;
 }

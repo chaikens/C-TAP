@@ -1,0 +1,15 @@
+(1) Exit if return code of a program exe is bad
+if [ ! $? ]
+ then
+  error exit
+ fi
+
+(2) I like to ${always} instead of $always.
+
+(3) It's a pain that
+setting a variable is var=...  but using a value is ... ${var} ... .
+I've been bugged by  ${var}=  DONT DO THAT (unless you want something else).
+
+
+
+
