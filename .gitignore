@@ -1,0 +1,17 @@
+*.bmp
+*.BMP
+*.yuv
+*.YUV
+*.mov
+*.MOV
+*.mp4
+*.mp3
+*.MP4
+*.MP3
+*.jpeg
+*.JPEG
+*.o
+*.bak
+core
+*.bak
+*~
