@@ -30,3 +30,6 @@ else
 echo Dont worry
 fi
 
+emacs -title "C-TAP DEVELOPMENT AND TESTING" -g 100x50 $(pwd) &
+
+

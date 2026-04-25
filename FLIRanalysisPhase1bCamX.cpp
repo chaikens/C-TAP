@@ -11,6 +11,7 @@
 #include <getopt.h>
 using namespace std;
 
+//scaling?  typedef unsigned short pixCoord; not done here
 vector<bool> SignalTruth;
 double prob[555000];
 
@@ -118,6 +119,7 @@ int main ( int argc, char** argv ) {
   cerr << "Phase1b bounds Params: " << boundsParams << endl;
   cerr << "smallestThr" << smallestThr << endl;
   cerr << "biggestThr=" << biggestThr << endl;
+  //scaling?
   cerr << "smallestPix=" << smallestPix << endl;
   cerr << "biggestPix=" << biggestPix << endl;
   cerr << endl;
@@ -165,6 +167,7 @@ int main ( int argc, char** argv ) {
   GlobPixSigma /= (double(NumFrames)-1.);
   GlobPixSigma = sqrt(GlobPixSigma);
   fprintf(stderr,"The number of pixels above %d units is %.2f +/- %.2f\n",SubThr,GlobPixMean[6],GlobPixSigma);
+  //scaling?
   int MinPix = std::max(smallestPix,int(ceil(GlobPixMean[6]+1.)));
   int MaxPix = biggestPix;
   while ( MaxPix <= MinPix ) {
@@ -223,16 +226,16 @@ int main ( int argc, char** argv ) {
     AbsStdDev = sqrt ( AbsStdDev / 5. );
     vector<double> SkewGauss(4); // "classic" values for the next line: ampl .633, mu 1.97, sig 1.89, skew 2.5
     if ( camera == "Custom" ) {
-      SkewGauss[0] = CamSett[4];
-      SkewGauss[1] = CamSett[5];
-      SkewGauss[2] = CamSett[6];
-      SkewGauss[3] = CamSett[7];
+      SkewGauss[0] = CamSett[4]; //SkewGaussAmpl 
+      SkewGauss[1] = CamSett[5]; //SkewGaussXi	 
+      SkewGauss[2] = CamSett[6]; //SkewGaussOmega
+      SkewGauss[3] = CamSett[7]; //SkewGaussAlpha
     }
     else {
-      SkewGauss[0] = 0.673;
-      SkewGauss[1] = 2.;
-      SkewGauss[2] = 2.;
-      SkewGauss[3] = 2.0;
+      SkewGauss[0] = 0.673;  //SkewGaussAmpl 
+      SkewGauss[1] = 2.;     //SkewGaussXi	 
+      SkewGauss[2] = 2.;     //SkewGaussOmega
+      SkewGauss[3] = 2.0;    //SkewGaussAlpha
     }
     prob[i] = 1. - SkewGauss[0]*exp(-0.5*(AbsStdDev-SkewGauss[1])*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*SkewGauss[2]))*(1.+erf(SkewGauss[3]*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*sqrt(2.))));
     

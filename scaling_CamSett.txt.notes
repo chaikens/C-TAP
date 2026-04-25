@@ -1,0 +1,23 @@
+I don't know if smallestPix and biggestPix are pixel coods!
+
+smallestThr= 0
+biggestThr= 254
+smallestPix= 0 scaling??
+biggestPix= 67 scaling??
+SkewGaussAmpl= 0.633
+SkewGaussXi= 1.97
+SkewGaussOmega= 1.89
+SkewGaussAlpha= 2.5
+NumPixAbvThrSumMin= 0
+NumPixAbvThrSumMax= 3
+SubThr= 20
+RewFram= 0
+ForFram= -2
+FramBefNew= 1
+FracYes= 1.0
+CROP_XI= 100  scaling?
+CROP_XF= 900  scaling?
+CROP_YI= 0    scaling?
+CROP_YF= 1919 scaling?
+mainThreshold= 14
+cameraName= Custom
