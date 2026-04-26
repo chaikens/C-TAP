@@ -27,6 +27,7 @@ using namespace std;
       #endif
 */ 
 
+//scaling?
 #ifdef Custom
 unsigned int CROP_YI = 0; //left edge
 unsigned int CROP_XI = 0; //top edge
@@ -69,11 +70,16 @@ unsigned int CROP_XF = 1080; /*default: UFODAP*/
 static const std::string camera = "Custom";
 #endif
 
+//scaling? maybe use this everywhere including width and height
 typedef unsigned short pixCoord; 
 
-int Ret[2] = { 505, 85 };
+//scaling?
+int Ret[2] = { 505, 85 }; //used ONLY by ezCamB1
 int diffs[3] = { 0, 0, 0 };
-unsigned int width, height, imgsize;
+
+//scaling?
+unsigned int width, height;
+unsigned imgsize; //scaling? must accomodate Megas, 16 bit short no good.
 
 static char * bmfilename( int f );
 
@@ -94,10 +100,12 @@ void readFirstBMPToAandAllocB(char* filename)
   fread(info, sizeof(unsigned char), 54, f);
 
   // extract image height and width from header
+  //scaling?
   width = *(int*)&info[18];
   height = *(int*)&info[22];
   //cerr << width << " " << height << endl;
 
+  //scaling??
   // allocate three bytes per pixel
   imgsize = 3 * width * height;
   BMP_A = new unsigned char[imgsize];
@@ -148,6 +156,7 @@ void readSubsequentBMP(char* filename, unsigned char *dest)
     }
   
   // extract image height and width from header
+  //scaling?
   if( width   != *(int*)&info[18] ||
       height  != *(int*)&info[22]  ) {
     cerr << "DIFFERENT DIM of Subsequent bitmap " << filename << endl;
@@ -195,6 +204,7 @@ static bool ezNone( pixCoord ii, pixCoord jj ) {
   return false;
 }
 
+//scaling? all ez* functions!
 static bool ezCamA1( pixCoord ii, pixCoord jj ) {
   return
     ( abs(jj-1205) < 40
@@ -258,6 +268,7 @@ static bool ezCamB4( pixCoord ii, pixCoord jj ) {
      || ((jj-637)*(jj-637)+(ii-364)*(ii-364)) < 11000 );
 }
 
+//scaling?
 static bool (*inExclusionZone)( pixCoord ii, pixCoord jj );
 // One can code this variable be set when the program runs 
 // by copying the pointer from the array below.
@@ -305,6 +316,7 @@ int main ( int argc, char** argv ) {
     fclose(file);
   }
 
+//scaling?
 #ifdef Custom
   CROP_XI = (unsigned int)CamSett[15];
   CROP_XF = (unsigned int)CamSett[16];
@@ -327,7 +339,8 @@ int main ( int argc, char** argv ) {
     int maximum[3] = {-1,-1,-1}; int minimum[3] = {256,256,256}; int maxLoc[3][2] = {0}; int minLoc[3][2] = {0};
     int NumPixAbvThr[3][2] = {0};
     int NumPixAbvSubThrSum = 0, CloudCover = 100;
-    
+
+    //scaling? ii and jj too
     for ( int i = (height-1-CROP_XI); i >= (height-CROP_XF); --i ) {
       for ( int j = CROP_YI; j < CROP_YF; ++j ) {
 	
@@ -348,7 +361,8 @@ int main ( int argc, char** argv ) {
 	diffs[2] = rgbColorNew[2]-rgbColorOld[2];
 	int jj = j;
 	int ii = height - 1 - i;
-	
+
+	//scaling? ezFuns rely on it.
 	if ( !(*inExclusionZone)(ii, jj) || k == start ) {
 	  if ( diffs[0] > maximum[0] )
 	    { maximum[0] = diffs[0]; maxLoc[0][0] = ii; maxLoc[0][1] = jj; if ( maximum[0] > MinThr ) ++NumPixAbvThr[0][0]; if ( maximum[0] > SubThr ) ++NumPixAbvSubThrSum; }
@@ -367,7 +381,7 @@ int main ( int argc, char** argv ) {
       } /* end pixel y loop */
     } /* end pixel x loop */
     
-
+    //scaling? OUTPUT is in pixel coords.
       printf("%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
 	      k,
 	      maximum[0],maxLoc[0][1],maxLoc[0][0],
@@ -405,7 +419,7 @@ static char * bmfilename( int f )
   return bmpfilename_buffer;
 }
 
-
+//scaling?  We could pass a scale option.
 static int get_our_options( int *argc, char **argv[])
 {
   extern char *optarg; //globals from getopt and getopt_long
