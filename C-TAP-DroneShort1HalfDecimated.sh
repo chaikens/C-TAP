@@ -325,7 +325,7 @@ do
 	#thumb%06d.bmp                                                     \
 	#&> $RESULTS_DIR/ffmpeg.outputs"
 
-	
+	##scaling? We actually do half-scaling and full scaling.
 	FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an  \
            -i $movie_file                                                 \
            -vf                                                            \
@@ -595,6 +595,8 @@ do
     cd ${BITMAPS_PARENT_DIR}
     
     echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
+    
+    ##scaling? x and y are pixel coords.
     cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | while read evt frame extr x y prob
     do
 	((++frame))
@@ -602,7 +604,7 @@ do
 	#then
 	    #echo "processing frame number" $frame
 	#fi
-	i=$((x-9))
+	i=$((x-9))  ##scaling?  maybe 9 could remain unscaled
 	j=$((y-9))
 	k=$((x+9))
 	l=$((y+9))
@@ -629,6 +631,7 @@ do
 	then
 	    # echo '$y -lt 800 yes branch'
 	    #Remember, we're in ${BITMAPS_PARENT_DIR}
+	    #scaling?  Convert command works in terms of pixel coords, it must.
 	    BITMAP_EDIT_CMD=\
 "convert bitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
 	else
@@ -664,8 +667,9 @@ do
     cd ${SOFTWARE_DIR}
 
     # save the result movie
-    #I'd rather leave that for the build system.
-    #echo "Cleaning detritus..."
+    
+    
+    #echo "Cleaning detritus..." #I'd rather leave that for the build system.
 
     #rm -rf *.cpp~ *.sh~ *.txt~ *.err bitmaps/
     # sdc: Keep old bitmaps BUT the script removes them early next time
