@@ -39,65 +39,88 @@ static const char default_bitmaps_dir[] = "bitmaps";
 static const char default_CamSett_file[] = "CamSett.txt";
 static const char *pix_scale_string = 0;
 
+//scaling? will use this everywhere including width and height
+typedef uint16_t pixCoord;
+//Maybe, someday, the pixCoord type will be a C++ class, with
+//useful member functions and supporting better type checking.
 
-//scaling?
+//declare these globals undefined so we set them with a function
+//instead of compile time selected initializers
+pixCoord CROP_YI, //left edge
+  CROP_XI, //top edge
+  CROP_YF, //right edge
+  CROP_XF; //bottom edge
+
+//will be set by init_CROPS_and_camera() at runtime
+string camera;
+
+void init_CROPS_and_camera(void)
+{
+  //We have these preprocessor conditionals to
+  //maintain regression as we develop support for
+  //different cameras.
+
+  //scaling?
 #ifdef Custom
-unsigned int CROP_YI = 0; //left edge
-unsigned int CROP_XI = 0; //top edge
+  CROP_YI = 0; //left edge
+  CROP_XI = 0; //top edge
 #else
-unsigned int CROP_YI = 15;
-unsigned int CROP_XI = 10;
+  CROP_YI = 15;
+  CROP_XI = 10;
 #endif
 
+  //Remember, camera is now a global string (C++ library) variable
+
+  //CROP_YF is set here for everybody.
+  //Camera particulars set CROP_XF below.
 #ifdef CamB1
-unsigned int CROP_YF = 1275;
+ CROP_YF = 1275;
 #else
-unsigned int CROP_YF = 1249; //right edge (UFODAP: 1920)
+ CROP_YF = 1249; //right edge (UFODAP: 1920)
 #endif
+
 #ifdef CamA1 //bottom edge is crop_xf. High num to catch boat: 635 MIN. 650 for mult frames
-unsigned int CROP_XF = 590; static const std::string camera = "A1";
+ CROP_XF = 590; camera = "A1";
 #endif
 #ifdef CamA2
-unsigned int CROP_XF = 640; static const std::string camera = "A2";
+ CROP_XF = 640; camera = "A2";
 #endif
 #ifdef CamA3
-unsigned int CROP_XF = 590; static const std::string camera = "A3";
+ CROP_XF = 590; camera = "A3";
 #endif
 #ifdef CamA4
-unsigned int CROP_XF = 575; static const std::string camera = "A4";
+ CROP_XF = 575; camera = "A4";
 #endif
 #ifdef CamB1
-unsigned int CROP_XF = 580; static const std::string camera = "B1";
+ CROP_XF = 580; camera = "B1";
 #endif
 #ifdef CamB2
-unsigned int CROP_XF = 590; static const std::string camera = "B2";
+ CROP_XF = 590; camera = "B2";
 #endif
 #ifdef CamB3
-unsigned int CROP_XF = 575; static const std::string camera = "B3";
+ CROP_XF = 575; camera = "B3";
 #endif
 #ifdef CamB4
-unsigned int CROP_XF = 590; static const std::string camera = "B4";
+ CROP_XF = 590; camera = "B4";
 #endif
 #ifdef Custom
-unsigned int CROP_XF = 1080; /*default: UFODAP*/
-static const std::string camera = "Custom";
+ CROP_XF = 1080; /*default: UFODAP*/
+ camera = "Custom";
 #endif
-
-//scaling? maybe use this everywhere including width and height
-typedef unsigned short pixCoord; 
+}
 
 //scaling?
 int Ret[2] = { 505, 85 }; //used ONLY by ezCamB1
 int diffs[3] = { 0, 0, 0 };
 
 //scaling?
-unsigned int width, height;
-unsigned imgsize; //scaling? must accomodate Megas, 16 bit short no good.
+pixCoord width, height;
+uint32_t imgsize; //scaling? must accomodate Megas, 16 bit short no good.
 
 static char * bmfilename( int f );
 
-static unsigned char *BMP_A;
-static unsigned char *BMP_B;
+static uint8_t *BMP_A;
+static uint8_t *BMP_B;
 static int frameCnt = -1;
 
 void readFirstBMPToAandAllocB(char* filename)
@@ -107,25 +130,25 @@ void readFirstBMPToAandAllocB(char* filename)
   if( !f ) {
     error(1, errno, "Opening first frame %s failed.", filename);
   }
-  unsigned char info[54];
+  uint8_t info[54];
   size_t readret;
   // read the 54-byte header
   fread(info, sizeof(unsigned char), 54, f);
 
   // extract image height and width from header
   //scaling?
-  width = *(int*)&info[18];
-  height = *(int*)&info[22];
+  width = *(pixCoord*)&info[18];
+  height = *(pixCoord*)&info[22];
   //cerr << width << " " << height << endl;
 
   //scaling??
   // allocate three bytes per pixel
   imgsize = 3 * width * height;
-  BMP_A = new unsigned char[imgsize];
-  BMP_B = new unsigned char[imgsize];
+  BMP_A = new uint8_t[imgsize];
+  BMP_B = new uint8_t[imgsize];
 
   // read the rest of the data at once
-  readret = fread(BMP_A, sizeof(unsigned char), imgsize, f);
+  readret = fread(BMP_A, sizeof(uint8_t), imgsize, f);
   if( readret != imgsize){
     if( readret < 0 ) {
       error(1, errno, "Reading %s failed.", filename);
@@ -155,7 +178,7 @@ void readSubsequentBMP(char* filename, unsigned char *dest)
   if( !f ) {
     error(1, errno, "Opening %dth frame %s failed.", frameCnt+1, filename);
   }
-  unsigned char info[54];
+  uint8_t info[54];
 
   // read the 54-byte header
   readret = fread(info, sizeof(unsigned char), 54, f);
@@ -197,7 +220,7 @@ void readSubsequentBMP(char* filename, unsigned char *dest)
   for(int i = 0; i < imgsize; i += 3)
     {
       // flip the order of every 3 bytes
-      unsigned char tmp = dest[i];
+      uint8_t tmp = dest[i];
       dest[i] = dest[i+2]; dest[i+2] = tmp;
     }
 
@@ -297,6 +320,10 @@ int main ( int argc, char** argv ) {
   // if not supplied, the original defaults that work when
   // these files are in cwd are used.
 
+  //This will probability have to go later, after (not yet)
+  //variable cameras are supported.
+  init_CROPS_and_camera();
+  
   int camera_index = 0;
   inExclusionZone = ezFunArray[camera_index];
   /* make it point to the right function */
@@ -305,9 +332,11 @@ int main ( int argc, char** argv ) {
   unsigned long end = start + (unsigned long)atof(argv[2]);
   //arg[3] is unused!
   if( argc >= 3 ) {
-    bool CC = atoi(argv[3]);
+    bool CC = atoi(argv[3]); //Cloud Cover
   }  
   char line[80]; double temp; vector<double> CamSett;
+  //At present, keys in the CamSett file, CamSett.txt
+  //are NOT checked against the order of the file's lines!
   FILE *file = fopen(CamSett_file,"r");
   for ( unsigned short k = 0; k < 20; ++k ) {
     fscanf ( file, "%s %lf", line, &temp );
@@ -321,12 +350,14 @@ int main ( int argc, char** argv ) {
     fclose(file);
   }
 
-//scaling?
+  //scaling?
+  //note This code is in function main.
+  //At present, THIS sets the CROPS, not our new initializer fn
 #ifdef Custom
-  CROP_XI = (unsigned int)CamSett[15];
-  CROP_XF = (unsigned int)CamSett[16];
-  CROP_YI = (unsigned int)CamSett[17];
-  CROP_YF = (unsigned int)CamSett[18];
+  CROP_XI = (pixCoord)CamSett[15];
+  CROP_XF = (pixCoord)CamSett[16];
+  CROP_YI = (pixCoord)CamSett[17];
+  CROP_YF = (pixCoord)CamSett[18];
 #endif
 
   unsigned long k = start;
