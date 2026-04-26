@@ -1,0 +1,23 @@
+function exit_greeting() {
+echo "True, full consciousness can now be reasserted by you poor human user."
+
+echo "See the results in the xterms"
+echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
+if ! read -t 20 yes
+then
+    echo OK. Time for asking done, leaving the xterms.
+    echo Kill them manually or use ./killxterms.sh
+fi
+
+if [ ${yes}"" = "yes" ]
+then
+    kill ${Phase1b_xterm_PID}
+    kill ${Phase1a_xterm_PID}
+    kill ${Phase1b_mess_xterm_PID}
+    kill ${Extract_xterm_PID}
+fi
+
+echo $0 Done.
+exit 0
+}
+

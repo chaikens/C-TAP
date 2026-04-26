@@ -1,4 +1,5 @@
 #!/bin/bash
+source C-TAP-HELPERS
 REUSE_BMPS=no #Do not change to yes except if you already
 # had the thumb*.bmp frames extracted and are re-using
 # the script for development and testing of subsequent steps
@@ -337,7 +338,7 @@ do
 	  echo ${FFMPEG_EXTRACT_CMD}
 	  echo ${FFMPEG_EXTRACT_CMD} | cat >>${COMMAND_ARCHIVE_PATHNAME}
 
-    xterm -geometry 100x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
+    xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
     Extract_xterm_PID=$!  #so we can kill you later.
 	  
     eval ${FFMPEG_EXTRACT_CMD}
@@ -689,19 +690,7 @@ do
 
 done
 
-echo "True, full consciousness can now be reasserted by you poor human user."
-
-echo "See the results in the xterms"
-echo -n "Type yes to kill the xterms:"
-read yes
-if [ $yes = "yes" ]
-then
-    kill ${Phase1b_xterm_PID}
-    kill ${Phase1a_xterm_PID}
-    kill ${Phase1b_mess_xterm_PID}
-    kill ${Extract_xterm_PID}
-fi
-
+exit_greeting
 
 # buy a Mac or install Linux. Just kidding (But get Ubuntu for Windows!)
 # remove all instances of -Ofast (or replace w/ -O3). There should be 4
