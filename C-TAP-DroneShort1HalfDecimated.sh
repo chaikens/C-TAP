@@ -127,11 +127,11 @@ ext=mp4
 # The pipeline works much faster and doesn't use excessive disk space.
 # We are keeping the .bmp image version up to make comparisons with
 # previous analyses.
-
+#OK diff with brother
 #This is the name for half resolution decimated frame ffmpeg extraction.
 movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
-
 #Alternative:
+#OK diff with brother
 #This is the name for full frame ffmpeg extraction.
 #movie_files="$SLOW_MOVIE_DIR/DroneShort1Full.$ext"
 
@@ -259,7 +259,7 @@ fi
 
 numMovieFiles=`ls $movie_files | wc -l`
 
-echo "We will process these $numMovieFiles movie files."
+echo "We will process this (these) $numMovieFiles movie file(s)."
 
 #echo $movie_files
 ls $movie_files
@@ -306,9 +306,13 @@ do
     
     #ffmpeg -threads 0 -hide_banner -an -i $movie_file -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" -fps_mode vfr thumb%06d.bmp
     
+    #
+    # EXTRACT or REUSE BMPS
+    #
+    #
     if [ ${REUSE_BMPS}"" != "yes" ]
     then
-
+	echo "Extracting .bmp's"
 	# BITMAPS_DIR is assurred at the beginning, not sep. for each movie
 	rm  -f $BITMAPS_DIR/*
 	#aside from saving space, we must delete old bitmaps
@@ -320,13 +324,18 @@ do
 	
 	#ffmpeg -xerror -threads 0 -hide_banner -an -i ${movie_file}  thumb%06d.bmp  &> ${RESULTS_DIR}/ffmpeg.outputs 
 
+	#OK diff with brother
         #FFMPEG_EXTRACT_CMD=
 	#"ffmpeg -xerror -threads 0 -hide_banner -an    \
 	#-i $movie_file                                                    \
 	#thumb%06d.bmp                                                     \
 	#&> $RESULTS_DIR/ffmpeg.outputs"
 
+	movie_width=$(widthOfMovie $movie_file)
+	movie_height=$(heightOfMovie $movie_file)
+
 	##scaling? We actually do half-scaling and full scaling.
+	#OK diff with brother
 	FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an  \
            -i $movie_file                                                 \
            -vf                                                            \
@@ -338,10 +347,10 @@ do
 	  echo ${FFMPEG_EXTRACT_CMD}
 	  echo ${FFMPEG_EXTRACT_CMD} | cat >>${COMMAND_ARCHIVE_PATHNAME}
 
-    xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
-    Extract_xterm_PID=$!  #so we can kill you later.
+	  xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
+	  Extract_xterm_PID=$!  #so we can kill you later.
 	  
-    eval ${FFMPEG_EXTRACT_CMD}
+	  eval ${FFMPEG_EXTRACT_CMD}
     
     if [ ! $? ]
     then
@@ -355,11 +364,28 @@ do
     echo 
     echo "ffmpeg done."
     echo
+    if ! depthOfBmpIs24 thumb000001.bmp
+    then
+	echo 'thumb000001.bmp does not exist (in its proper place)'
+	echo or its non-24bit depth is not supported by Phase1a
+    else
+	bmp_width=$(widthOfBmp thumb000001.bmp)
+	bmp_height=$(heightOfBmp thumb000001.bmp)
+    fi
+    #done with extrating bitmaps.
     else
 	echo
 	echo "We're reusing movie bitmaps for debugging speed."
 	echo
 	rm -f pic*.bmp #only delete images used to make the previous "baby movie"
+	if ! depthOfBmpIs24 thumb000001.bmp
+	then
+	    echo 'thumb000001.bmp does not exist (in its proper place)'
+	    echo or its non-24bit depth is not supported by Phase1a
+	else
+	    bmp_width=$(widthOfBmp thumb000001.bmp)
+	    bmp_height=$(heightOfBmp thumb000001.bmp)
+	fi
     fi
     
     #
@@ -391,8 +417,37 @@ do
     # ${moviePrefix}.MOV (that's the "baby movie")
 
     echo
-    echo "Beginning Phase1a"
+    echo Input Origin Report:
+    if [ $widthOfMovie"" = "" ]
+    then
+	echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.'
+	echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height}
+    else
+	echo 'We extracted bitmaps from the movie:'
+	echo $movie_file
+	echo 'movie_width='$movie_width 'movie_height='$movie_height
+	echo 'And, FYI,:'
+	echo 'bmp_width='$bmp_width 'bmp_height='$bmp_height
+    fi
 
+    if [ $bmp_width"" != "1920" ]
+    then
+	echo Until a new version is completed,
+	echo clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+	echo based on 1920x1080 bmps, not what you have.
+    else
+	if [ $bmp_height"" != "1080" ]
+	then
+	    echo Until a new version is completed,
+	    echo clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+	    echo based on 1920x1080 bmps, not what you have.
+	    echo Hmm you have 1920 width, but bmp_height=${bmp_height}
+	fi
+    fi
+
+    echo
+    echo "Beginning Phase1a"
+    echo
 
     RESULT_OF_1a_BASE="${moviePrefix}.int"
     cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
@@ -488,6 +543,7 @@ do
 
     echo
     echo Beginning Phase1b
+    echo
     
     RESULT_OF_1b_BASE="${moviePrefix}.out"
     cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}

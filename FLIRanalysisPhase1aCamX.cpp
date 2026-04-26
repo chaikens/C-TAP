@@ -12,6 +12,8 @@
 #include <getopt.h>
 using namespace std;
 
+// Camera settings will eventually be systematized.
+// For now, defining this macro makes only Custom be used.
 #define Custom
 /* When Custom is defined, 
    (1) global variable std::string camera = "Custom"
@@ -26,6 +28,17 @@ using namespace std;
 	if ( false ) ExclusionZone = true;
       #endif
 */ 
+
+
+// Command line options.  Set when, early, main calls
+static int get_our_options( int *argc, char **argv[]);
+
+static const char *bitmaps_dir = 0;
+static const char *CamSett_file = 0;
+static const char default_bitmaps_dir[] = "bitmaps";
+static const char default_CamSett_file[] = "CamSett.txt";
+static const char *pix_scale_string = 0;
+
 
 //scaling?
 #ifdef Custom
@@ -277,14 +290,6 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
   { ezNone, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
     ezCamB1, ezCamB2, ezCamB3, ezCamA4 };
 
-
-static const char *bitmaps_dir = 0;
-static const char *CamSett_file = 0;
-static const char default_bitmaps_dir[] = "bitmaps";
-static const char default_CamSett_file[] = "CamSett.txt";
-
-static int get_our_options( int *argc, char **argv[]);
-
 int main ( int argc, char** argv ) {
 
   get_our_options( & argc, & argv);
@@ -437,6 +442,7 @@ static int get_our_options( int *argc, char **argv[])
     static struct option long_options[] = {
       {"bitmaps-dir", required_argument,   0,  0 },
       {"CamSett-file", required_argument, 0,  0 },
+      {"pix-scale", required_argument, 0,  0 },  
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -448,10 +454,10 @@ static int get_our_options( int *argc, char **argv[])
     case 0:
       switch (option_index) {
       case 0: bitmaps_dir = optarg;
-	num_args_gotten += 2;
 	break;
       case 1: CamSett_file = optarg;
-	num_args_gotten += 2;
+	break;
+      case 3: pix_scale_string = optarg;
       }
     }
   }

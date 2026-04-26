@@ -11,21 +11,23 @@
 #include <getopt.h>
 using namespace std;
 
-//scaling?  typedef unsigned short pixCoord; not done here
-vector<bool> SignalTruth;
-double prob[555000];
-
-
-// Code below to modify CamSett.txt is buggy
-// and commented out until Matt advises on a
-// better Camera property management system.
+// Command line options.  Set when, early, main calls
+static int get_our_options( int *argc, char **argv[]);
 
 static const char *CamSett_file = "CamSett.txt";
 //static const char *CamSett_file_tmp = "CamSett.txt.tmp";
 static const char *new_CamSett_file = 0;
 //static const char *SYS_CamSettMOVE ="mv CamSett.txt.tmp CamSett.txt";
+// About CamSett
+// Code below to modify CamSett.txt is buggy
+// and commented out until Matt advises on a
+// better Camera property management system.
 
-static int get_our_options( int *argc, char **argv[]);
+static const char *pix_scale_string = 0;
+
+//scaling?  typedef unsigned short pixCoord; not done here
+vector<bool> SignalTruth;
+double prob[555000];
 
 int main ( int argc, char** argv ) {
   
@@ -321,6 +323,7 @@ static int get_our_options( int *argc, char **argv[])
     int option_index = 0;
     static struct option long_options[] = {
       {"CamSett-file", required_argument, 0,  0 },
+      {"pix-scale", required_argument, 0,  0 },
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -332,6 +335,9 @@ static int get_our_options( int *argc, char **argv[])
     case 0:
       switch (option_index) {
       case 0: new_CamSett_file = optarg;
+	break;
+      case 1:
+	pix_scale_string = optarg;
 	break;
       }
     }
