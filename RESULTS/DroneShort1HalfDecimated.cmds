@@ -1,3 +1,0 @@
-ffmpeg -xerror -threads 0 -hide_banner -an -i /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4 thumb%06d.bmp &> /data/GIT/C-TAP/RESULTS/ffmpeg.outputs
-/data/GIT/C-TAP/Phase1a 0 2880 0 --bitmaps-dir /media/seth/CTAP/bitmaps --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int
-/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int 2879 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.out

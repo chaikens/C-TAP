@@ -133,7 +133,7 @@ movie_files="$SLOW_MOVIE_DIR/DroneShort1Full.$ext"
 #Alternative:
 #OK diff with brother
 #This is the name for half resolution decimated frame ffmpeg extraction.
-movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
+#movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
 
 # moviePrefix is going to be the name of the movie file without any extension.
 # So, in one example above, it is DroneShort1Full
@@ -417,7 +417,7 @@ do
 
     echo
     echo Input Origin Report:
-    if [ $widthOfMovie"" = "" ]
+    if [ ${movie_width}"" = "" ]
     then
 	echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.'
 	echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height}
