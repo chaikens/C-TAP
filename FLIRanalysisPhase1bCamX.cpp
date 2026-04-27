@@ -36,11 +36,10 @@ int main ( int argc, char** argv ) {
   // if not supplied, the original defaults that work when
   // these files are in cwd are used.
 
-  double data[26]; vector<double> store[26]; vector<short> extrema;
+  vector<short> extrema;
   unsigned long i = 0;
   signed short j = 0;
   float AbsAvg, AbsStdDev, FracYes;
-  double GlobPixMean[7] = {0.,0.,0.,0.,0.,0.,0.};
   
   char line[80];
   double temp;
@@ -55,6 +54,29 @@ int main ( int argc, char** argv ) {
     CamSett.push_back(temp);
     cerr << "Line" << j << " Value=" << temp << "(ignored Key =" << line << ")" << endl;
   }
+  /***********************************************
+  From original CamSett.txt
+Line0 Value=0(ignored Key =smallestThr=)
+Line1 Value=254(ignored Key =biggestThr=)
+Line2 Value=0(ignored Key =smallestPix=)
+Line3 Value=67(ignored Key =biggestPix=)
+Line4 Value=0.633(ignored Key =SkewGaussAmpl=)
+Line5 Value=1.97(ignored Key =SkewGaussXi=)
+Line6 Value=1.89(ignored Key =SkewGaussOmega=)
+Line7 Value=2.5(ignored Key =SkewGaussAlpha=)
+Line8 Value=0(ignored Key =NumPixAbvThrSumMin=)
+Line9 Value=3(ignored Key =NumPixAbvThrSumMax=)
+Line10 Value=20(ignored Key =SubThr=)
+Line11 Value=0(ignored Key =RewFram=)
+Line12 Value=-2(ignored Key =ForFram=)
+Line13 Value=1(ignored Key =FramBefNew=)
+Line14 Value=1(ignored Key =FracYes=)
+Line15 Value=100(ignored Key =CROP_XI=)
+Line16 Value=900(ignored Key =CROP_XF=)
+Line17 Value=0(ignored Key =CROP_YI=)
+Line18 Value=1919(ignored Key =CROP_YF=)
+Line19 Value=14(ignored Key =mainThreshold=)
+  **************************************************/
   char camName[80];  //used to be [3], caused buffer overflow!
   fscanf ( file, "%s %s", line, camName );
   string camera(camName);
@@ -125,7 +147,16 @@ int main ( int argc, char** argv ) {
   cerr << "smallestPix=" << smallestPix << endl;
   cerr << "biggestPix=" << biggestPix << endl;
   cerr << endl;
-  ifstream ifp(argv[1]); long NumFrames = atol(argv[2]); double level = atof(argv[3]);
+  
+  //
+  // Process non-option command line args.
+  //
+  //One could read (filename argv[1]) until EOF
+  //to count or check NumFrames==number of difference lines.
+  ifstream ifp(argv[1]); long NumFrames = atol(argv[2]);
+
+  double level = atof(argv[3]);
+
   if ( level >= 0.979 && camera != "B1" ) {
     if ( camera == "B2" ) level = 0.999999999999; // the minimum allowed that doesn't make B2 collect too many events (16_21-57-25)
     else if ( camera == "B3" ) level = 0.9999999999;
@@ -133,9 +164,30 @@ int main ( int argc, char** argv ) {
     else if ( camera == "Custom" ) { ; }
     else level = 0.99999999999; // 11 9's
   }
+  //
+  //It might be better to compute with log(1 - level) since it's so tiny sometimes.
+  //
+  //At present, level:=0.5 for first try and 0.97 for redo.
+  //Also, this kind of adjustment for special movie/camera issues may be better
+  //handled at the script level.
+  //
+  // level is used only once, in the diff frame traversing loop after the reading and mean loop.
+  //
+  
+  double data[26];  //for reading Phase1a data.
+  double GlobPixMean[7] = {0.,0.,0.,0.,0.,0.,0.};
+  vector<double> store[26];
+  //for storing that data, store[kind of data][which diff frame]
+  //(?Not very important) store[] starts at 0 but diff line numbers at the
+  //start of each line begin at 1, for frame1-frame0.
+  
   for ( i = 0; i < NumFrames; ++i ) {
-    ifp >> data[0] >> data[1] >> data[2] >> data[3] >> data[4] >> data[5] >> data[6] >> data[7] >> data[8] >> data[9] >> data[10] >> data[11] >> data[12] >> data[13]
-        >> data[14] >> data[15] >> data[16] >> data[17] >> data[18] >> data[19] >> data[20] >> data[21] >> data[22] >> data[23] >> data[24] >> data[25];
+    ifp >> data[0] >> data[1] >> data[2] >> data[3] >> data[4]
+	>> data[5] >> data[6] >> data[7] >> data[8] >> data[9]
+	>> data[10] >> data[11] >> data[12] >> data[13] >> data[14]
+	>> data[15] >> data[16] >> data[17] >> data[18] >> data[19]
+	>> data[20] >> data[21] >> data[22] >> data[23] >> data[24] >> data[25];
+    
     GlobPixMean[0] += data[1];
     GlobPixMean[1] += data[4];
     GlobPixMean[2] += data[7];
@@ -143,7 +195,61 @@ int main ( int argc, char** argv ) {
     GlobPixMean[4] -= data[13];
     GlobPixMean[5] -= data[16];
     GlobPixMean[6] += data[25];
-    for ( j = 0; j < 26; ++j ) store[j].push_back(data[j]);
+    
+    for ( j = 0; j < 26; ++j ) {
+      store[j].push_back(data[j]);
+    }
+
+    //C-TAP=Custom Target Analysis Protocol
+    // (Szydagis) arXiv:2312.00558v4
+    // chaikens annotation/refactorization.
+    // FLIR stands for Forward-Looking InfraRed, cameras for which
+    // this project was started, but then extended to regular cameras.
+    //
+    //Page11 par1,3: min and max diffs in pixels between successive frames.
+    //
+    //       par4 L1 Calc avg in pixel diffs.
+    //
+    //       par3 L3-5:
+    //"It is adjusted depending on the nature of the noise, such as a
+    //severe non-Gaussian upward tail, typical of the older (noisier) camera units,
+    //necessitating setting a threshold toward the upper end of this range to avoid
+    //a high false-positive rate."
+    //
+    //data[] includes differences; from current frame data[0] - previous frame
+    // starting with frame1 (2nd movie frame) - (beginning frame)
+    // i  data[i] meaning                       we compute                  notation in paper
+    //
+    // 0  difference frame number (starts with 1) 
+    // 1  max pos diff Red   (max +R)        its mean=:GlobPixMean[0]
+    // 2      where x	    
+    // 3      where y	    
+    // 4  max pos diff Green (max +G)        its mean=:GlobPixMean[1]
+    // 5      where x        
+    // 6      where y
+    // 7  max pos diff Blue  (max +B)        its mean=:GlobPixMean[2]
+    // 8     where x	    
+    // 9     where y
+
+    //10  min neg diff Red, neg#. (min -R)  (- its mean)=:GlobPixMean[3](>=0)
+    //11      where x	    
+    //12      where y	    
+    //13  max pos diff Green, neg#. (min -G)(- its mean)=:GlobPixMean[4](>=0)
+    //14      where x        
+    //15      where y
+    //16  max pos diff Blue, neg#  (min +B) (- its mean)=:GlobPixMean[5](>=0)
+    //17     where x	    
+    //18     where y
+    
+    //19  #pixels with +R >= (max +R) - thresh
+    //20  #pixels with +G >= (max +G) - thresh
+    //21  #pixels with +B >= (max +B) - thresh
+    //22  #pixels with -R <= (min -R) + thresh
+    //23  #pixels with -G <= (min -G) + thresh
+    //24  #pixels with -B <= (min -B) + thresh
+
+    //25  var name used below:NumPixAbvSubThrSum    its mean=:GlobPixMean[6]
+
   }
   ifp.close();
   
@@ -169,8 +275,9 @@ int main ( int argc, char** argv ) {
   GlobPixSigma /= (double(NumFrames)-1.);
   GlobPixSigma = sqrt(GlobPixSigma);
   fprintf(stderr,"The number of pixels above %d units is %.2f +/- %.2f\n",SubThr,GlobPixMean[6],GlobPixSigma);
-  //scaling?
+  // used only once, -------V---, from CamSett and our changes above
   int MinPix = std::max(smallestPix,int(ceil(GlobPixMean[6]+1.)));
+  // used only once--V--,         from CamSett and our changes above
   int MaxPix = biggestPix;
   while ( MaxPix <= MinPix ) {
     if ( camera == "B1" )
@@ -180,7 +287,8 @@ int main ( int argc, char** argv ) {
   }
   fprintf(stderr,"Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
   fprintf(stderr,"Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
-  
+
+  //big diff frame loop
   for ( i = 0; i < (NumFrames-1); ++i ) {
     
     unsigned long frameNum = (unsigned long)store[0][i];
@@ -211,21 +319,26 @@ int main ( int argc, char** argv ) {
     
     unsigned int NumPixAbvThrSum = NumPixAbvThrR + NumPixAbvThrG + NumPixAbvThrB + NumPixAbvThrr + NumPixAbvThrg + NumPixAbvThrb;
     unsigned int NumPixAbvSubThrSum = (unsigned int)store[25][i];
-    
+
+    //new use of extrema, separate for each diff frame i
     extrema.clear();
-    extrema.push_back(maxR);
+    extrema.push_back(maxR); //inserts at posn [len]
     extrema.push_back(maxG);
     extrema.push_back(maxB);
     extrema.push_back(maxr);
     extrema.push_back(maxg);
     extrema.push_back(maxb);
-    std::sort( extrema.begin(), extrema.end() );
+    std::sort( extrema.begin(), extrema.end() ); //sorted goes up or ==, non-descending sort.
     unsigned short AbsMax =abs(extrema.back());
+    //Apparently, C++ doesn't have vararg max( ., ., ., ... )
+    //this extrema data not used anymore
+
     
     AbsAvg = ( maxR + maxG + maxB + maxr + maxg + maxb ) / 6.;
     AbsStdDev = ( maxR - AbsAvg ) * ( maxR - AbsAvg ) + ( maxG - AbsAvg ) * ( maxG - AbsAvg ) + ( maxB - AbsAvg ) * ( maxB - AbsAvg ) +
       ( maxr - AbsAvg ) * ( maxr - AbsAvg ) + ( maxg - AbsAvg ) * ( maxg - AbsAvg ) + ( maxb - AbsAvg ) * ( maxb - AbsAvg );
     AbsStdDev = sqrt ( AbsStdDev / 5. );
+    
     vector<double> SkewGauss(4); // "classic" values for the next line: ampl .633, mu 1.97, sig 1.89, skew 2.5
     if ( camera == "Custom" ) {
       SkewGauss[0] = CamSett[4]; //SkewGaussAmpl 
@@ -239,19 +352,34 @@ int main ( int argc, char** argv ) {
       SkewGauss[2] = 2.;     //SkewGaussOmega
       SkewGauss[3] = 2.0;    //SkewGaussAlpha
     }
-    prob[i] = 1. - SkewGauss[0]*exp(-0.5*(AbsStdDev-SkewGauss[1])*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*SkewGauss[2]))*(1.+erf(SkewGauss[3]*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*sqrt(2.))));
     
+    prob[i] = 1. -
+      SkewGauss[0]
+      *( exp( -0.5*(AbsStdDev-SkewGauss[1])*(AbsStdDev-SkewGauss[1])
+	           /(SkewGauss[2]*SkewGauss[2]) ) )
+      *(        1. + erf(SkewGauss[3]*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*sqrt(2.)))          );
+
+    //
+    // decision below depends on camera
+    //
+    // level is used only one time, here:
+    //  --------------V--
     if ( (prob[i] > level && (AbsMax > MinThr && AbsMax < MaxThr) && NumPixAbvSubThrSum > MinPix && NumPixAbvSubThrSum < MaxPix) ||
 	 (NumPixAbvThrSum > 36 && NumPixAbvThrSum < 44 && camera == "B1") || (NumPixAbvThrSum > 100 && (camera == "B3" || camera == "B4")) ||
 	 (camera == "Custom" && NumPixAbvThrSum > CamSett[8] && NumPixAbvThrSum < CamSett[9]) )
       SignalTruth.push_back(true);
     else
       SignalTruth.push_back(false);
-    
+    //end of big diff frame loop on i
   }
   
-  double previous[4] = {1.,256.,0.,0.}; unsigned short int iEvtN = 0; // the global event number
-  unsigned short FrameNum[2] = { 0, 0 }; if ( camera != "Custom" ) SignalTruth.erase(SignalTruth.begin());
+  double previous[4] = {1.,256.,0.,0.};
+  unsigned short int iEvtN = 0; // the global event number
+  unsigned short FrameNum[2] = { 0, 0 };
+  
+  if ( camera != "Custom" ) {
+    SignalTruth.erase(SignalTruth.begin());
+  }
   
   for ( i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
     
@@ -273,21 +401,32 @@ int main ( int argc, char** argv ) {
       unsigned short maxr = (unsigned short)(-store[10][i]);
       unsigned short maxg = (unsigned short)(-store[13][i]);
       unsigned short maxb = (unsigned short)(-store[16][i]);
+      
+      //new use of extrema
       extrema.clear();
       extrema.push_back(maxR); extrema.push_back(maxG); extrema.push_back(maxB); extrema.push_back(maxr); extrema.push_back(maxg); extrema.push_back(maxb);
-      std::sort(extrema.begin(),extrema.end()); unsigned short AbsMax = abs(extrema.back());
+      std::sort(extrema.begin(),extrema.end());
+      unsigned short AbsMax = abs(extrema.back());
       extrema.clear();
+      //Just compute max's?
+      //done with extrema
+
+      //new use of extrema, not for finding max, but for reporting events
+      //(vector).push_back(val) inserts at posn [len]
       if ( AbsMax == maxR ) { extrema.push_back( maxR); extrema.push_back(store[2][i]); extrema.push_back(store[3][i]); }
       else if ( AbsMax == maxG ) { extrema.push_back( maxG); extrema.push_back(store[5][i]); extrema.push_back(store[6][i]); }
       else if ( AbsMax == maxB ) { extrema.push_back( maxB); extrema.push_back(store[8][i]); extrema.push_back(store[9][i]); }
       else if ( AbsMax == maxr ) { extrema.push_back(-maxr); extrema.push_back(store[11][i]); extrema.push_back(store[12][i]); }
       else if ( AbsMax == maxg ) { extrema.push_back(-maxg); extrema.push_back(store[14][i]); extrema.push_back(store[15][i]); }
       else { extrema.push_back(-maxb); extrema.push_back(store[17][i]); extrema.push_back(store[18][i]); }
+
       FrameNum[1] = store[0][i];
       if ( (FrameNum[1]-FrameNum[0]) > FramBefNew && FrameNum[0] != 0 ) ++iEvtN;
       FrameNum[0] = FrameNum[1];
-      if ( !GoldenEvent )
+      
+      if ( !GoldenEvent ) {
 	cout << iEvtN << "\t\t" << store[0][i] << "\t" << short(previous[0]) << "  " << (unsigned short)previous[1] << " " << (unsigned short)previous[2] << "\t" << previous[3] << endl;
+      }
       else {
 	cout << iEvtN << "\t\t" << store[0][i] << "\t" << extrema[0] << "  " << extrema[1] << " " << extrema[2] << "\t" << prob[i] << endl;
 	previous[3] = prob[i];
@@ -295,17 +434,20 @@ int main ( int argc, char** argv ) {
 	previous[1] = double(extrema[1]);
 	previous[2] = double(extrema[2]);
       }
+      //end of use of this extrema
+      
       /*printf("%.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f %.0f %.0f\t%.0f %.0f %.0f\t\t%.0f\t%.12f\n",store[0][i],
 	     store[1][i],store[2][i],store[3][i],store[4][i],store[5][i],store[6][i],store[7][i],store[8][i],store[9][i],
 	     store[10][i],store[11][i],store[12][i],store[13][i],store[14][i],store[15][i],store[16][i],store[17][i],store[18][i],
 	     store[19][i],store[20][i],store[21][i],
 	     store[22][i],store[23][i],store[24][i],store[25][i],prob[i]);*/
+      
+      //end of  if ( GoldenEvent || float(NumBools) / float(ForFram+RewFram) > FracYes )
     }
-    
+    //end of loop ( i = RewFram; i < (NumFrames-ForFram-2); ++i ) 
   }
   
-  return 0;
-  
+  return 0; //exit main, we're done.
 }
 
 

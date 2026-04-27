@@ -344,7 +344,7 @@ do
 
 	  echo Running
 	  echo ${FFMPEG_EXTRACT_CMD}
-	  echo ${FFMPEG_EXTRACT_CMD} | cat >>${COMMAND_ARCHIVE_PATHNAME}
+	  ( echo  ; echo ${FFMPEG_EXTRACT_CMD} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 
 	  xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
 	  Extract_xterm_PID=$!  #so we can kill you later.
@@ -470,7 +470,7 @@ do
 	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" 
 	echo Running
 	echo ${Phase1a_cmd}
-	echo ${Phase1a_cmd} | cat >>${COMMAND_ARCHIVE_PATHNAME}
+	( echo ; echo ${Phase1a_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 
 	#HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
 	eval ${Phase1a_cmd}
@@ -546,18 +546,21 @@ do
     
     RESULT_OF_1b_BASE="${moviePrefix}.out"
     cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+    
     #so xterm's less doesnt fess. We use less since the result is finished fast.
-
     xterm -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
     Phase1b_xterm_PID=$!
 
+    #
+    # level for Phase1b first try is 0.5, here----------------------------------------------V---
+    #
     Phase1b_cmd_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.5 "
     Phase1b_cmd_args="${Phase1b_cmd_args} ${NEW_CamSett}"
     Phase1b_cmd="${Phase1b_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}"
 
     echo Running
     echo ${Phase1b_cmd}
-    echo ${Phase1b_cmd} | cat >>${COMMAND_ARCHIVE_PATHNAME}
+    ( echo ; echo ${Phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
     #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
     #${Phase1b_cmd_args} > ${RESULT_DIR}/${RESULT_OF_1b_BASE}
     
@@ -614,10 +617,14 @@ do
 #            done
 #
 
+
+	    #
+	    # level for Phase1b redo is 0.98, here-----------------------------------------------------------V---
+	    #
 	    Phase1b_redo_command_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 "
 	    Phase1b_redo_command_args="${Phase1b_redo_command} ${NEW_CamSett}"
 	    Phase1b_redo_command="${Phase1b_redo_command_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}"
-	    echo "${Phase1b_redo_command}" | cat >> ${COMMAND_ARCHIVE_PATHNAME}
+	    ( echo  ; echo "${Phase1b_redo_command}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 	    echo "${Phase1b_redo_command}" | cat >> $MESS_1b_FULL_PATH
 	    eval $Phase1b_redo_command 2>> $MESS_1b_FULL_PATH
 	    err=$?
