@@ -46,10 +46,11 @@ DEBUG=false
 #this options is given Phase1a and Phase1b.
 
 #Today, we use an external drive filesystem
+BITMAPS_DIR_NAME="SMALLbitmaps"
 BITMAPS_PARENT_DIR=${FAST_FILESYS_DIR_IF_USED}
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/SMALLbitmaps"
 #Again for today's external drive's sake
-NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/SMALLbitmaps"
+NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 NEW_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 #
@@ -127,11 +128,11 @@ ext=mp4
 # The pipeline works much faster and doesn't use excessive disk space.
 # We are keeping the .bmp image version up to make comparisons with
 # previous analyses.
-#OK diff with brother
+#OK diff with brother FullScaling
 #This is the name for half resolution decimated frame ffmpeg extraction.
 movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
 #Alternative:
-#OK diff with brother
+#OK diff with brother FullScaling 
 #This is the name for full frame ffmpeg extraction.
 #movie_files="$SLOW_MOVIE_DIR/DroneShort1Full.$ext"
 
@@ -324,7 +325,7 @@ do
 	
 	#ffmpeg -xerror -threads 0 -hide_banner -an -i ${movie_file}  thumb%06d.bmp  &> ${RESULTS_DIR}/ffmpeg.outputs 
 
-	#OK diff with brother
+	#OK diff with brother Full Scaling
         #FFMPEG_EXTRACT_CMD=
 	#"ffmpeg -xerror -threads 0 -hide_banner -an    \
 	#-i $movie_file                                                    \
@@ -335,7 +336,7 @@ do
 	movie_height=$(heightOfMovie $movie_file)
 
 	##scaling? We actually do half-scaling and full scaling.
-	#OK diff with brother
+	#OK diff with brother FullScaling 
 	FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an  \
            -i $movie_file                                                 \
            -vf                                                            \
@@ -418,7 +419,7 @@ do
 
     echo
     echo Input Origin Report:
-    if [ $widthOfMovie"" = "" ]
+    if [ ${movie_width}"" = "" ]
     then
 	echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.'
 	echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height}
@@ -461,12 +462,12 @@ do
     
     cd $BITMAPS_PARENT_DIR
     #That's where the C++ image processors expect us to be
-    # for now "bitmaps/thumb{0-9}^6.bmp" filenames are hard coded. 
-
+ 
     if [ true ]
     then
 	# run Phase1a once on all the frames
 	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
+	#OK diff with brother FullScale
 	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 "
 	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" 
 	echo Running
@@ -507,6 +508,7 @@ do
 	do
 
 	    Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
+	    #OK diff with brother FullScaling
 	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 "
 	    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 	    #HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
@@ -697,11 +699,11 @@ do
 	    #Remember, we're in ${BITMAPS_PARENT_DIR}
 	    #scaling?  Convert command works in terms of pixel coords, it must.
 	    BITMAP_EDIT_CMD=\
-"convert SMALLbitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' SMALLbitmaps/pic$pad$frame.bmp"
+"convert ${BITMAPS_DIR_NAME}/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR_NAME}/pic$pad$frame.bmp"
 	else
 	    # echo  '$y -lt 800 no branch'
 	    BITMAP_EDIT_CMD=\
-"convert SMALLbitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' SMALLbitmaps/pic$pad$frame.bmp"
+"convert ${BITMAPS_DIR_NAME}/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR_NAME}/pic$pad$frame.bmp"
 	fi
 	# ..echo 'We will eval' $BITMAP_EDIT_CMD
 	eval $BITMAP_EDIT_CMD

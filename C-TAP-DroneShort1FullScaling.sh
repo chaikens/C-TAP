@@ -53,7 +53,6 @@ BITMAPS_DIR="${BITMAPS_PARENT_DIR}/$BITMAPS_DIR_NAME"
 NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/$BITMAPS_DIR_NAME"
 NEW_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
-
 #
 # Please code below where you would like us to
 # find 1 or more movies to process, plus
@@ -129,11 +128,11 @@ ext=mp4
 # The pipeline works much faster and doesn't use excessive disk space.
 # We are keeping the .bmp image version up to make comparisons with
 # previous analyses.
-#OK diff with brother
+#OK diff with brother HalfDecimated
 # This is the name for full frame ffmpeg extraction.
 movie_files="$SLOW_MOVIE_DIR/DroneShort1FullScaling.$ext"
 #Alternative:
-#OK diff with brother
+#OK diff with brother HalfDecimated
 #This is the name for half resolution decimated frame ffmpeg extraction.
 #movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
 
@@ -326,7 +325,7 @@ do
 	
 	#ffmpeg -xerror -threads 0 -hide_banner -an -i ${movie_file}  thumb%06d.bmp  &> ${RESULTS_DIR}/ffmpeg.outputs 
 
-	#ok diff with brother
+	#ok diff with brother HalfDecimated
 	FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an    \
 	-i $movie_file                                                    \
 	thumb%06d.bmp                                                     \
@@ -336,7 +335,7 @@ do
 	movie_height=$(heightOfMovie $movie_file)
 
 	##scaling? We actually do half-scaling and full scaling.
-	#OK diff with brother
+	#OK diff with brother HalfDecimated
 	#"ffmpeg -xerror -threads 0 -hide_banner -an  \
         #   -i $movie_file                                                 \
         #   -vf                                                            \
@@ -467,6 +466,7 @@ do
     then
 	# run Phase1a once on all the frames
 	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
+	#OK diff with brother HalfDecimated
 	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
 	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" 
 	echo Running
@@ -507,6 +507,7 @@ do
 	do
 
 	    Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
+	    #OK diff with brother HalfDecimated
 	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
 	    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 	    #HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
