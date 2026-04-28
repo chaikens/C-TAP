@@ -1,0 +1,44 @@
+First 1b try:
+/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.int 2879 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.out
+endlReading /data/GIT/C-TAP/CamSett.txt
+Line0 Value=0(ignored Key =smallestThr=)
+Line1 Value=254(ignored Key =biggestThr=)
+Line2 Value=0(ignored Key =smallestPix=)
+Line3 Value=67(ignored Key =biggestPix=)
+Line4 Value=0.633(ignored Key =SkewGaussAmpl=)
+Line5 Value=1.97(ignored Key =SkewGaussXi=)
+Line6 Value=1.89(ignored Key =SkewGaussOmega=)
+Line7 Value=2.5(ignored Key =SkewGaussAlpha=)
+Line8 Value=0(ignored Key =NumPixAbvThrSumMin=)
+Line9 Value=3(ignored Key =NumPixAbvThrSumMax=)
+Line10 Value=20(ignored Key =SubThr=)
+Line11 Value=0(ignored Key =RewFram=)
+Line12 Value=-2(ignored Key =ForFram=)
+Line13 Value=1(ignored Key =FramBefNew=)
+Line14 Value=1(ignored Key =FracYes=)
+Line15 Value=0(ignored Key =CROP_XI=)
+Line16 Value=1920(ignored Key =CROP_XF=)
+Line17 Value=0(ignored Key =CROP_YI=)
+Line18 Value=1080(ignored Key =CROP_YF=)
+Line19 Value=14(ignored Key =mainThreshold=)
+Last read:cameraName= camName=Custom C++string=Custom
+
+Phase1b Capitalized Params: From Custom
+SubThr=20
+RewFram=0
+ForFram=-2
+FramBefNew=1
+FracYes=1
+
+Phase1b bounds Params: From CamSett.txt
+smallestThr0
+biggestThr=254
+smallestPix=0
+biggestPix=67
+
+Grey(8-bit) pixel diff mu and sigma of 135.1 +/- 1.59 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 136 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 61.33 +/- 19.05
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 63
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67

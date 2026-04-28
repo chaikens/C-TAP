@@ -54,10 +54,15 @@ pixCoord CROP_YI, //left edge
   CROP_XF; //bottom edge
 
 //will be set by init_CROPS_and_camera() at runtime
-string camera;
+string camera;  //still custom, didn't integrate new camera_index
+//for exclusion zone with a camera name.
 
 int please_double = 0; //dont double unless asked through our
 // new option --pix-scale double
+
+int scale = 1;
+pixCoord s( pixCoord c ) { return scale*c; }
+  
 void init_CROPS_and_camera(int please_double)
 {
   //We have these preprocessor conditionals to
@@ -69,8 +74,8 @@ void init_CROPS_and_camera(int please_double)
   CROP_YI = 0; //left edge
   CROP_XI = 0; //top edge
 #else
-  CROP_YI = 15;
-  CROP_XI = 10;
+  CROP_YI = s(15);
+  CROP_XI = s(10);
 #endif
 
   //Remember, camera is now a global string (C++ library) variable
@@ -78,37 +83,37 @@ void init_CROPS_and_camera(int please_double)
   //CROP_YF is set here for everybody.
   //Camera particulars set CROP_XF below.
 #ifdef CamB1
- CROP_YF = 1275;
+  CROP_YF = s(1275);
 #else
- CROP_YF = 1249; //right edge (UFODAP: 1920)
+  CROP_YF = s(1249); //right edge (UFODAP: 1920)
 #endif
 
 #ifdef CamA1 //bottom edge is crop_xf. High num to catch boat: 635 MIN. 650 for mult frames
- CROP_XF = 590; camera = "A1";
+  CROP_XF = s(590); camera = "A1";
 #endif
 #ifdef CamA2
- CROP_XF = 640; camera = "A2";
+  CROP_XF = s(640); camera = "A2";
 #endif
 #ifdef CamA3
- CROP_XF = 590; camera = "A3";
+  CROP_XF = s(590); camera = "A3";
 #endif
 #ifdef CamA4
- CROP_XF = 575; camera = "A4";
+  CROP_XF = s(575); camera = "A4";
 #endif
 #ifdef CamB1
- CROP_XF = 580; camera = "B1";
+  CROP_XF = s(580); camera = "B1";
 #endif
 #ifdef CamB2
- CROP_XF = 590; camera = "B2";
+  CROP_XF = s(590); camera = "B2";
 #endif
 #ifdef CamB3
- CROP_XF = 575; camera = "B3";
+  CROP_XF = s(575); camera = "B3";
 #endif
 #ifdef CamB4
- CROP_XF = 590; camera = "B4";
+  CROP_XF = s(590); camera = "B4";
 #endif
 #ifdef Custom
- CROP_XF = 1080; /*default: UFODAP*/
+  CROP_XF = s(1080); /*default: UFODAP*/
  camera = "Custom";
 #endif
 
@@ -120,6 +125,7 @@ void init_CROPS_and_camera(int please_double)
  //the full frame movie bitmaps.
  if(please_double)
    {
+     error(1,0,"DONT USE DOUBLING (FOR) NOW.");
      cerr << "init_CROPS thinks please_double=" << please_double << " so" << endl;
      CROP_YI *= 2;
      CROP_YF *= 2;
@@ -264,10 +270,14 @@ static bool ezNone( pixCoord ii, pixCoord jj ) {
 }
 
 static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
-  return (ii < 73) && (jj > 1568); //exclude the date-time exhibit
+  return (ii < s(73) ) && (jj > s(1568) );
+  //exclude the upper right date-time exhibit
+  //These coords are wrt the 1920x1040 frame, which is 1/2 the original
+  //DroneCalib1.mp4 (and DroneShort1.mp4) movies.
 }
 
 //scaling? all ez* functions!
+//s( consts ) below NOT DONE YET
 static bool ezCamA1( pixCoord ii, pixCoord jj ) {
   return
     ( abs(jj-1205) < 40
@@ -556,12 +566,15 @@ static int get_our_options( int *argc, char **argv[])
       case 1: CamSett_file = optarg;
 	break;
       case 2: pix_scale_string = optarg;
+	/*
 	if (  strncmp( pix_scale_string, "double", 8) )
 	  {
 	    error(1, 0, "Improper use of --pix-scale %s for now, --pix-scale double is the only way.\n", optarg);
 	  }
 	please_double = 1;
 	cerr << "get_our_options set please_double." << endl;
+	*/
+	scale = atoi(optarg);
 	break;
       case 4:
 	camera_index = atoi(optarg);
