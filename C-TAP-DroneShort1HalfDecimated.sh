@@ -1,6 +1,6 @@
 #!/bin/bash
 source C-TAP-HELPERS
-REUSE_BMPS=no #Do not change to yes except if you already
+REUSE_BMPS=yes #Do not change to yes except if you already
 # had the thumb*.bmp frames extracted and are re-using
 # the script for development and testing of subsequent steps
 # for the same movie and extraction choices.
@@ -47,9 +47,9 @@ DEBUG=false
 
 #Today, we use an external drive filesystem
 BITMAPS_PARENT_DIR=${FAST_FILESYS_DIR_IF_USED}
-BITMAPS_DIR="${BITMAPS_PARENT_DIR}/bitmaps"
+BITMAPS_DIR="${BITMAPS_PARENT_DIR}/SMALLbitmaps"
 #Again for today's external drive's sake
-NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/bitmaps"
+NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/SMALLbitmaps"
 NEW_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 #
@@ -467,7 +467,7 @@ do
     then
 	# run Phase1a once on all the frames
 	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
-	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett}"
+	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 "
 	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" 
 	echo Running
 	echo ${Phase1a_cmd}
@@ -507,7 +507,7 @@ do
 	do
 
 	    Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
-	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett}"
+	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 "
 	    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 	    #HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
 	    #${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
@@ -697,11 +697,11 @@ do
 	    #Remember, we're in ${BITMAPS_PARENT_DIR}
 	    #scaling?  Convert command works in terms of pixel coords, it must.
 	    BITMAP_EDIT_CMD=\
-"convert bitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
+"convert SMALLbitmaps/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' SMALLbitmaps/pic$pad$frame.bmp"
 	else
 	    # echo  '$y -lt 800 no branch'
 	    BITMAP_EDIT_CMD=\
-"convert bitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' bitmaps/pic$pad$frame.bmp"
+"convert SMALLbitmaps/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' SMALLbitmaps/pic$pad$frame.bmp"
 	fi
 	# ..echo 'We will eval' $BITMAP_EDIT_CMD
 	eval $BITMAP_EDIT_CMD

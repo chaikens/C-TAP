@@ -36,7 +36,6 @@ int main ( int argc, char** argv ) {
   // if not supplied, the original defaults that work when
   // these files are in cwd are used.
 
-  vector<short> extrema;
   unsigned long i = 0;
   signed short j = 0;
   float AbsAvg, AbsStdDev, FracYes;
@@ -249,7 +248,10 @@ Line19 Value=14(ignored Key =mainThreshold=)
     //24  #pixels with -B <= (min -B) + thresh
 
     //25  var name used below:NumPixAbvSubThrSum    its mean=:GlobPixMean[6]
-
+    //  Total number of pixels above the threshold, for all 6 +/- RGBs
+    //  If the same pixel beats threshold for more than one of 6 cases,
+    //  a the count is incremented for each case.
+    // See FLIRanalysisPhase1aCamX.cpp of course.
   }
   ifp.close();
   
@@ -320,18 +322,11 @@ Line19 Value=14(ignored Key =mainThreshold=)
     unsigned int NumPixAbvThrSum = NumPixAbvThrR + NumPixAbvThrG + NumPixAbvThrB + NumPixAbvThrr + NumPixAbvThrg + NumPixAbvThrb;
     unsigned int NumPixAbvSubThrSum = (unsigned int)store[25][i];
 
-    //new use of extrema, separate for each diff frame i
-    extrema.clear();
-    extrema.push_back(maxR); //inserts at posn [len]
-    extrema.push_back(maxG);
-    extrema.push_back(maxB);
-    extrema.push_back(maxr);
-    extrema.push_back(maxg);
-    extrema.push_back(maxb);
-    std::sort( extrema.begin(), extrema.end() ); //sorted goes up or ==, non-descending sort.
-    unsigned short AbsMax =abs(extrema.back());
-    //Apparently, C++ doesn't have vararg max( ., ., ., ... )
-    //this extrema data not used anymore
+    unsigned short AbsMax;
+    { // maxine should be local
+    vector<unsigned short> maxine = {maxR, maxG, maxB, maxr, maxg, maxb}; //all unsigned, see above.
+    AbsMax = *max_element( maxine.begin(), maxine.end() ); 
+    }
 
     
     AbsAvg = ( maxR + maxG + maxB + maxr + maxg + maxb ) / 6.;
@@ -364,12 +359,18 @@ Line19 Value=14(ignored Key =mainThreshold=)
     //
     // level is used only one time, here:
     //  --------------V--
-    if ( (prob[i] > level && (AbsMax > MinThr && AbsMax < MaxThr) && NumPixAbvSubThrSum > MinPix && NumPixAbvSubThrSum < MaxPix) ||
-	 (NumPixAbvThrSum > 36 && NumPixAbvThrSum < 44 && camera == "B1") || (NumPixAbvThrSum > 100 && (camera == "B3" || camera == "B4")) ||
-	 (camera == "Custom" && NumPixAbvThrSum > CamSett[8] && NumPixAbvThrSum < CamSett[9]) )
+    if ( (prob[i] > level && (AbsMax > MinThr && AbsMax < MaxThr) && NumPixAbvSubThrSum > MinPix && NumPixAbvSubThrSum < MaxPix)
+	 || (NumPixAbvThrSum > 36 && NumPixAbvThrSum < 44 && camera == "B1")
+	 || (NumPixAbvThrSum > 100 && (camera == "B3" || camera == "B4"))
+	 || (camera == "Custom" && NumPixAbvThrSum > CamSett[8] && NumPixAbvThrSum < CamSett[9]) )
+      //.............................  NumPixAbvThrSumMin====^=0 ....  NumPixAbvThrSumMax====^=3
+
+      {
       SignalTruth.push_back(true);
-    else
+    }
+    else {
       SignalTruth.push_back(false);
+    }
     //end of big diff frame loop on i
   }
   
@@ -402,17 +403,13 @@ Line19 Value=14(ignored Key =mainThreshold=)
       unsigned short maxg = (unsigned short)(-store[13][i]);
       unsigned short maxb = (unsigned short)(-store[16][i]);
       
-      //new use of extrema
-      extrema.clear();
-      extrema.push_back(maxR); extrema.push_back(maxG); extrema.push_back(maxB); extrema.push_back(maxr); extrema.push_back(maxg); extrema.push_back(maxb);
-      std::sort(extrema.begin(),extrema.end());
-      unsigned short AbsMax = abs(extrema.back());
-      extrema.clear();
-      //Just compute max's?
-      //done with extrema
+      unsigned short AbsMax;
+      { // maxine should be local
+	vector<unsigned short> maxine = {maxR, maxG, maxB, maxr, maxg, maxb}; //all unsigned, see above.
+	AbsMax = *max_element( maxine.begin(), maxine.end() ); 
+      }
 
-      //new use of extrema, not for finding max, but for reporting events
-      //(vector).push_back(val) inserts at posn [len]
+      vector<short> extrema;
       if ( AbsMax == maxR ) { extrema.push_back( maxR); extrema.push_back(store[2][i]); extrema.push_back(store[3][i]); }
       else if ( AbsMax == maxG ) { extrema.push_back( maxG); extrema.push_back(store[5][i]); extrema.push_back(store[6][i]); }
       else if ( AbsMax == maxB ) { extrema.push_back( maxB); extrema.push_back(store[8][i]); extrema.push_back(store[9][i]); }

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <vector>
 #include <getopt.h>
+#include <cstring>
 using namespace std;
 
 // Camera settings will eventually be systematized.
@@ -38,6 +39,7 @@ static const char *CamSett_file = 0;
 static const char default_bitmaps_dir[] = "bitmaps";
 static const char default_CamSett_file[] = "CamSett.txt";
 static const char *pix_scale_string = 0;
+int no_crop = 0;
 
 //scaling? will use this everywhere including width and height
 typedef uint16_t pixCoord;
@@ -54,7 +56,9 @@ pixCoord CROP_YI, //left edge
 //will be set by init_CROPS_and_camera() at runtime
 string camera;
 
-void init_CROPS_and_camera(void)
+int please_double = 0; //dont double unless asked through our
+// new option --pix-scale double
+void init_CROPS_and_camera(int please_double)
 {
   //We have these preprocessor conditionals to
   //maintain regression as we develop support for
@@ -107,6 +111,23 @@ void init_CROPS_and_camera(void)
  CROP_XF = 1080; /*default: UFODAP*/
  camera = "Custom";
 #endif
+
+ // cerr << "init_CROPS..CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
+ //this is only good for the current task of comparing
+ //well-working 3840x2080 movies scaled and decimated
+ //to 1920x1040, for which the above pixel coordinates
+ //are good, with our new version that works on
+ //the full frame movie bitmaps.
+ if(please_double)
+   {
+     cerr << "init_CROPS thinks please_double=" << please_double << " so" << endl;
+     CROP_YI *= 2;
+     CROP_YF *= 2;
+     CROP_XI *= 2;
+     CROP_XF *= 2;
+     cerr << "init_CROPS..CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
+   }
+ //end of init_CROPS_and_camera()
 }
 
 //scaling?
@@ -235,9 +256,15 @@ void readSubsequentBMP(char* filename, unsigned char *dest)
 // Then, use it by assigning the function pointer variable
 // inExclusionZone (static declared and defined to &ezNone below.
 //
+// watch out! ii is the vertical coord, jj is the horiz coord
+// Top is 0, bottom is height-1
 
 static bool ezNone( pixCoord ii, pixCoord jj ) {
   return false;
+}
+
+static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
+  return (ii < 73) && (jj > 1568); //exclude the date-time exhibit
 }
 
 //scaling? all ez* functions!
@@ -310,11 +337,14 @@ static bool (*inExclusionZone)( pixCoord ii, pixCoord jj );
 // by copying the pointer from the array below.
 
 static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
-  { ezNone, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
+  { ezNone, ezDroneCalib1, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
     ezCamB1, ezCamB2, ezCamB3, ezCamA4 };
 
-int main ( int argc, char** argv ) {
 
+int camera_index = 0;
+
+int main ( int argc, char** argv ) {
+  cerr << "Phase1a called!" << endl;
   get_our_options( & argc, & argv);
   // --bitmaps-dir and --CamSett-file are really options.
   // if not supplied, the original defaults that work when
@@ -322,9 +352,10 @@ int main ( int argc, char** argv ) {
 
   //This will probability have to go later, after (not yet)
   //variable cameras are supported.
-  init_CROPS_and_camera();
+
+  init_CROPS_and_camera(please_double); //global above,
+  //might be set by get_our_options
   
-  int camera_index = 0;
   inExclusionZone = ezFunArray[camera_index];
   /* make it point to the right function */
   
@@ -358,14 +389,23 @@ int main ( int argc, char** argv ) {
   CROP_XF = (pixCoord)CamSett[16];
   CROP_YI = (pixCoord)CamSett[17];
   CROP_YF = (pixCoord)CamSett[18];
+  if(please_double) {
+    CROP_XI *= 2;  
+    CROP_XF *= 2;
+    CROP_YI *= 2;
+    CROP_YF *= 2;
+  }
 #endif
-
+  
   unsigned long k = start;
 
   readFirstBMPToAandAllocB( bmfilename(k+1) );
   unsigned char* dataOld = BMP_B;
   unsigned char* dataNew = BMP_A;
 
+  //cerr << "Just before k loop, where they are used" << endl 
+  // <<  "CROP_XI=" << CROP_XI  << " CROP_XF=" << CROP_XF
+  // << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
   
   for ( k = start+1; k < end; ++k ) {
     unsigned char* tem = dataOld; dataOld = dataNew; dataNew = tem; 
@@ -376,9 +416,27 @@ int main ( int argc, char** argv ) {
     int NumPixAbvThr[3][2] = {0};
     int NumPixAbvSubThrSum = 0, CloudCover = 100;
 
+    //Pixel indexing in the code indicates j selects the horizontal coord
+    //and i the vertical coord, BUT these original limits use
+    // X cropping on i and Y cropping on j!
+    // Is this a long undetected bug?
+    
+    int i_loop_from = height-1-CROP_XI;
+    int i_loop_ge   = height-CROP_XF;
+    int j_loop_from = CROP_YI;
+    int j_loop_lt   = CROP_YF;
+    
+    if (no_crop) {
+      i_loop_from = height-1;
+      i_loop_ge   = 0;
+      j_loop_from = 0;
+      j_loop_lt   = width;
+    }
+
+
     //scaling? ii and jj too
-    for ( int i = (height-1-CROP_XI); i >= (height-CROP_XF); --i ) {
-      for ( int j = CROP_YI; j < CROP_YF; ++j ) {
+    for ( int i = (i_loop_from); i >= (i_loop_ge); --i ) {
+      for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
 	
 	int rgbColorNew[3], rgbColorOld[3];
 	
@@ -395,9 +453,12 @@ int main ( int argc, char** argv ) {
 	diffs[0] = rgbColorNew[0]-rgbColorOld[0];
 	diffs[1] = rgbColorNew[1]-rgbColorOld[1];
 	diffs[2] = rgbColorNew[2]-rgbColorOld[2];
-	int jj = j;
-	int ii = height - 1 - i;
 
+	int jj = j;              //OK jives with bug? comment.
+	int ii = height - 1 - i; //OK jives with bug? comment.
+
+
+	
 	//scaling? ezFuns rely on it.
 	if ( !(*inExclusionZone)(ii, jj) || k == start ) {
 	  if ( diffs[0] > maximum[0] )
@@ -414,9 +475,13 @@ int main ( int argc, char** argv ) {
 	    { minimum[2] = diffs[2]; minLoc[2][0] = ii; minLoc[2][1] = jj; if ( minimum[2] <-MinThr ) ++NumPixAbvThr[2][1]; if ( minimum[2] <-SubThr ) ++NumPixAbvSubThrSum; }
 	}
 	
-      } /* end pixel y loop */
-    } /* end pixel x loop */
-    
+      } /* end pixel y, j, jj loop */
+    } /* end pixel x, i, ii loop */
+
+    //Output Vertical Pixel coodinates are REVERSED compared to input images.
+    //The input, being a .bmp (even current in pipelined version), uses
+    //Microsoft's bottom-is-zero convention.  
+
     //scaling? OUTPUT is in pixel coords.
       printf("%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
 	      k,
@@ -471,9 +536,11 @@ static int get_our_options( int *argc, char **argv[])
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
     static struct option long_options[] = {
-      {"bitmaps-dir", required_argument,   0,  0 },
-      {"CamSett-file", required_argument, 0,  0 },
-      {"pix-scale", required_argument, 0,  0 },  
+      {"bitmaps-dir", required_argument, 0,  0 },  //0
+      {"CamSett-file", required_argument, 0,  0 }, //1
+      {"pix-scale", required_argument, 0,  0 },    //2
+      {"no-crop",  no_argument, &no_crop, 1 },     //3
+      {"camera-index", required_argument, 0, 0},   //4
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -488,7 +555,17 @@ static int get_our_options( int *argc, char **argv[])
 	break;
       case 1: CamSett_file = optarg;
 	break;
-      case 3: pix_scale_string = optarg;
+      case 2: pix_scale_string = optarg;
+	if (  strncmp( pix_scale_string, "double", 8) )
+	  {
+	    error(1, 0, "Improper use of --pix-scale %s for now, --pix-scale double is the only way.\n", optarg);
+	  }
+	please_double = 1;
+	cerr << "get_our_options set please_double." << endl;
+	break;
+      case 4:
+	camera_index = atoi(optarg);
+	break;
       }
     }
   }

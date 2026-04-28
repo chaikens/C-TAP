@@ -16,10 +16,10 @@ Line11 Value=0(ignored Key =RewFram=)
 Line12 Value=-2(ignored Key =ForFram=)
 Line13 Value=1(ignored Key =FramBefNew=)
 Line14 Value=1(ignored Key =FracYes=)
-Line15 Value=100(ignored Key =CROP_XI=)
-Line16 Value=900(ignored Key =CROP_XF=)
+Line15 Value=0(ignored Key =CROP_XI=)
+Line16 Value=1920(ignored Key =CROP_XF=)
 Line17 Value=0(ignored Key =CROP_YI=)
-Line18 Value=1919(ignored Key =CROP_YF=)
+Line18 Value=1080(ignored Key =CROP_YF=)
 Line19 Value=14(ignored Key =mainThreshold=)
 Last read:cameraName= camName=Custom C++string=Custom
 
@@ -36,9 +36,9 @@ biggestThr=254
 smallestPix=0
 biggestPix=67
 
-Grey(8-bit) pixel diff mu and sigma of 80.9 +/- 1.82 (units of 0-255)
-So, setting a minimum threshold of 1.0 SIGMA = 82 (so-called SUB threshold of 20)
+Grey(8-bit) pixel diff mu and sigma of 91.5 +/- 2.45 (units of 0-255)
+So, setting a minimum threshold of 2.0 SIGMA = 95 (so-called SUB threshold of 20)
 And setting a maximum threshold of 254
-The number of pixels above 20 units is 30.26 +/- 13.64
-Minimum number of pixels allowed to be above the sub-threshold of 20 is 32
+The number of pixels above 20 units is 34.36 +/- 14.04
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 36
 Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
