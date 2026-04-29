@@ -46,11 +46,12 @@ DEBUG=false
 #this options is given Phase1a and Phase1b.
 
 #Today, we use an external drive filesystem
+#OK diff with SMALL brother 
 BITMAPS_DIR_NAME="BIGbitmaps"
 BITMAPS_PARENT_DIR=${FAST_FILESYS_DIR_IF_USED}
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/$BITMAPS_DIR_NAME"
 #Again for today's external drive's sake
-NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/$BITMAPS_DIR_NAME"
+NEW_bitmaps="--bitmaps-dir ${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 NEW_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 #
@@ -301,6 +302,8 @@ do
     #rerun, debug, etc!
     COMMAND_ARCHIVE_PATHNAME=${RESULTS_DIR}/${moviePrefix}.cmds
     cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
+
+    ALL_MESSAGES_PATH=${RESULTS_DIR}/${moviePrefix}.mess
     
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
@@ -468,13 +471,14 @@ do
 	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
 	#OK diff with brother HalfDecimated
 	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
-	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" 
+	#Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett}           --camera-index 1 --pix-scale 2"
+	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>> $ALL_MESSAGES_PATH " 
 	echo Running
 	echo ${Phase1a_cmd}
 	( echo ; echo ${Phase1a_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 
 	#HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
-	eval ${Phase1a_cmd}
+	eval ${Phase1a_cmd} 
 	#${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 	err=$?
 	if [ ${err} != 0 ]
@@ -508,8 +512,9 @@ do
 
 	    Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
 	    #OK diff with brother HalfDecimated
-	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
-	    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
+	    #Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
+	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett}  --camera-index 1 --pix-scale 2"
+	    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>> $ALL_MESSAGES_PATH"
 	    #HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
 	    #${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 	    eval ${Phase1a_cmd}  #this does the trick
@@ -558,23 +563,21 @@ do
     #
     Phase1b_cmd_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.5 "
     Phase1b_cmd_args="${Phase1b_cmd_args} ${NEW_CamSett}"
-    Phase1b_cmd="${Phase1b_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}"
+    Phase1b_cmd="${Phase1b_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>>$ALL_MESSAGES_PATH"
 
     echo Running
-    echo ${Phase1b_cmd}
+    echo ${Phase1b_cmd} 
     ( echo ; echo ${Phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
     #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
     #${Phase1b_cmd_args} > ${RESULT_DIR}/${RESULT_OF_1b_BASE}
     
-    MESSAGES_FROM_1b_BASE="${moviePrefix}.mess"
-    MESS_1b_FULL_PATH=${RESULTS_DIR}/${MESSAGES_FROM_1b_BASE}
-    echo "First 1b try:" | cat > $MESS_1b_FULL_PATH
+    echo "First 1b try:" | cat >> $ALL_MESSAGES_PATH
 
     xterm -geometry 180x30+50+180 -title 'Phase 1b messages'  -e less -f $MESS_1b_FULL_PATH &
     Phase1b_mess_xterm_PID=$!  #so we can kill you later.
 
-    echo ${Phase1b_cmd} | cat >> $MESS_1b_FULL_PATH
-    eval ${Phase1b_cmd} 2>> $MESS_1b_FULL_PATH
+    echo ${Phase1b_cmd} | cat >> $ALL_MESSAGES_PATH
+    eval ${Phase1b_cmd} 
     err=$?
     if [ ${err} != 0 ]
     then
@@ -625,10 +628,10 @@ do
 	    #
 	    Phase1b_redo_command_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 "
 	    Phase1b_redo_command_args="${Phase1b_redo_command} ${NEW_CamSett}"
-	    Phase1b_redo_command="${Phase1b_redo_command_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}"
+	    Phase1b_redo_command="${Phase1b_redo_command_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>> $ALL_MESSAGES_PATH"
 	    ( echo  ; echo "${Phase1b_redo_command}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 	    echo "${Phase1b_redo_command}" | cat >> $MESS_1b_FULL_PATH
-	    eval $Phase1b_redo_command 2>> $MESS_1b_FULL_PATH
+	    eval $Phase1b_redo_command
 	    err=$?
 	    if [ ${err} != 0]
 	    then

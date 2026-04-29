@@ -1,4 +1,78 @@
+// The scaling issue was raised because the DroneCalib1 movie
+// is in 3840x2080 resolution, original C-TAP extracted half-resolution
+// 1920x1040 frames, and Custom (hardcoded and coded in CamSett.txt)
+// selected clipping coordinates were
+// specified in terms of the lower resolution frame coordinates.
+// So, when we were able to process the movie with full resolution
+// frames using pipelined extraction, the clipping cooridinates
+// had to be doubled.  This is implemented below by the
+// option --pix-scale s
+// When s="2", the global scale=2 (generally, scale=atoi(s);).
+// The function s(c) returns scale*c.
+// Finally, the hard coded constants (among others) are first passed through
+// s(), in
 
+/*
+static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
+  return (ii < s(73) ) && (jj > s(1568) );
+
+CROP_YF = s(1249) //restricting more than 1920
+#ifdef Custom
+CROP_XF = s(1080)
+*/
+
+
+
+// Now, we'll try out the idea that:
+// There should be 3 types for coordintes:
+// MCoord -- used in the job's input movie files
+// UCoord -- users specify crop limits and exclusion zones
+//           and similar features in terms of these
+// PCoord -- Pixel or Processing Coordinates, used in
+//           individual processing stages, for now, Phase1a and b.
+//Eventually these might be implemented by C++ classes, say
+//with a common parent named Coord; but, most importantly,
+//each contains a common CoordInfo object that encodes
+//how the unsigned int (uint16) internal data in each object, as an instance
+//of which of the 3 classes it belongs to, should be converted
+//(by some sort of scaling) to objects of one of the other classes.
+//
+// But for now,
+// scaleCD will be a keyword in comments about what conversions
+//should apply.  So, we can test and scope out a good, flexible object
+//oriented design.  No new types will be introduced as we try to
+//finish the April 2026 4-way comparison project on 3840x2080 movies,
+//with properties given by camera name Custom
+//
+//Unfortunately, what we aim for April 2026 is .out files in terms of
+//the Pcoord's of Stage1b, used as such for the baby movies built out
+//our extracted (full or half resolution) movies, and will be double
+//the full frame runs compared to the half-frame runs.
+
+//                            LOOK AT LINES BELOW IN A 150-char WIDE SCREEN
+
+////                                                     concept----V         V------execution
+// __Current__(so I can change now!) CamSett and excl zone params:Ucoord(=(1/2)Mcoord in April 2026):
+//
+//
+//                             concept----V         V------execution
+//    [cropping &/or exclus zones]---->Ucoord(=(1/2)Mcoord)--->V              /-->Matt      /-->Matt
+//Movie-->Mcoord--->Extract(1=Full OR 1/2=Half)--->Pcoord--->Phase1a--->Pcoord/----->Phase2/------->C-TAP,ImageMagik,ffmpeg---->Pcoord--->BabyMovie
+//[.bmp  ext OR YUV-pipe]/                     \---Pcoord----------------------------------------------^
+// so soooo Phase1a HERE should think what we hard-coded in our ezDroneCalib1()
+// are Ucoords!!
+//So, also, in this primative time, the .int, .out and Baby outputs are in Pcoords, NOT Ucoords.
+//If the .bmp/.yuv pipe consistency continues to manifest, we will have to straightforwardly translate the Pcoords in .int and .out
+//to some common Ucoord, for the future machine learning level work.
+//
+// A little background: When I got the .bmp, Fullframe try working on DroneShort1, I had to use an exclusion zone
+// around the date/time display in order to get a better result; whilst no need for Half-frame--this might have done cropping,
+// don't know for sure.  In the full frame try, FLIR got badly distracted by the date-time display. 
+//
+// We really want to vary Processing resolutions.  Mcoords don't change.
+//  So, Mcoord <---> Pcoord must vary at runtime
+// So, if we want Ucoords to be fixed, Pcoord<---->Ucoord must vary at runtime.
+//
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -21,7 +95,7 @@ using namespace std;
 
    (2) code in main() unconditionally 
        sets CROP_{X,Y}{I,F} from CamSett.txt.
-       See comments abt CROP.
+       See comments abt CROP. scaleCD
 
    (3) Mysterious (buggy?) line which does nothing is compiled
        before computing the differences:
@@ -39,11 +113,11 @@ static const char *bitmaps_dir = 0;
 static const char *CamSett_file = 0;
 static const char default_bitmaps_dir[] = "bitmaps";
 static const char default_CamSett_file[] = "CamSett.txt";
-static const char *pix_scale_string = 0;
-int no_crop = 0;
+static const char *pix_scale_string = 0; //scaleCD
+int no_crop = 0; //scaleCD
 
 //scaling? will use this everywhere including width and height
-typedef uint16_t pixCoord;
+typedef uint16_t pixCoord; //scaleCD
 //
 //Maybe, someday, the pixCoord type will be a C++ class, with
 //useful member functions and supporting better type checking.
@@ -85,19 +159,14 @@ typedef uint16_t pixCoord;
 //to pixCoords in the .bmp 
 //
 
-int scale = 1;
-pixCoord s( pixCoord c ) { return scale*c; } //don't bother inlining or
-// worse, compile-time configuration!  Today's optimizing compilers and
-// out-of-ording, cached, pipelined CPU/ALUs make such hand tricks
-// insignificant.  But, it's possible that separate cropping is
-// more efficient than including that in exclusion zone functions,
-// since cropping can REDUCE THE RANGE OF THE MAIN LOOP
-// by \Theta(length*width).
-
-//
+//scaleCD
 //By the way, halving the resolution of the images
 // will 1/4 the \Theta(length*width) runtime of Phase1a.
 //
+
+
+// CROP_* variables
+//scaleCD SHOULD they be PCoords or UCoords??? Unclear, try to settle the choice soon.
 
 //Declare these globals undefined so we set them with a function
 //instead of compile time selected initializers
@@ -141,13 +210,24 @@ pixCoord CROP_YI, /*LEFT edge  Initial HORIZONTAL COORDINATE, its for the
 */
 
 
+int scale = 1;//scaleCD -- April 2026 we use this!
+pixCoord s( pixCoord c ) { return scale*c; } //don't bother inlining or
+// worse, compile-time configuration!  Today's optimizing compilers and
+// out-of-ording, cached, pipelined CPU/ALUs make such hand tricks
+// insignificant.  But, it's possible that separate cropping is
+// more efficient than including that in exclusion zone functions,
+// since cropping can REDUCE THE RANGE OF THE MAIN LOOP
+// by \Theta(length*width).
+
+
+//scaleCD
 //dont use yet while still working on 1 vs 2 scaling in April 2026's
 //4-way comparison project.
 /** 
  *I'm using this ordering of variables since it's consistent
  * with the exclusion zone functions ((ezFun)(ii, jj)) below.
  */
-bool DONT_USE_inCROP(  pixCoord vert, pixCoord horiz ) {
+bool DONT_USE_YET_CROP(  pixCoord vert, pixCoord horiz ) {
   return  ((CROP_YI <= horiz <= CROP_YF) && (CROP_XI <= vert < CROP_XF));
   //Whoppie! C/C++ accepts the mathematicians' syntax for ordered interval containment!
 }
@@ -160,6 +240,7 @@ string camera;  //still custom, didn't integrate new camera_index
 int please_double = 0; //dont double unless asked through our
 // new option --pix-scale double
 
+//scaleCD -- April 2016 we use this
 void init_CROPS_and_camera(int please_double)
 {
   //We have these preprocessor conditionals to
@@ -171,10 +252,14 @@ void init_CROPS_and_camera(int please_double)
   CROP_YI = 0; //left edge
   CROP_XI = 0; //top edge
 #else
-  CROP_YI = s(15);
+  CROP_YI = s(15); //scaleCD 15 should be is a UCoord
   CROP_XI = s(10);
 #endif
+////scaleCD
+// scale_factor == 1 ----Half-Resolution---Ucoord=Pcoord GOOD
+// scale_factor == 2 --n-crop ----Full Resolution --Ucoord=(1/2) Pcoord GOOD!
 
+  
   //Remember, camera is now a global string (C++ library) variable
 
   //CROP_YF is set here for everybody.
@@ -222,7 +307,7 @@ void init_CROPS_and_camera(int please_double)
  //the full frame movie bitmaps.
  if(please_double)
    {
-     error(1,0,"DONT USE DOUBLING (FOR) NOW.");
+     error(1,0,"DONT USE DOUBLING (FOR) NOW.");  //we didn't use it for the pre Apr29 test which WORKED
      cerr << "init_CROPS thinks please_double=" << please_double << " so" << endl;
      CROP_YI *= 2;
      CROP_YF *= 2;
@@ -366,6 +451,8 @@ static bool ezNone( pixCoord ii, pixCoord jj ) {
   return false;
 }
 
+
+//scaleCD Yes.. ii, jj are Pcoord and 73, 1568 are Ucoord. GOOD
 static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
   return (ii < s(73) ) && (jj > s(1568) );
   //         ^                ^
@@ -376,10 +463,15 @@ static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
   //Exclude the upper right date-time exhibit
   //These coords are wrt the 1920x1040 frame, which is 1/2 the original
   //DroneCalib1.mp4 (and DroneShort1.mp4) movies.
+  //1920x1040 is in Ucoord for this series of movies.
 }
 
+//scaleCD
 //scaling? all ez* functions!
 //s( consts ) below NOT DONE YET
+
+//scaleCD--yes, pixCoord==Pcoord are what we should use here,
+//given these are called with loop indices, which are Pcoords.
 static bool ezCamA1( pixCoord ii, pixCoord jj ) {
   return
     ( abs(jj-1205) < 40
@@ -508,6 +600,7 @@ int main ( int argc, char** argv ) {
     CROP_YF *= 2;
   }
 #endif
+
   
   unsigned long k = start;
 
@@ -515,9 +608,9 @@ int main ( int argc, char** argv ) {
   unsigned char* dataOld = BMP_B;
   unsigned char* dataNew = BMP_A;
 
-  //cerr << "Just before k loop, where they are used" << endl 
-  // <<  "CROP_XI=" << CROP_XI  << " CROP_XF=" << CROP_XF
-  // << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
+  cerr << "Just before k loop, where they are used" << endl 
+   <<  "CROP_XI=" << CROP_XI  << " CROP_XF=" << CROP_XF
+   << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
   
   for ( k = start+1; k < end; ++k ) {
     unsigned char* tem = dataOld; dataOld = dataNew; dataNew = tem; 
@@ -531,10 +624,18 @@ int main ( int argc, char** argv ) {
     //Pixel indexing in the code indicates j selects the horizontal coord
     //and i the vertical coord, BUT these original limits use
     // X cropping on i and Y cropping on j!
-    // Is this a long undetected bug?
+    // The choice of variable names is confusing, but, to maintain consistency
+    // with the devel-pipeline, we didn't change and added extensive documentation.
+    // For now, the CROP vars are in Pcoors
+
+    //scaleCD
+    //width and height are from the extracted frames, as such, Pcoords 
+
+    //This is functionally identical to the original.
+    //Any reason for the vert loop to go backwards?
     
-    int i_loop_from = height-1-CROP_XI;
-    int i_loop_ge   = height-CROP_XF;
+    int i_loop_from = height-1-CROP_XI;  //so, for now CROPS should certainly 
+    int i_loop_ge   = height-CROP_XF;    //be in the Pcoord system.
     int j_loop_from = CROP_YI;
     int j_loop_lt   = CROP_YF;
     
@@ -543,7 +644,9 @@ int main ( int argc, char** argv ) {
       i_loop_ge   = 0;
       j_loop_from = 0;
       j_loop_lt   = width;
+      cerr << "Option no-crop has been activated: CROP_var cropping not done." << endl; 
     }
+
 
 
     //scaling? ii and jj too
@@ -594,7 +697,7 @@ int main ( int argc, char** argv ) {
     //The input, being a .bmp (even current in pipelined version), uses
     //Microsoft's bottom-is-zero convention.  
 
-    //scaling? OUTPUT is in pixel coords.
+    //scaling? OUTPUT is in pixel coords.  //scaleCD yes, we are outputting Pcoords
       printf("%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
 	      k,
 	      maximum[0],maxLoc[0][1],maxLoc[0][0],
