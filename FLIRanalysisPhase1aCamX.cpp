@@ -20,7 +20,8 @@ using namespace std;
    (1) global variable std::string camera = "Custom"
 
    (2) code in main() unconditionally 
-       sets CROP_{X,Y}{I,F} from CamSett.txt
+       sets CROP_{X,Y}{I,F} from CamSett.txt.
+       See comments abt CROP.
 
    (3) Mysterious (buggy?) line which does nothing is compiled
        before computing the differences:
@@ -43,16 +44,115 @@ int no_crop = 0;
 
 //scaling? will use this everywhere including width and height
 typedef uint16_t pixCoord;
+//
 //Maybe, someday, the pixCoord type will be a C++ class, with
 //useful member functions and supporting better type checking.
+//
 
-//declare these globals undefined so we set them with a function
+
+//Comments and choices for now, during the Apr 2026 4-way comparison project:
+
+
+//Design issues: Should cropping and exclusion zone specifying
+//be in terms of the original movie collection pixel coodinates,
+//or a resolution-free floating point coordinate system, like
+//  [0.0, 1.0] X [0.0, AspectRatio]
+//
+// Another choice, handle integer data like (width,height)=(w,h) as
+// homogeneous coods.
+// That means (sw,sh) is equivalent to (tw,tw) for
+// "suitable" s, t. (Perhaps that means s, t have enough divisors so
+// (w/s)*s = (w/t)*t  and (h/s)*s = (h/t)*t etc.?)
+//
+// Or perhaps (w, h, s) actual homogeneous coords; carry s around.
+// That will really simplify and make more reliable calculations
+// for non-rectilinear exclusion zones!  (Don't think so for now
+// except internal to ezfun coding; since only pixel coords are
+// passed to later phases
+//
+
+//For the April 2026 comparison project:
+// The below 4 CROP_* varable values will in the scale of the
+//coord system used in the .bmp images Phase1a is processing.
+//
+//The unsigned constant, program parameter, or Sett
+//file values before comparisons will be in the HALF SCALING our
+//movies' original coordinate system, because that is what the
+//earliest C-TAP software did.  It used ffmpeg to extract half-width/height
+//frames for in order to limit .bmp frame storage to feasible
+//capacities.  
+//The handy function s() be coded around every ??? to scale it for comparison
+//to pixCoords in the .bmp 
+//
+
+int scale = 1;
+pixCoord s( pixCoord c ) { return scale*c; } //don't bother inlining or
+// worse, compile-time configuration!  Today's optimizing compilers and
+// out-of-ording, cached, pipelined CPU/ALUs make such hand tricks
+// insignificant.  But, it's possible that separate cropping is
+// more efficient than including that in exclusion zone functions,
+// since cropping can REDUCE THE RANGE OF THE MAIN LOOP
+// by \Theta(length*width).
+
+//
+//By the way, halving the resolution of the images
+// will 1/4 the \Theta(length*width) runtime of Phase1a.
+//
+
+//Declare these globals undefined so we set them with a function
 //instead of compile time selected initializers
-pixCoord CROP_YI, //left edge
-  CROP_XI, //top edge
-  CROP_YF, //right edge
-  CROP_XF; //bottom edge
+//
+//Caution: The current names clash with some ituition about horiz vs vertical.
+//  We clarify
+//
+// The Pixel coordinate system in which these are interpreted
+// is that of Microsoft .bmp images:
+// 0 <= x < width,  [0,width)  is the range of horiz. coods. LEFT to RIGHT
+// 0 <= y < height, [0,height) is the range of verti. coods. BOTTOM to TOP
+//
+// The Pixel coordinate system used for Phase1.out lines uses the
+// more conventional TOP to BOTTOM ordering for the vertical cooridinate.
 
+pixCoord CROP_YI, /*LEFT edge  Initial HORIZONTAL COORDINATE, its for the
+		  //vertical line that's the left edge inclusively
+		  //of the (i.e., closed) effective, non-cropped region.
+		  //CROP_YI == x is the eq. of the LEFT edge
+		  */
+  CROP_YF, /*RIGHT edge.   Final HORIZONTAL COORDINATE, its for the
+	   //vertical line that's the right edge inclusively
+	   //of the (closed) effective, non-cropped region.
+	   //CROP_YF == x is the eq. of the RIGHT edge
+	   */
+  CROP_XI, /*TOP edge  Initial VERTICAL COORDINATE, its for the
+	 //horiz  line that's the TOP edge inclusively
+	 //of the (closed) effective, non-cropped region.
+	 //CROP_XI == y is the eq. of the TOP edge
+	 */
+  CROP_XF; /* BOTTOM edge.   Final HORIZONTAL COORDINATE, its for the
+	   //horiz. line that's the BOTTOM edge inclusively
+	   //of the (closed) effective, non-cropped region.
+	   //CROP_XF == x is the eq. of the BOTTOM edge
+	   */
+
+/* So ((horiz)x,(vert, top-to-bot)y) locates a pixel in the effective region
+   IFF
+   CROP_YI <= x <= CROP_YF AND CROP_XI <= y < CROP_XF
+   (which is confusing to some of us)
+*/
+
+
+//dont use yet while still working on 1 vs 2 scaling in April 2026's
+//4-way comparison project.
+/** 
+ *I'm using this ordering of variables since it's consistent
+ * with the exclusion zone functions ((ezFun)(ii, jj)) below.
+ */
+bool DONT_USE_inCROP(  pixCoord vert, pixCoord horiz ) {
+  return  ((CROP_YI <= horiz <= CROP_YF) && (CROP_XI <= vert < CROP_XF));
+  //Whoppie! C/C++ accepts the mathematicians' syntax for ordered interval containment!
+}
+
+ 
 //will be set by init_CROPS_and_camera() at runtime
 string camera;  //still custom, didn't integrate new camera_index
 //for exclusion zone with a camera name.
@@ -60,9 +160,6 @@ string camera;  //still custom, didn't integrate new camera_index
 int please_double = 0; //dont double unless asked through our
 // new option --pix-scale double
 
-int scale = 1;
-pixCoord s( pixCoord c ) { return scale*c; }
-  
 void init_CROPS_and_camera(int please_double)
 {
   //We have these preprocessor conditionals to
@@ -271,7 +368,12 @@ static bool ezNone( pixCoord ii, pixCoord jj ) {
 
 static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
   return (ii < s(73) ) && (jj > s(1568) );
-  //exclude the upper right date-time exhibit
+  //         ^                ^
+  //         |                |
+  //         |                |-- Right of a vertical line
+  //         |                    near the left edge.
+  //---------^ Above line 73 pix down from top
+  //Exclude the upper right date-time exhibit
   //These coords are wrt the 1920x1040 frame, which is 1/2 the original
   //DroneCalib1.mp4 (and DroneShort1.mp4) movies.
 }

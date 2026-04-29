@@ -13,6 +13,8 @@ if [ $CTAPDevelSetupDone"" != "yes" ]
 #if it is, we do nothing of below
 then
 	CTAPDevelSetupDone=yes
+	function CDCT()
+	{    cd /data/GIT/C-TAP   }
 	function gswitch()
 	{
 	    if [ $1"" = "" ]
