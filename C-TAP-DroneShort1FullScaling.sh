@@ -5,6 +5,8 @@ REUSE_BMPS=yes #Do not change to yes except if you already
 # the script for development and testing of subsequent steps
 # for the same movie and extraction choices.
 
+#new scaling options used, see FLIRanalysisPhase1aCamX.cpp
+
 #
 # At the top are instructions and manual settings
 # 
@@ -304,6 +306,7 @@ do
     cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
 
     ALL_MESSAGES_PATH=${RESULTS_DIR}/${moviePrefix}.mess
+    cat /dev/null > $ALL_MESSAGES_PATH
     
     echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
     cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
@@ -419,34 +422,39 @@ do
     # ${moviePrefix}.out
     # ${moviePrefix}.MOV (that's the "baby movie")
 
-    echo
-    echo Input Origin Report:
+    echo | cat >>$ALL_MESSAGES_PATH
+    echo Input Origin Report: | cat >>$ALL_MESSAGES_PATH
     if [ ${movie_width}"" = "" ]
     then
-	echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.'
-	echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height}
+	echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.' | cat >>$ALL_MESSAGES_PATH
+	echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height} | cat >>$ALL_MESSAGES_PATH
     else
-	echo 'We extracted bitmaps from the movie:'
-	echo $movie_file
-	echo 'movie_width='$movie_width 'movie_height='$movie_height
-	echo 'And, FYI,:'
-	echo 'bmp_width='$bmp_width 'bmp_height='$bmp_height
+	echo 'We extracted bitmaps from the movie:' | cat >>$ALL_MESSAGES_PATH
+	echo $movie_file | cat >>$ALL_MESSAGES_PATH
+	echo 'movie_width='$movie_width 'movie_height='$movie_height | cat >>$ALL_MESSAGES_PATH
+	echo 'And, FYI,:' | cat >>$ALL_MESSAGES_PATH
+	echo 'bmp_width='$bmp_width 'bmp_height='$bmp_height | cat >>$ALL_MESSAGES_PATH
     fi
 
     if [ $bmp_width"" != "1920" ]
     then
-	echo Until a new version is completed,
-	echo clipping is done in Phase1a, maybe other stuff is done in Phase1b,
-	echo based on 1920x1080 bmps, not what you have.
+	echo Until a new version is completed, | cat >>$ALL_MESSAGES_PATH
+	echo clipping is done in Phase1a, maybe other stuff is done in Phase1b, | cat >>$ALL_MESSAGES_PATH
+	echo based on 1920x1080 bmps, not what you have. | cat >>$ALL_MESSAGES_PATH
     else
 	if [ $bmp_height"" != "1080" ]
 	then
-	    echo Until a new version is completed,
-	    echo clipping is done in Phase1a, maybe other stuff is done in Phase1b,
-	    echo based on 1920x1080 bmps, not what you have.
-	    echo Hmm you have 1920 width, but bmp_height=${bmp_height}
+	    echo Until a new version is completed, | cat >>$ALL_MESSAGES_PATH
+	    echo clipping is done in Phase1a, maybe other stuff is done in Phase1b, | cat >>$ALL_MESSAGES_PATH
+	    echo based on 1920x1080 bmps, not what you have. | cat >>$ALL_MESSAGES_PATH
+	    echo Hmm you have 1920 width, but bmp_height=${bmp_height} | cat >>$ALL_MESSAGES_PATH
 	fi
     fi
+
+    #will put in both phases, though not used in Phase1b yet.
+    #OK diff with brother --movie-scale 1
+    scaling_cmd_args="--movie-scale 2 --pixproc-scale 1 "
+
 
     echo
     echo "Beginning Phase1a"
@@ -459,7 +467,7 @@ do
     # If we did staged runs, we must start with nothing.
     # Also, this ensures xterm's tail doesn't fail.
 
-    xterm -geometry 180x30+0+180 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm -geometry 150x30+0+180 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     Phase1a_xterm_PID=$!  #so we can kill you later.
     
     cd $BITMAPS_PARENT_DIR
@@ -470,8 +478,8 @@ do
 	# run Phase1a once on all the frames
 	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
 	#OK diff with brother HalfDecimated
-	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
-	#Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett}           --camera-index 1 --pix-scale 2"
+	Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 $scaling_cmd_args"
+	#Phase1a_cmd_args="$Phase1a_cmd_args ${NEW_bitmaps} ${NEW_CamSett}           --camera-index 1 $scaling_cmd_args"
 	Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>> $ALL_MESSAGES_PATH " 
 	echo Running
 	echo ${Phase1a_cmd}
@@ -512,8 +520,8 @@ do
 
 	    Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
 	    #OK diff with brother HalfDecimated
-	    #Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 --pix-scale 2"
-	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett}  --camera-index 1 --pix-scale 2"
+	    Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett} --no-crop --camera-index 1 $scaling_cmd_args"
+	    #Phase1a_cmd_args=" ${Phase1a_cmd_args} ${NEW_bitmaps} ${NEW_CamSett}  --camera-index 1 - $scaling_cmd_args"
 	    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>> $ALL_MESSAGES_PATH"
 	    #HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
 	    #${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
@@ -547,6 +555,12 @@ do
     echo Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in"
     echo "${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 
+    echo | cat >>$ALL_MESSAGES_PATH
+    echo Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in" | cat >>$ALL_MESSAGES_PATH
+    echo "${RESULTS_DIR}/${RESULT_OF_1a_BASE}" cat >>$ALL_MESSAGES_PATH
+
+    #Someday result files might include comments, so simple wc won't work to get the number of data lines.
+    
     echo
     echo Beginning Phase1b
     echo
@@ -562,7 +576,7 @@ do
     # level for Phase1b first try is 0.5, here----------------------------------------------V---
     #
     Phase1b_cmd_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.5 "
-    Phase1b_cmd_args="${Phase1b_cmd_args} ${NEW_CamSett}"
+    Phase1b_cmd_args="${Phase1b_cmd_args} ${NEW_CamSett} $scaling_cmd_args"
     Phase1b_cmd="${Phase1b_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>>$ALL_MESSAGES_PATH"
 
     echo Running
@@ -627,7 +641,7 @@ do
 	    # level for Phase1b redo is 0.98, here-----------------------------------------------------------V---
 	    #
 	    Phase1b_redo_command_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 "
-	    Phase1b_redo_command_args="${Phase1b_redo_command} ${NEW_CamSett}"
+	    Phase1b_redo_command_args="${Phase1b_redo_command} ${NEW_CamSett} $scaling_cmd_args"
 	    Phase1b_redo_command="${Phase1b_redo_command_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>> $ALL_MESSAGES_PATH"
 	    ( echo  ; echo "${Phase1b_redo_command}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 	    echo "${Phase1b_redo_command}" | cat >> $MESS_1b_FULL_PATH

@@ -1,6 +1,6 @@
-#!/usr/bin/bash
+ #!/usr/bin/bash
 
-NAME=DroneShort1HalfDecimated
+NAME=DroneShort1FullScaling
 
 OLD_DIR=RESULTS-GOOD-OLD
 

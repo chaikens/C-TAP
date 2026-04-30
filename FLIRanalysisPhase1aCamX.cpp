@@ -1,3 +1,9 @@
+// new scaling parameters!
+// --movie-scale Mscale scale for original movie (or group) linear resolutio
+// --pixproc-scale Pscale for pixel processing 
+// --user-scale  Uscale for specifying cropping, exclusion regions and
+//                          maybe eventually data analysis
+
 // The scaling issue was raised because the DroneCalib1 movie
 // is in 3840x2080 resolution, original C-TAP extracted half-resolution
 // 1920x1040 frames, and Custom (hardcoded and coded in CamSett.txt)
@@ -5,23 +11,29 @@
 // specified in terms of the lower resolution frame coordinates.
 // So, when we were able to process the movie with full resolution
 // frames using pipelined extraction, the clipping cooridinates
-// had to be doubled.  This is implemented below by the
-// option --pix-scale s
-// When s="2", the global scale=2 (generally, scale=atoi(s);).
-// The function s(c) returns scale*c.
+// had to be doubled.  This is implemented below by the above scaling parmeters.
+//
+// In this case, the global UtoPmult=2.
+// (Generally, UtoP=Pscale/Uscale which currently must have no roundoff.).
+// The function UtoP(c) returns UtoPmult*c.
 // Finally, the hard coded constants (among others) are first passed through
-// s(), in
+// UtoP(), in
 
 /*
 static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
-  return (ii < s(73) ) && (jj > s(1568) );
+  return (ii < UtoP(73) ) && (jj > UtoP(1568) );
 
 CROP_YF = s(1249) //restricting more than 1920
 #ifdef Custom
 CROP_XF = s(1080)
 */
 
-
+//Thus, the April 2026 4-way comparison,
+// HalfDecimated : --movie-scale 1 --pixproc-scale 1 --user-scale 1
+// Full          : --movie-scale 2 --pixproc-scale 1 --user-scale 1
+//Remember, the original and current C-TAP half-scaled the movie and
+//used the resulting scaled pixels for crop specifications, exclusion zones
+//and result .int and .out files.
 
 // Now, we'll try out the idea that:
 // There should be 3 types for coordintes:
@@ -109,11 +121,11 @@ using namespace std;
 // Command line options.  Set when, early, main calls
 static int get_our_options( int *argc, char **argv[]);
 
+//options might change defaults:
 static const char *bitmaps_dir = 0;
 static const char *CamSett_file = 0;
 static const char default_bitmaps_dir[] = "bitmaps";
 static const char default_CamSett_file[] = "CamSett.txt";
-static const char *pix_scale_string = 0; //scaleCD
 int no_crop = 0; //scaleCD
 
 //scaling? will use this everywhere including width and height
@@ -123,6 +135,10 @@ typedef uint16_t pixCoord; //scaleCD
 //useful member functions and supporting better type checking.
 //
 
+//might be modified by get_our_options()
+pixCoord Mscale = 1; //original movies
+pixCoord Pscale = 1; //pixel processing
+pixCoord Uscale = 1; //user specification of clipping and exclusion zones
 
 //Comments and choices for now, during the Apr 2026 4-way comparison project:
 
@@ -155,7 +171,7 @@ typedef uint16_t pixCoord; //scaleCD
 //earliest C-TAP software did.  It used ffmpeg to extract half-width/height
 //frames for in order to limit .bmp frame storage to feasible
 //capacities.  
-//The handy function s() be coded around every ??? to scale it for comparison
+//The handy function UtoP() be coded around every ??? to scale it for comparison
 //to pixCoords in the .bmp 
 //
 
@@ -166,7 +182,13 @@ typedef uint16_t pixCoord; //scaleCD
 
 
 // CROP_* variables
-//scaleCD SHOULD they be PCoords or UCoords??? Unclear, try to settle the choice soon.
+//scaleCD
+//Decision made: they are Pscale.
+// The constants and CamSett data used to set them are first scaled
+// from Uscale to Pscale before assignment.
+
+//That choice was is the result of orig. C-TAP analyzing pixel data of half-scaled movies,
+//before we introduced pipeline speedup for full-resolution processing. 
 
 //Declare these globals undefined so we set them with a function
 //instead of compile time selected initializers
@@ -209,9 +231,9 @@ pixCoord CROP_YI, /*LEFT edge  Initial HORIZONTAL COORDINATE, its for the
    (which is confusing to some of us)
 */
 
-
-int scale = 1;//scaleCD -- April 2026 we use this!
-pixCoord s( pixCoord c ) { return scale*c; } //don't bother inlining or
+//scaleCD -- April 2026 we use this!
+pixCoord UtoPmult; //Undefined, set in runtime after option processing.
+pixCoord UtoP( pixCoord c ) { return UtoPmult*c; } //don't bother inlining or
 // worse, compile-time configuration!  Today's optimizing compilers and
 // out-of-ording, cached, pipelined CPU/ALUs make such hand tricks
 // insignificant.  But, it's possible that separate cropping is
@@ -241,7 +263,7 @@ int please_double = 0; //dont double unless asked through our
 // new option --pix-scale double
 
 //scaleCD -- April 2016 we use this
-void init_CROPS_and_camera(int please_double)
+void init_CROPS_and_camera( void )
 {
   //We have these preprocessor conditionals to
   //maintain regression as we develop support for
@@ -265,37 +287,37 @@ void init_CROPS_and_camera(int please_double)
   //CROP_YF is set here for everybody.
   //Camera particulars set CROP_XF below.
 #ifdef CamB1
-  CROP_YF = s(1275);
+  CROP_YF = UtoP(1275);
 #else
-  CROP_YF = s(1249); //right edge (UFODAP: 1920)
+  CROP_YF = UtoP(1249); //right edge (UFODAP: 1920)
 #endif
 
 #ifdef CamA1 //bottom edge is crop_xf. High num to catch boat: 635 MIN. 650 for mult frames
-  CROP_XF = s(590); camera = "A1";
+  CROP_XF = UtoP(590); camera = "A1";
 #endif
 #ifdef CamA2
-  CROP_XF = s(640); camera = "A2";
+  CROP_XF = UtoP(640); camera = "A2";
 #endif
 #ifdef CamA3
-  CROP_XF = s(590); camera = "A3";
+  CROP_XF = UtoP(590); camera = "A3";
 #endif
 #ifdef CamA4
-  CROP_XF = s(575); camera = "A4";
+  CROP_XF = UtoP(575); camera = "A4";
 #endif
 #ifdef CamB1
-  CROP_XF = s(580); camera = "B1";
+  CROP_XF = UtoP(580); camera = "B1";
 #endif
 #ifdef CamB2
-  CROP_XF = s(590); camera = "B2";
+  CROP_XF = UtoP(590); camera = "B2";
 #endif
 #ifdef CamB3
-  CROP_XF = s(575); camera = "B3";
+  CROP_XF = UtoP(575); camera = "B3";
 #endif
 #ifdef CamB4
-  CROP_XF = s(590); camera = "B4";
+  CROP_XF = UtoP(590); camera = "B4";
 #endif
 #ifdef Custom
-  CROP_XF = s(1080); /*default: UFODAP*/
+  CROP_XF = UtoP(1080); /*default: UFODAP*/
  camera = "Custom";
 #endif
 
@@ -315,7 +337,7 @@ void init_CROPS_and_camera(int please_double)
      CROP_XF *= 2;
      cerr << "init_CROPS..CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
    }
- //end of init_CROPS_and_camera()
+ //end of init_CROPS_and_camera( void )
 }
 
 //scaling?
@@ -454,7 +476,7 @@ static bool ezNone( pixCoord ii, pixCoord jj ) {
 
 //scaleCD Yes.. ii, jj are Pcoord and 73, 1568 are Ucoord. GOOD
 static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
-  return (ii < s(73) ) && (jj > s(1568) );
+  return (ii < UtoP(73) ) && (jj > UtoP(1568) );
   //         ^                ^
   //         |                |
   //         |                |-- Right of a vertical line
@@ -468,7 +490,7 @@ static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
 
 //scaleCD
 //scaling? all ez* functions!
-//s( consts ) below NOT DONE YET
+//UtoP( consts ) below NOT DONE YET
 
 //scaleCD--yes, pixCoord==Pcoord are what we should use here,
 //given these are called with loop indices, which are Pcoords.
@@ -547,7 +569,7 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
 
 int camera_index = 0;
 
-int main ( int argc, char** argv ) {
+int main( int argc, char** argv ) {
   cerr << "Phase1a called!" << endl;
   get_our_options( & argc, & argv);
   // --bitmaps-dir and --CamSett-file are really options.
@@ -557,8 +579,23 @@ int main ( int argc, char** argv ) {
   //This will probability have to go later, after (not yet)
   //variable cameras are supported.
 
-  init_CROPS_and_camera(please_double); //global above,
-  //might be set by get_our_options
+  //Scaling
+  if((Pscale > Mscale) || Pscale*(Mscale/Pscale) != Mscale)
+    {
+      error(1,0,"Not Supported yet: Bigger Pscale(=%u) or Pscale doesnt divide Mscale(=%u).\n",
+	    Pscale, Mscale);
+    }
+  UtoPmult = Mscale/Pscale;
+  //For now, we don't use or check Uscale, nor do other scaling.
+  if( UtoPmult != 1 )
+  cerr <<
+    "Compile Time and CamSett crop constants will be *%u before comparison with a pix coord."
+       << endl;
+
+  //Might be set by get_our_options.
+  //Must set UtoPmult first.
+  init_CROPS_and_camera( ); //global above,
+
   
   inExclusionZone = ezFunArray[camera_index];
   /* make it point to the right function */
@@ -611,7 +648,21 @@ int main ( int argc, char** argv ) {
   cerr << "Just before k loop, where they are used" << endl 
    <<  "CROP_XI=" << CROP_XI  << " CROP_XF=" << CROP_XF
    << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
-  
+
+    
+  int i_loop_from = height-1-CROP_XI;  //so, for now CROPS should certainly 
+  int i_loop_ge   = height-CROP_XF;    //be in the Pcoord system.
+  int j_loop_from = CROP_YI;
+  int j_loop_lt   = CROP_YF;
+    
+  if (no_crop) {
+    i_loop_from = height-1;
+    i_loop_ge   = 0;
+    j_loop_from = 0;
+    j_loop_lt   = width;
+    cerr << "Option no-crop has been activated: CROP_var cropping not done." << endl; 
+  }
+
   for ( k = start+1; k < end; ++k ) {
     unsigned char* tem = dataOld; dataOld = dataNew; dataNew = tem; 
 
@@ -633,23 +684,14 @@ int main ( int argc, char** argv ) {
 
     //This is functionally identical to the original.
     //Any reason for the vert loop to go backwards?
-    
-    int i_loop_from = height-1-CROP_XI;  //so, for now CROPS should certainly 
-    int i_loop_ge   = height-CROP_XF;    //be in the Pcoord system.
-    int j_loop_from = CROP_YI;
-    int j_loop_lt   = CROP_YF;
-    
-    if (no_crop) {
-      i_loop_from = height-1;
-      i_loop_ge   = 0;
-      j_loop_from = 0;
-      j_loop_lt   = width;
-      cerr << "Option no-crop has been activated: CROP_var cropping not done." << endl; 
-    }
 
+    //Eventually, make both loops go forward to improve locality of reference.
+    //Already, it's good the inner loop has smaller stride.
 
 
     //scaling? ii and jj too
+    //Loop bounds defined above.  Don't want to repeat cropping decision
+    //and informational report
     for ( int i = (i_loop_from); i >= (i_loop_ge); --i ) {
       for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
 	
@@ -698,17 +740,24 @@ int main ( int argc, char** argv ) {
     //Microsoft's bottom-is-zero convention.  
 
     //scaling? OUTPUT is in pixel coords.  //scaleCD yes, we are outputting Pcoords
-      printf("%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
+
+    const char oldformat[] = "%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n";
+
+    const char newformat[] ="%-8lu %4i  %4i %4i   %4i  %4i %4i   %4i %4i %4i     %4i  %4i %4i   %4i  %4i %4i   %4i %4i %4i   "
+    //                           k   1   2   3     4    5   6     7    8   9      10   11  12    13   14  15    16  17  18
+                            "%2i %2i %2i   %2i %2i %2i   %i\n";
+    //                        19  20  21    22  23  24   25 
+    printf(newformat,
 	      k,
-	      maximum[0],maxLoc[0][1],maxLoc[0][0],
-	      maximum[1],maxLoc[1][1],maxLoc[1][0],
-	      maximum[2],maxLoc[2][1],maxLoc[2][0],
-	      minimum[0],minLoc[0][1],minLoc[0][0],
-	      minimum[1],minLoc[1][1],minLoc[1][0],
-	      minimum[2],minLoc[2][1],minLoc[2][0],
-	      NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
-	      NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],
-	      NumPixAbvSubThrSum);
+	   maximum[0],maxLoc[0][1],maxLoc[0][0],  // 1  2  3
+	   maximum[1],maxLoc[1][1],maxLoc[1][0],  // 4  5  6
+	   maximum[2],maxLoc[2][1],maxLoc[2][0],  // 7  8  9
+	   minimum[0],minLoc[0][1],minLoc[0][0],  //10 11 12
+	   minimum[1],minLoc[1][1],minLoc[1][0],  //13 14 15
+	   minimum[2],minLoc[2][1],minLoc[2][0],  //16 17 18
+	   NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],  //19 20 21
+	   NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],  //22 23 24
+	   NumPixAbvSubThrSum); //25
 
     
   } /* end of frame loop */
@@ -751,11 +800,13 @@ static int get_our_options( int *argc, char **argv[])
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
     static struct option long_options[] = {
-      {"bitmaps-dir", required_argument, 0,  0 },  //0
-      {"CamSett-file", required_argument, 0,  0 }, //1
-      {"pix-scale", required_argument, 0,  0 },    //2
-      {"no-crop",  no_argument, &no_crop, 1 },     //3
-      {"camera-index", required_argument, 0, 0},   //4
+      {"bitmaps-dir",     required_argument, 0,  0 },  //0
+      {"CamSett-file",    required_argument, 0,  0 },  //1
+      {"movie-scale",   required_argument, 0,  0 },    //2
+      {"pixproc-scale", required_argument, 0, 0 },     //3
+      {"user-scale",    required_argument, 0, 0 },      //4
+      {"no-crop",  no_argument, &no_crop, 1 },         //5
+      {"camera-index", required_argument, 0, 0},       //6
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -766,24 +817,15 @@ static int get_our_options( int *argc, char **argv[])
     switch (c) {
     case 0:
       switch (option_index) {
-      case 0: bitmaps_dir = optarg;
+      case 0: bitmaps_dir  = optarg; /*cstring*/    break;
+      case 1: CamSett_file = optarg; /*cstring*/    break;
+	//Below will be processed by main.
+      case 2: Mscale = atoi(optarg); /*uint*/ break;
+      case 3: Pscale = atoi(optarg); /*uint*/ break;
+      case 4: Uscale = atoi(optarg); /*uint*/ break;
+      case 5: /*no_crop set by getopt_long action on long_options[] */
 	break;
-      case 1: CamSett_file = optarg;
-	break;
-      case 2: pix_scale_string = optarg;
-	/*
-	if (  strncmp( pix_scale_string, "double", 8) )
-	  {
-	    error(1, 0, "Improper use of --pix-scale %s for now, --pix-scale double is the only way.\n", optarg);
-	  }
-	please_double = 1;
-	cerr << "get_our_options set please_double." << endl;
-	*/
-	scale = atoi(optarg);
-	break;
-      case 4:
-	camera_index = atoi(optarg);
-	break;
+      case 6: camera_index = atoi(optarg); /*cstring*/ break;	
       }
     }
   }

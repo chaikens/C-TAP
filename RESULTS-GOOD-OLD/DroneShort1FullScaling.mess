@@ -1,5 +1,21 @@
+
+Input Origin Report:
+We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.
+bmp_width=3840 bmp_height=2160
+Until a new version is completed,
+clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+based on 1920x1080 bmps, not what you have.
+Phase1a called!
+new_bitmaps_dir /media/seth/CTAP/BIGbitmaps
+Compile Time and CamSett crop constants will be *%u before comparison with a pix coord.
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+
+Phase1a computed 2879 difference lines in
+/data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.int cat
 First 1b try:
-/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.int 2879 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.out
+/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.int 2879 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.mess
 endlReading /data/GIT/C-TAP/CamSett.txt
 Line0 Value=0(ignored Key =smallestThr=)
 Line1 Value=254(ignored Key =biggestThr=)
@@ -16,10 +32,10 @@ Line11 Value=0(ignored Key =RewFram=)
 Line12 Value=-2(ignored Key =ForFram=)
 Line13 Value=1(ignored Key =FramBefNew=)
 Line14 Value=1(ignored Key =FracYes=)
-Line15 Value=0(ignored Key =CROP_XI=)
-Line16 Value=1920(ignored Key =CROP_XF=)
+Line15 Value=100(ignored Key =CROP_XI=)
+Line16 Value=900(ignored Key =CROP_XF=)
 Line17 Value=0(ignored Key =CROP_YI=)
-Line18 Value=1080(ignored Key =CROP_YF=)
+Line18 Value=1919(ignored Key =CROP_YF=)
 Line19 Value=14(ignored Key =mainThreshold=)
 Last read:cameraName= camName=Custom C++string=Custom
 

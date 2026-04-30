@@ -23,8 +23,6 @@ static const char *new_CamSett_file = 0;
 // and commented out until Matt advises on a
 // better Camera property management system.
 
-static const char *pix_scale_string = 0;
-
 //scaling?  typedef unsigned short pixCoord; not done here
 vector<bool> SignalTruth;
 double prob[555000];
@@ -461,8 +459,10 @@ static int get_our_options( int *argc, char **argv[])
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
     static struct option long_options[] = {
-      {"CamSett-file", required_argument, 0,  0 },
-      {"pix-scale", required_argument, 0,  0 },
+      {"CamSett-file", required_argument, 0,  0 },     //0
+      {"movie-scale",   required_argument, 0,  0 },    //1
+      {"pixproc-scale", required_argument, 0, 0 },     //2
+      {"user-scale",    required_argument, 0, 0 },     //3
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -474,9 +474,6 @@ static int get_our_options( int *argc, char **argv[])
     case 0:
       switch (option_index) {
       case 0: new_CamSett_file = optarg;
-	break;
-      case 1:
-	pix_scale_string = optarg;
 	break;
       }
     }
