@@ -1,0 +1,63 @@
+
+Input Origin Report:
+We extracted bitmaps from the movie:
+/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+movie_width=3840 movie_height=2160
+And, FYI,:
+bmp_width=3840 bmp_height=2160
+Until a new version is completed,
+clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+based on 1920x1080 bmps, not what you have.
+Phase1a called!
+new_bitmaps_dir /media/seth/CTAP/FullDecimatedbitmaps
+Compile Time and CamSett crop constants will be *%u before comparison with a pix coord.
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+
+Phase1a computed 443 difference lines in
+/data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.int cat
+First 1b try:
+/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.mess
+endlReading /data/GIT/C-TAP/CamSett.txt
+Line0 Value=0(ignored Key =smallestThr=)
+Line1 Value=254(ignored Key =biggestThr=)
+Line2 Value=0(ignored Key =smallestPix=)
+Line3 Value=67(ignored Key =biggestPix=)
+Line4 Value=0.633(ignored Key =SkewGaussAmpl=)
+Line5 Value=1.97(ignored Key =SkewGaussXi=)
+Line6 Value=1.89(ignored Key =SkewGaussOmega=)
+Line7 Value=2.5(ignored Key =SkewGaussAlpha=)
+Line8 Value=0(ignored Key =NumPixAbvThrSumMin=)
+Line9 Value=3(ignored Key =NumPixAbvThrSumMax=)
+Line10 Value=20(ignored Key =SubThr=)
+Line11 Value=0(ignored Key =RewFram=)
+Line12 Value=-2(ignored Key =ForFram=)
+Line13 Value=1(ignored Key =FramBefNew=)
+Line14 Value=1(ignored Key =FracYes=)
+Line15 Value=100(ignored Key =CROP_XI=)
+Line16 Value=900(ignored Key =CROP_XF=)
+Line17 Value=0(ignored Key =CROP_YI=)
+Line18 Value=1919(ignored Key =CROP_YF=)
+Line19 Value=14(ignored Key =mainThreshold=)
+Last read:cameraName= camName=Custom C++string=Custom
+
+Phase1b Capitalized Params: From Custom
+SubThr=20
+RewFram=0
+ForFram=-2
+FramBefNew=1
+FracYes=1
+
+Phase1b bounds Params: From CamSett.txt
+smallestThr0
+biggestThr=254
+smallestPix=0
+biggestPix=67
+
+Grey(8-bit) pixel diff mu and sigma of 160.1 +/- 1.79 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 161 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 77.89 +/- 13.96
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 79
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 82
