@@ -1,0 +1,4 @@
+
+/data/GIT/C-TAP/Phase1a 0 2880 0 --bitmaps-dir /media/seth/CTAP/BIGbitmaps --CamSett-file /data/GIT/C-TAP/CamSett.txt --no-crop --camera-index 1 --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.int 2>> /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.mess
+
+/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.int 2879 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1FullScaling.mess

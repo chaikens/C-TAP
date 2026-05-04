@@ -1,0 +1,46 @@
+time ./C-TAP-DroneShort1Full.sh 
+make: 'Phase1a' is up to date.
+make: 'Phase1b' is up to date.
+Movie dir /data/GIT/C-TAP and programs /data/GIT/C-TAP are on the same filesystem
+We will process these 1 movie files.
+/data/GIT/C-TAP/DroneShort1Full.mp4
+
+Begin processing 1 of 1 movie file(s)
+Making Mick West redundant, processing ONI FOIA files...
+DroneShort1Full.mp4
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+Running
+ffmpeg -xerror -threads 0 -hide_banner -an -i /data/GIT/C-TAP/DroneShort1Full.mp4 thumb%06d.bmp &> /data/GIT/C-TAP/RESULTS/ffmpeg.outputs
+
+ffmpeg done.
+
+2880 frames captured
+
+Beginning Phase1a
+running
+/data/GIT/C-TAP/Phase1a 0 2880 0 --bitmaps-dir /media/seth/CTAP/bitmaps --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS/DroneShort1Full.int
+new_bitmaps_dir /media/seth/CTAP/bitmaps
+
+Phase1a computed 2879 difference lines in
+/data/GIT/C-TAP/RESULTS/DroneShort1Full.int
+
+Beginning Phase1b
+Running
+/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1Full.int 2879 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS/DroneShort1Full.out
+
+First try of Phase1b reported 510 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS/DroneShort1Full.out
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+Breaking Lue's NDA...make a movie of them
+Cosmic consciousness has been achieved!!
+from yet another movie 1 of 1.
+True, full consciousness can now be reasserted by you poor human user.
+See the results in the xterms
+Type yes to kill the xterms:yes
+
+real	12m56.628s
+user	6m53.125s
+sys	2m8.718s
+(base) seth@turtle:/data/GIT/C-TAP$
+
