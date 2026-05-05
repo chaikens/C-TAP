@@ -766,11 +766,15 @@ static bool (*inExclusionZone)( pixCoord ii, pixCoord jj );
 // One can code this variable be set when the program runs 
 // by copying the pointer from the array below.
 
+// for camera databae
+// We eventually will NOT have these error-prone separate intializers
+// Also, camera will be selected by name, NOT -camera-index !
 struct camera {
   const char *name;
   bool (*ezFun)(pixCoord, pixCoord);
 } cameras[] = {
   { "None",  ezNone },
+  { "DroneCalib1", ezDroneCalib1 },
   { "CamA1", ezCamA1 },
   { "CamA2", ezCamA2 },
   { "CamA3", ezCamA3 },
@@ -785,7 +789,7 @@ struct camera {
 };
   
 static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
-  { ezNone, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
+  { ezNone, ezDroneCalib1, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
     ezCamB1, ezCamB2, ezCamB3, ezCamB4 };
 
 int camera_index = 0;
@@ -805,20 +809,28 @@ int main( int argc, char** argv ) {
       error(1,0,"Not Supported yet: Bigger Pscale(=%u) or Pscale doesnt divide Mscale(=%u).\n",
 	    Pscale, Mscale);
     }
+  // To develop this while comparing results from the original testing with DroneShort1,
+  // we pretend the movie to pixel scale is 1-1 because the parameters were in terms
+  // of the halved movie scale.  So we use --movie-scale 1 --pixproc-scale 1
+  // for the original, and for full resolution, we use --movie-scale 2 -pixproc-scale 1
+  // all with --user-scale 1 set by default.
   UtoPmult = Mscale/Pscale;
   //For now, we don't use or check Uscale, nor do other scaling.
   if( UtoPmult != 1 )
-  cerr <<
-    "Compile Time and CamSett crop constants will be *%u before comparison with a pix coord."
-       << endl;
+    fprintf(stderr,"Compile Time and CamSett crop constants will be *%u before comparison with a pix coord.\n",
+	    UtoPmult);
 
   //Might be set by get_our_options.
   //Must set UtoPmult first.
   init_CROPS_and_camera( ); //global above,
 
 
+  
   inExclusionZone = cameras[camera_index].ezFun;
   /* make it point to the right function */
+
+  cerr << "camera_index setting inExclusionZone is " << camera_index << endl;
+
 
   if(argc < 2) {
     error(1, 0,
