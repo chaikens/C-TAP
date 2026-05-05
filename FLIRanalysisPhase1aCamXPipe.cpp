@@ -473,21 +473,25 @@ int main ( int argc, char** argv ) {
     } /* end pixel x loop */
     
 
-      fprintf(stdout,
-"%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n",
-	      k,
-	      maximum[0],maxLoc[0][1],maxLoc[0][0],
-	      maximum[1],maxLoc[1][1],maxLoc[1][0],
-	      maximum[2],maxLoc[2][1],maxLoc[2][0],
-	      minimum[0],minLoc[0][1],minLoc[0][0],
-	      minimum[1],minLoc[1][1],minLoc[1][0],
-	      minimum[2],minLoc[2][1],minLoc[2][0],
-	      NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],
-	      NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],
-	      NumPixAbvSubThrSum);
+    const char oldformat[] = "%lu\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i  %i %i\t%i  %i %i\t%i  %i %i\t\t%i %i %i\t%i %i %i\t\t%d\n";
 
-    
-  } /* end of frame loop */
+    const char newformat[] ="%-8lu %4i  %4i %4i   %4i  %4i %4i   %4i %4i %4i     %4i  %4i %4i   %4i  %4i %4i   %4i %4i %4i   "
+    //                           k   1   2   3     4    5   6     7    8   9      10   11  12    13   14  15    16  17  18
+                            "%2i %2i %2i   %2i %2i %2i   %i\n";
+    //                        19  20  21    22  23  24   25 
+    printf(newformat,
+	      k,
+	   maximum[0],maxLoc[0][1],maxLoc[0][0],  // 1  2  3
+	   maximum[1],maxLoc[1][1],maxLoc[1][0],  // 4  5  6
+	   maximum[2],maxLoc[2][1],maxLoc[2][0],  // 7  8  9
+	   minimum[0],minLoc[0][1],minLoc[0][0],  //10 11 12
+	   minimum[1],minLoc[1][1],minLoc[1][0],  //13 14 15
+	   minimum[2],minLoc[2][1],minLoc[2][0],  //16 17 18
+	   NumPixAbvThr[0][0],NumPixAbvThr[1][0],NumPixAbvThr[2][0],  //19 20 21
+	   NumPixAbvThr[0][1],NumPixAbvThr[1][1],NumPixAbvThr[2][1],  //22 23 24
+	   NumPixAbvSubThrSum); //25
+
+      } /* end of frame loop */
   
   return 0;
   /* We don't free BMP_A and BMP_B memory since we exit 1a's process right away.*/

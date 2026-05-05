@@ -1,14 +1,19 @@
-//  FLIRanalysisPhase1aCamXPipe.cpp, compiled to Phase1aPipe
+//  FLIRanalysisPhase1aCamXPipeOpt.cpp, compiled to Phase1aPipeOpt
 
 /////////////////////in the Pipe version editing in progress://///////////
 
   // $ Phase1APipeOpt --pipeline StartFrameNumber NumberOfFrames CloudCover(not used)
   //   < (pipe or file containing a concatenation of bitmaps).
+  //   > (pipe or file or maybe tee for .int result)
 
   // $ Phase1aPipeOpt StartFrameNumber NumberOfFrames CloudCover(not used)
+  //   > (pipe or file or maybe tee for .int result)
+  //  It reads files named successively thumb000sss.bmp, ... from the bitmaps
+  //  dir, where sss is the StartFrameNumber, say here of exactly 3 decimal digits.
+  //  The default bitmaps dir is ./bitmaps which the --bitmaps-dir changes
 
   // Other common options:
-  // 
+  // See scaling below.
 
 
   // It reads parameters from CamSett.txt for in its current working dir.
@@ -25,7 +30,8 @@
   // If there are more frames than number_of_frames_to_process,
   // processing stops after the last frame.
 
-  //  This version reads a concatenation of .bmp (54 byte header) files 
+  //  WHEN the --pipeline option is given, version reads a concatenation of
+  // .bmp (54 byte header) files 
   //  from fd 0.  It finishes either after processing 
   //  NumberOfFrames or EOF on fd 0. A double buffered (although 
   //  single thread) strategy is used, so each image is read only once.
