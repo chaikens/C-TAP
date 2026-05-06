@@ -1,6 +1,0 @@
-
-ffmpeg -xerror -threads 0 -hide_banner -an -i /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 -vf 'decimate,setpts=N/100/TB' thumb%06d.bmp &> /data/GIT/C-TAP/RESULTS/ffmpeg.outputs
-
-/data/GIT/C-TAP/Phase1a 0 444 0 --bitmaps-dir /media/seth/CTAP/FullDecimatedbitmaps --CamSett-file /data/GIT/C-TAP/CamSett.txt --no-crop --camera-index 1 --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.int 2>> /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.mess
-
-/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.mess

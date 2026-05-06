@@ -857,6 +857,7 @@ int main( int argc, char** argv ) {
   }
   fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
+  fprintf(stderr,"%s MinThr=%u SubThr=%u\n", argv[0], MinThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
 #ifdef Custom
@@ -919,8 +920,8 @@ int main( int argc, char** argv ) {
     int NumPixAbvThr[3][2] = {0};
     int NumPixAbvSubThrSum = 0, CloudCover = 100;
     
-    for ( int i = (height-1-CROP_XI); i >= (height-CROP_XF); --i ) {
-      for ( int j = CROP_YI; j < CROP_YF; ++j ) {
+    for ( int i = (i_loop_from); i >= (i_loop_ge); --i ) {
+      for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
 	
 	int rgbColorNew[3], rgbColorOld[3];
 	
@@ -990,8 +991,6 @@ int main( int argc, char** argv ) {
   /* Yes, we will skip frames when the caller asks for a partial job! */
   /* Each output line is numbered by it's OLD frame. */
 } /* end of main */
-
-
 
 string bmp_file_printf_format_string; //set by get_our_options
 const char *bmp_file_printf_format_cstring; //set by get_our_options

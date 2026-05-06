@@ -1,24 +1,20 @@
 
 Input Origin Report:
 We extracted bitmaps from the movie:
-/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
 movie_width=3840 movie_height=2160
 And, FYI,:
-bmp_width=3840 bmp_height=2160
-Until a new version is completed,
-clipping is done in Phase1a, maybe other stuff is done in Phase1b,
-based on 1920x1080 bmps, not what you have.
+bmp_width=1920 bmp_height=1080
 Phase1a called!
-new_bitmaps_dir /media/seth/CTAP/FullDecimatedbitmaps
-Compile Time and CamSett crop constants will be *%u before comparison with a pix coord.
+new_bitmaps_dir /media/seth/CTAP/SMALLbitmaps
 Just before k loop, where they are used
 CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
 Option no-crop has been activated: CROP_var cropping not done.
 
 Phase1a computed 443 difference lines in
-/data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.int cat
+/data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int cat
 First 1b try:
-/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1FullDecimated.mess
+/data/GIT/C-TAP/Phase1b /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.mess
 endlReading /data/GIT/C-TAP/CamSett.txt
 Line0 Value=0(ignored Key =smallestThr=)
 Line1 Value=254(ignored Key =biggestThr=)
@@ -55,9 +51,9 @@ biggestThr=254
 smallestPix=0
 biggestPix=67
 
-Grey(8-bit) pixel diff mu and sigma of 160.1 +/- 1.79 (units of 0-255)
-So, setting a minimum threshold of 1.0 SIGMA = 161 (so-called SUB threshold of 20)
+Grey(8-bit) pixel diff mu and sigma of 91.5 +/- 2.45 (units of 0-255)
+So, setting a minimum threshold of 2.0 SIGMA = 95 (so-called SUB threshold of 20)
 And setting a maximum threshold of 254
-The number of pixels above 20 units is 77.89 +/- 13.96
-Minimum number of pixels allowed to be above the sub-threshold of 20 is 79
-Maximum number of pixels allowed to be above the sub-threshold of 20 is 82
+The number of pixels above 20 units is 34.36 +/- 14.04
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 36
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67

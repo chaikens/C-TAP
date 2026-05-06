@@ -1,0 +1,24 @@
+
+Input Origin Report:
+We extracted bitmaps from the movie:
+/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
+movie_width=3840 movie_height=2160
+And, FYI,:
+bmp_width=1920 bmp_height=1080
+Phase1aPipeOpt called!
+new_bitmaps_dir /media/seth/CTAP/SMALLbitmaps
+camera_index setting inExclusionZone is 1
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+
+Phase1a computed 443 difference lines in
+/data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int cat
+First 1b try:
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.mess
+Grey(8-bit) pixel diff mu and sigma of 80.9 +/- 1.82 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 82 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 30.26 +/- 13.64
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 32
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67

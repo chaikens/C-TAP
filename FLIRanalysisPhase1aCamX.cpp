@@ -616,6 +616,7 @@ int main( int argc, char** argv ) {
   }
   fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
+  fprintf(stderr,"%s MinThr=%u SubThr=%u\n", argv[0], MinThr, SubThr);
   if ( line[0] != 'c' ) {
     file = fopen(CamSett_file,"a");
     fprintf(file, "cameraName= %s\n", camera.c_str());
