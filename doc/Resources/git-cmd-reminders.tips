@@ -1,0 +1,16 @@
+push all branches (this pushes new only local branches too)
+-----------------
+git push origin --all
+
+get or update a file from a different branch
+--------------------------------------------
+git checkout mystery-pipe-opt -- FLIRanalysisPhase1aCamXPipeOpt.cpp
+git add FLIRanalysisPhase1bCamXPipeOpt.cpp
+
+status of tracked files only
+---------------------------
+git status -uno
+
+
+
+
