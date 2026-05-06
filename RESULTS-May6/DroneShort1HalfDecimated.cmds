@@ -1,0 +1,4 @@
+
+/data/GIT/C-TAP/Phase1aPipeOpt 0 444 0 --bitmaps-dir /media/seth/CTAP/SMALLbitmaps --CamSett-file /data/GIT/C-TAP/CamSett.txt --no-crop --camera-index 1 > /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int 2>>/data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.mess
+
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS/DroneShort1HalfDecimated.mess
