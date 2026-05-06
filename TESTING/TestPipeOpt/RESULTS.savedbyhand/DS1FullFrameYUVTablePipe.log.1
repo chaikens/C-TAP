@@ -1,0 +1,54 @@
+./runthis.fullframe.sh
+Wed May 6 06:55:08 PM EDT 2026
+commit 933d38b6
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+make: Entering directory '/data/GIT/C-TAP'
+make: Nothing to be done for 'all'.
+make: Leaving directory '/data/GIT/C-TAP'
+ffmpeg .mp4---->Full frame (default) .yuv raw 
+(our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe)
+ (redirects to/from files) > movie.int > (Phase1bPipe) > file.out 
+This is coded by DoOneMovieFullFrames1ab.sh
+Running ./DoOneMovieFullFrames1ab.sh DS1FullFrameYUVTablePipe.mp4 DS1FullFrameYUVTablePipe.log.1
+The frame extraction command is
+ffmpeg_pipe_extract is a function
+ffmpeg_pipe_extract () 
+{ 
+    ffmpeg -hide_banner -y -i $@ PIPE.yuv &> ffmpeg.log
+}
+Frame resolution is Movie resolution / 1
+Extracted frames width=3840 height=2160 yuvsizeb=12441600
+Processing 3840x2160 frames from DS1FullFrameYUVTablePipe.mp4
+STARTED ffmpeg at /proc/uptime=
+35423.59 seconds
+Started YUVToBMPStreamFilter at /proc/uptime=
+35423.59 seconds
+./DoOneMovieFullFrames1ab.sh STARTED Phase1aPipeOpt /proc/uptime=
+35423.59 seconds, will block
+
+./Phase1aPipeOpt --pipeline --no-crop --camera-index 1 --movie-scale 2 --pixproc-scale 1 --user-scale 1 0 10000000 < PIPE.bmp > DS1FullFrameYUVTablePipe.int 2>> DS1FullFrameYUVTablePipe.log.1
+
+./Phase1aPipeOpt  called!
+Compile Time and CamSett crop constants will be *2 before comparison with a pix coord.
+camera_index setting inExclusionZone is 1
+./Phase1aPipeOpt MinThr=14 SubThr=20
+./Phase1aPipeOpt gets a stream of 3840x2160 .bmps
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+YUVToBMPStreamFilter transformed 2880 images.
+./DoOneMovieFullFrames1ab.sh FINISHED returned 0, /proc/uptime=
+35759.06 seconds
+Find Phase1aPipeOpt results in DS1FullFrameYUVTablePipe.int
+
+./Phase1bPipeOpt --no-crop --camera-index 1 --movie-scale 2 --pixproc-scale 1 --user-scale 1 /data/GIT/C-TAP/TESTING/TestPipeOpt/DS1FullFrameYUVTablePipe.int 1000000 0.5 > /data/GIT/C-TAP/TESTING/TestPipeOpt/DS1FullFrameYUVTablePipe.out 2>> DS1FullFrameYUVTablePipe.log.1
+
+/data/GIT/C-TAP/TESTING/TestPipeOpt/DS1FullFrameYUVTablePipe.int .int line reading reached EOF. We read 2879
+Grey(8-bit) pixel diff mu and sigma of 135.2 +/- 1.66 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 136 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 61.64 +/- 18.88
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 63
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
+Find the 141 Phase1b results in DS1FullFrameYUVTablePipe.out

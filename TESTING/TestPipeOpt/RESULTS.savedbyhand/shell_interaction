@@ -1,0 +1,59 @@
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeOpt$ ./runthis.halfdecimated.sh 
+ln: failed to create symbolic link 'DS1HalfDecimatedYUVTablePipe.mp4': File exists
+Ignore this error when repeating
+Running ./DoOneMovieHalfDecimated1ab.sh.
+All echos go to
+    DS1HalfDecimatedYUVTablePipe.log.1
+except for exiting errors.
+
+Time Report
+real    109.59
+user  0:38.80
+sys      3.75
+
+In case of errors, (update maybe and)
+use ./killLeftovers.sh to kill our residual processes.
+
+View the log and results in xterm windows
+(Get rid of them by typing q, or closing the window)
+
+See measages from this run in
+DS1HalfDecimatedYUVTablePipe.log.1
+
+Goodbye.  That felt good.  Thanks for the run.  See you next time.
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeOpt$ killall xterm 
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeOpt$ ls
+CamSett.txt                    DoOneMoviePipeCommon.h.sh         DS1HalfDecimatedYUVTablePipe.log.0  DS1HalfDecimatedYUVTablePipe.out   Phase1aPipeOpt  PIPE.int   runthis.fullframe.sh
+DoOneMovieFullFrames1ab.sh     DS1FullFrameYUVTablePipe.mp4      DS1HalfDecimatedYUVTablePipe.log.1  DS1HalfDecimatedYUVTablePipe.time  Phase1bPipeOpt  PIPE.yuv   runthis.halfdecimated.sh
+DoOneMovieHalfDecimated1ab.sh  DS1HalfDecimatedYUVTablePipe.int  DS1HalfDecimatedYUVTablePipe.mp4    ffmpeg.log                         PIPE.bmp        README.md  YUVToBMPStreamFilter
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeOpt$ ./runthis.fullframe.sh 
+xterm: no process found
+ln: failed to create symbolic link 'DS1FullFrameYUVTablePipe.mp4': File exists
+Ignore this error when repeating
+Running ./DoOneMovieFullFrames1ab.sh.
+All echos go to
+    DS1FullFrameYUVTablePipe.log.1
+except for exiting errors.
+
+Time Report
+real    368.74
+user  5:35.97
+sys      46.80
+
+In case of errors, (update maybe and)
+use ./killLeftovers.sh to kill our residual processes.
+
+View the log and results in xterm windows
+(Get rid of them by typing q, or closing the window)
+
+See measages from this run in
+DS1FullFrameYUVTablePipe.log.1
+
+Goodbye.  That felt good.  Thanks for the run.  See you next time.
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeOpt$ ls
+CamSett.txt                    DS1FullFrameYUVTablePipe.int    DS1FullFrameYUVTablePipe.out        DS1HalfDecimatedYUVTablePipe.log.1  ffmpeg.log      PIPE.int              runthis.halfdecimated.sh
+DoOneMovieFullFrames1ab.sh     DS1FullFrameYUVTablePipe.log.0  DS1FullFrameYUVTablePipe.time       DS1HalfDecimatedYUVTablePipe.mp4    Phase1aPipeOpt  PIPE.yuv              YUVToBMPStreamFilter
+DoOneMovieHalfDecimated1ab.sh  DS1FullFrameYUVTablePipe.log.1  DS1HalfDecimatedYUVTablePipe.int    DS1HalfDecimatedYUVTablePipe.out    Phase1bPipeOpt  README.md
+DoOneMoviePipeCommon.h.sh      DS1FullFrameYUVTablePipe.mp4    DS1HalfDecimatedYUVTablePipe.log.0  DS1HalfDecimatedYUVTablePipe.time   PIPE.bmp        runthis.fullframe.sh
+(base) seth@turtle:/data/GIT/C-TAP/TESTING/TestPipeOpt$ 
+
