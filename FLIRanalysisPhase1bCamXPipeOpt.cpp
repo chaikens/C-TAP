@@ -129,8 +129,11 @@ static char camera_cstring[] = "Custom";
 vector<bool> SignalTruth;
 double prob[555000];
 
+char *mycmdname; //for printing error messages
 int main ( int argc, char** argv ) {
-  
+  mycmdname = argv[0];
+  get_our_options(&argc, &argv);
+
   double data[26]; //for reading Phase1a .int data
   vector<double> store[26];
   //for storing that data, store[kind of data][which diff frame]
@@ -203,7 +206,7 @@ int main ( int argc, char** argv ) {
     cerr << "Phase1b data input file " << argv[1] << "failed" << endl;
     return 1;
   }
-  long NumFrames = atol(argv[2]); //maybe use as an upper limit for num diffs to process
+  long MaxNumFrames = atol(argv[2]); //maybe use as an upper limit for num diffs to process
                                   //when it is used as a filter.
   double level = atof(argv[3]);
   if ( level >= 0.979 && camera != "B1" ) {
@@ -214,9 +217,9 @@ int main ( int argc, char** argv ) {
     else level = 0.99999999999; // 11 9's
   }
   
-  long NumFramesRead = 0;
+  long NumFrames = 0;
   
-  for ( i = 0; i < NumFrames; ++i ) {
+  for ( i = 0; i < MaxNumFrames; ++i ) {
     
     if (ifp >> data[0] >> data[1] >> data[2] >> data[3] >> data[4] >> data[5]
 	>> data[6] >> data[7] >> data[8] >> data[9] >> data[10] >> data[11]
@@ -225,7 +228,7 @@ int main ( int argc, char** argv ) {
 	>> data[24] >> data[25] )
       { //we read a proper line of data
 
-	NumFramesRead++;
+	NumFrames++;
 	
 	GlobPixMean[0] += data[1];
 	GlobPixMean[1] += data[4];
@@ -249,17 +252,16 @@ int main ( int argc, char** argv ) {
 	  }
 	else
 	  {
-	    cerr << argv[1] << " file reading line limit reached NumFrames=" <<
-	      NumFrames << "  NumFramesRead=" << NumFramesRead << endl;
-	    NumFrames = NumFramesRead;
-	    break; //number of lines exceeds NumFrames
+	    cerr << argv[1] << " .int line reading reached EOF. We read " << NumFrames << endl;
+	    break; //number of lines exceeds MaxNumFrames
 	  }
       }
   }
+  if (NumFrames == MaxNumFrames) {
+    cerr << argv[1] << " .int line reading stopped after reaching maximum param " << NumFrames << endl;
+  }
   ifp.close();
-  assert(NumFrames == NumFramesRead);
-  //  NumFrames = NumFramesRead;
-  
+    
   for ( j = 0; j < 7; ++j )
     { GlobPixMean[j] /= double(NumFrames); }
   double OverallAverage= (GlobPixMean[0]+GlobPixMean[1]+GlobPixMean[2]+GlobPixMean[3]+GlobPixMean[4]+GlobPixMean[5]) / 6.;
@@ -450,7 +452,10 @@ static int get_our_options( int *argc, char **argv[])
       {"user-scale",    required_argument, 0, 0 },     //3
       {"pipeline",    no_argument, &pipeline, 1 },     //4
       {"verbose",    no_argument, 0, 0 },              //5 ignored, for regres. devel.
+      {"no-crop",    no_argument, 0, 0 },              //6 ignored, compat w Phase1a
+      {"camera-index",    required_argument, 0, 0 },         //7 ignored, compat w Phase1a
       {0,         0,                 0,  0 }
+      //but we won't accept a --bitmaps-dir, at least yet..
     };
     c = getopt_long( *argc, *argv, "",
 		    long_options, &option_index);
@@ -467,6 +472,7 @@ static int get_our_options( int *argc, char **argv[])
       case 2: Pscale = atoi(optarg);
 	break;
       case 3: Uscale = atoi(optarg);
+	break;
       case 5: fprintf(stderr, "%s Ignores Option --verbose.\n", (*argv)[0]);
 	break;
       }

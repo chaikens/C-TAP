@@ -208,6 +208,7 @@ FILE* fd0 = 0;
 */ 
 
 
+char *progname; //for error and other messages
 // Command line options.  Set when, early, main calls
 static int get_our_options( int *argc, char **argv[]);
 
@@ -220,8 +221,6 @@ int no_crop = 0; //scaleCD
 
 int pipeline = 0;  //Default is legacy bmp reading version.
                  //Set by --pipeline option.
-
-
 
 //scaling? will use this everywhere including width and height
 typedef uint16_t pixCoord; //scaleCD
@@ -457,7 +456,7 @@ void readFirstBMPToAandAllocB(char* filename)
   //scaling?
   width = *(pixCoord*)&info[18];
   height = *(pixCoord*)&info[22];
-  //cerr << width << " " << height << endl;
+  fprintf(stderr, "%s gets %ux%u .bmp files.\n", progname, width, height);
 
   //scaling??
   // allocate three bytes per pixel
@@ -569,6 +568,7 @@ int readFirstBMPToAandAllocB()
   // extract image height and width from header
   width = *(int*)&info[18];
   height = *(int*)&info[22];
+  fprintf(stderr, "%s gets a stream of %ux%u .bmps\n", progname, width, height);
   //cerr << width << " " << height << endl;
 
   //scaling??
@@ -813,7 +813,8 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
 int camera_index = 0;
 
 int main( int argc, char** argv ) {
-  cerr << "Phase1aPipeOpt called!" << endl;
+  progname = argv[0];
+  cerr << progname << "  called!" << endl;
   get_our_options( & argc, & argv);
   // --bitmaps-dir and --CamSett-file are really options.
   // if not supplied, the original defaults that work when
@@ -875,7 +876,7 @@ int main( int argc, char** argv ) {
   }
   fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
-  fprintf(stderr,"%s MinThr=%u SubThr=%u\n", argv[0], MinThr, SubThr);
+  fprintf(stderr,"%s MinThr=%u SubThr=%u\n", progname, MinThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
 #ifdef Custom
