@@ -1,158 +1,176 @@
-//  FLIRanalysisPhase1aCamXPipeOpt.cpp, compiled to Phase1aPipeOpt
+/**  FLIRanalysisPhase1aCamXPipeOpt.cpp, compiled to Phase1aPipeOpt
 
 /////////////////////in the Pipe version editing in progress://///////////
 
-  // $ Phase1APipeOpt --pipeline StartFrameNumber NumberOfFrames CloudCover(not used)
-  //   < (pipe or file containing a concatenation of bitmaps).
-  //   > (pipe or file or maybe tee for .int result)
+   $ Phase1APipeOpt --pipeline StartFrameNumber NumberOfFrames CloudCover(not used)
+     < (pipe or file containing a concatenation of bitmaps).
+     > (pipe or file or maybe tee for .int result)
 
-  // $ Phase1aPipeOpt StartFrameNumber NumberOfFrames CloudCover(not used)
-  //   > (pipe or file or maybe tee for .int result)
-  //  It reads files named successively thumb000sss.bmp, ... from the bitmaps
-  //  dir, where sss is the StartFrameNumber, say here of exactly 3 decimal digits.
-  //  The default bitmaps dir is ./bitmaps which the --bitmaps-dir changes
+   $ Phase1aPipeOpt StartFrameNumber NumberOfFrames CloudCover(not used)
+     > (pipe or file or maybe tee for .int result)
+    It reads files named successively thumb000sss.bmp, ... from the bitmaps
+    dir, where sss is the StartFrameNumber, say here of 
+    exactly 3 decimal digits.
+    The default bitmaps dir is ./bitmaps which the --bitmaps-dir changes
 
-  // Other common options:
-  // See scaling below.
+   Other common options:
+   [--movie-scale M][--pixproc-scale P]--user-scale U]
+    See scaling below.
+  
+   [--no-crop]  Loop over all pixels is unrestricted 
+      (exclusion zones still apply.)
 
+   [--bitmaps-dir dir] When --pipeline is NOT given, THEN frames are input 
+                 from a directory of thumbdddddd.bmp
+                 flies rather than stdin.
+                 This overrides the default directory ./bitmaps
 
-  // It reads parameters from CamSett.txt for in its current working dir.
-  // and modifies it by appending the camera name.
+                 Good when a large, fast filesystem is used in addition
+                 to the holder of our software, or when repeated analysis
+                 should be done on the same extracted frames.
 
-  // It writes to stdout a one line report for each adjacent 
-  // pairs of frames. The index at each line beginning
-  // is of the 2nd frame of the pair, so the first index
-  // is start_frame_no. + 1.  The current script calls this
-  // program once (per movie) with start_frame_no. = 0.
+   [--CamSett-file file] makes it read parameters from a given 
+                  CamSett.txt format file.  Otherwise, it reads 
+                  ./CamSett.txt from the current working dir.  (It
+                   no longer rewrites file by appending the camera name.)
 
-  // Also, error reports written to stderr before exit.
+                    Overrides default ./CamSett.txt  See documenatation
+                    and reports from Phase1b.   
+                    Settings architecture still under development.
 
-  // If there are more frames than number_of_frames_to_process,
-  // processing stops after the last frame.
+   [--verbose]   Used in previous version, ignored, may be used again.
 
-  //  WHEN the --pipeline option is given, version reads a concatenation of
-  // .bmp (54 byte header) files 
-  //  from fd 0.  It finishes either after processing 
-  //  NumberOfFrames or EOF on fd 0. A double buffered (although 
-  //  single thread) strategy is used, so each image is read only once.
-  //  Memory use does not grow with number of frames.
+   It writes to stdout a one line report for each adjacent 
+   pairs of frames. The index at each line beginning
+   is of the 2nd frame of the pair, so the first index
+   is start_frame_no. + 1.  The current script calls this
+   program once (per movie) with start_frame_no. = 0.
 
-  //  It gets the (width)x(height) resolution from the first image and fails
-  //  if a subsequent image has different resolution.
+   Also, error reports written to stderr before exit.
 
-  //  There are no other external non-standard dependencies or effects.
+   If there are more frames than number_of_frames_to_process,
+   processing stops after the last frame.
+
+    WHEN the --pipeline option is given, version reads a concatenation of
+   .bmp (54 byte header) files 
+    from fd 0.  It finishes either after processing 
+    NumberOfFrames or EOF on fd 0. A double buffered (although 
+    single thread) strategy is used, so each image is read only once.
+    Memory use does not grow with number of frames.
+
+    It gets the (width)x(height) resolution from the first image and fails
+    if a subsequent image has different resolution.
+
+    There are no other external non-standard dependencies or effects.
 //////////////////////////////////////////////////////////////////////
+*/
 
+/**
 /////////////////////scaling stuff///////////////////////////////////
-// new scaling parameters!
-// --movie-scale Mscale scale for original movie (or group) linear resolutio
-// --pixproc-scale Pscale for pixel processing 
-// --user-scale  Uscale for specifying cropping, exclusion regions and
-//                          maybe eventually data analysis
+ new scaling parameters!
+ --movie-scale Mscale scale for original movie (or group) linear resolutio
+ --pixproc-scale Pscale for pixel processing 
+ --user-scale  Uscale for specifying cropping, exclusion regions and
+                          maybe eventually data analysis
 
-// The scaling issue was raised because the DroneCalib1 movie
-// is in 3840x2080 resolution, original C-TAP extracted half-resolution
-// 1920x1040 frames, and Custom (hardcoded and coded in CamSett.txt)
-// selected clipping coordinates were
-// specified in terms of the lower resolution frame coordinates.
-// So, when we were able to process the movie with full resolution
-// frames using pipelined extraction, the clipping cooridinates
-// had to be doubled.  This is implemented below by the above scaling parmeters.
-//
-// In this case, the global UtoPmult=2.
-// (Generally, UtoP=Pscale/Uscale which currently must have no roundoff.).
-// The function UtoP(c) returns UtoPmult*c.
-// Finally, the hard coded constants (among others) are first passed through
-// UtoP(), in
+ The scaling issue was raised because the DroneCalib1 movie
+ is in 3840x2080 resolution, original C-TAP extracted half-resolution
+ 1920x1040 frames, and Custom (hardcoded and coded in CamSett.txt)
+ selected clipping coordinates were
+ specified in terms of the lower resolution frame coordinates.
+ So, when we were able to process the movie with full resolution
+ frames using pipelined extraction, the clipping cooridinates
+ had to be doubled.  This is implemented below by the above scaling parmeters.
 
-//
+ In this case, the global UtoPmult=2.
+ (Generally, UtoP=Pscale/Uscale which currently must have no roundoff.).
+ The function UtoP(c) returns UtoPmult*c.
+ Finally, the hard coded constants (among others) are first passed through
+ UtoP(), in
+
+
 //static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
 //  return (ii < UtoP(73) ) && (jj > UtoP(1568) );
 
 //CROP_YF = s(1249) //restricting more than 1920
 //#ifdef Custom
 //CROP_XF = s(1080)
-//
-
-//Thus, the April 2026 4-way comparison,
-// HalfDecimated : --movie-scale 1 --pixproc-scale 1 --user-scale 1
-// Full          : --movie-scale 2 --pixproc-scale 1 --user-scale 1
-//Remember, the original and current C-TAP half-scaled the movie and
-//used the resulting scaled pixels for crop specifications, exclusion zones
-//and result .int and .out files.
-
-// Now, we'll try out the idea that:
-// There should be 3 types for coordintes:
-// MCoord -- used in the job's input movie files
-// UCoord -- users specify crop limits and exclusion zones
-//           and similar features in terms of these
-// PCoord -- Pixel or Processing Coordinates, used in
-//           individual processing stages, for now, Phase1a and b.
-//Eventually these might be implemented by C++ classes, say
-//with a common parent named Coord; but, most importantly,
-//each contains a common CoordInfo object that encodes
-//how the unsigned int (uint16) internal data in each object, as an instance
-//of which of the 3 classes it belongs to, should be converted
-//(by some sort of scaling) to objects of one of the other classes.
-//
-// But for now,
-// scaleCD will be a keyword in comments about what conversions
-//should apply.  So, we can test and scope out a good, flexible object
-//oriented design.  No new types will be introduced as we try to
-//finish the April 2026 4-way comparison project on 3840x2080 movies,
-//with properties given by camera name Custom
-//
-//Unfortunately, what we aim for April 2026 is .out files in terms of
-//the Pcoord's of Stage1b, used as such for the baby movies built out
-//our extracted (full or half resolution) movies, and will be double
-//the full frame runs compared to the half-frame runs.
-
-//                            LOOK AT LINES BELOW IN A 150-char WIDE SCREEN
-
-////                                                     concept----V         V------execution
-// __Current__(so I can change now!) CamSett and excl zone params:Ucoord(=(1/2)Mcoord in April 2026):
-//
-//
-//                             concept----V         V------execution
-//    [cropping &/or exclus zones]---->Ucoord(=(1/2)Mcoord)--->V              /-->Matt      /-->Matt
-//Movie-->Mcoord--->Extract(1=Full OR 1/2=Half)--->Pcoord--->Phase1a--->Pcoord/----->Phase2/------->C-TAP,ImageMagik,ffmpeg---->Pcoord--->BabyMovie
-//[.bmp  ext OR YUV-pipe]/                     \---Pcoord----------------------------------------------^
-// so soooo Phase1a HERE should think what we hard-coded in our ezDroneCalib1()
-// are Ucoords!!
-//So, also, in this primative time, the .int, .out and Baby outputs are in Pcoords, NOT Ucoords.
-//If the .bmp/.yuv pipe consistency continues to manifest, we will have to straightforwardly translate the Pcoords in .int and .out
-//to some common Ucoord, for the future machine learning level work.
-//
-// A little background: When I got the .bmp, Fullframe try working on DroneShort1, I had to use an exclusion zone
-// around the date/time display in order to get a better result; whilst no need for Half-frame--this might have done cropping,
-// don't know for sure.  In the full frame try, FLIR got badly distracted by the date-time display. 
-//
-// We really want to vary Processing resolutions.  Mcoords don't change.
-//  So, Mcoord <---> Pcoord must vary at runtime
-// So, if we want Ucoords to be fixed, Pcoord<---->Ucoord must vary at runtime.
-//
 
 
-//
-// In this case, the global UtoPmult=2.
-// (Generally, UtoP=Pscale/Uscale which currently must have no roundoff.).
-// The function UtoP(c) returns UtoPmult*c.
+Thus, the April 2026 4-way comparison,
+ HalfDecimated : --movie-scale 1 --pixproc-scale 1 --user-scale 1
+ Full          : --movie-scale 2 --pixproc-scale 1 --user-scale 1
+Remember, the original and current C-TAP half-scaled the movie and
+used the resulting scaled pixels for crop specifications, exclusion zones
+and result .int and .out files.
+
+ Now, we'll try out the idea that:
+ There should be 3 types for coordintes:
+ MCoord -- used in the job's input movie files
+ UCoord -- users specify crop limits and exclusion zones
+           and similar features in terms of these
+ PCoord -- Pixel or Processing Coordinates, used in
+           individual processing stages, for now, Phase1a and b.
+Eventually these might be implemented by C++ classes, say
+with a common parent named Coord; but, most importantly,
+each contains a common CoordInfo object that encodes
+how the unsigned int (uint16) internal data in each object, as an instance
+of which of the 3 classes it belongs to, should be converted
+(by some sort of scaling) to objects of one of the other classes.
+
+ But for now,
+ scaleCD will be a keyword in comments about what conversions
+should apply.  So, we can test and scope out a good, flexible object
+oriented design.  No new types will be introduced as we try to
+finish the April 2026 4-way comparison project on 3840x2080 movies,
+with properties given by camera name Custom
+
+Unfortunately, what we aim for April 2026 is .out files in terms of
+the Pcoord's of Stage1b, used as such for the baby movies built out
+our extracted (full or half resolution) movies, and will be double
+the full frame runs compared to the half-frame runs.
+
+                            LOOK AT LINES BELOW IN A 150-char WIDE SCREEN
+
+                                                     concept----V         V------execution
+ __Current__(so I can change now!) CamSett and excl zone params:Ucoord(=(1/2)Mcoord in April 2026):
 
 
-// Finally, the hard coded constants (among others) are first passed through
-// UtoP(), in
+                             concept----V         V------execution
+    [cropping &/or exclus zones]---->Ucoord(=(1/2)Mcoord)--->V              /-->Matt      /-->Matt
+Movie-->Mcoord--->Extract(1=Full OR 1/2=Half)--->Pcoord--->Phase1a--->Pcoord/----->Phase2/------->C-TAP,ImageMagik,ffmpeg---->Pcoord--->BabyMovie
+[.bmp  ext OR YUV-pipe]/                     \---Pcoord----------------------------------------------^
+ so soooo Phase1a HERE should think what we hard-coded in our ezDroneCalib1()
+ are Ucoords!!
+So, also, in this primative time, the .int, .out and Baby outputs are in Pcoords, NOT Ucoords.
+If the .bmp/.yuv pipe consistency continues to manifest, we will have to straightforwardly translate the Pcoords in .int and .out
+to some common Ucoord, for the future machine learning level work.
 
-//
+ A little background: When I got the .bmp, Fullframe try working on DroneShort1, I had to use an exclusion zone
+ around the date/time display in order to get a better result; whilst no need for Half-frame--this might have done cropping,
+ don't know for sure.  In the full frame try, FLIR got badly distracted by the date-time display. 
+
+ We really want to vary Processing resolutions.  Mcoords don't change.
+  So, Mcoord <---> Pcoord must vary at runtime
+ So, if we want Ucoords to be fixed, Pcoord<---->Ucoord must vary at runtime.
+
+ In this case, the global UtoPmult=2.
+ (Generally, UtoP=Pscale/Uscale which currently must have no roundoff.).
+ The function UtoP(c) returns UtoPmult*c.
+
+ Finally, the hard coded constants (among others) are first passed through
+ UtoP(), in
+
 //static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
 //  return (ii < UtoP(73) ) && (jj > UtoP(1568) );
-//
+
 //CROP_YF = s(1249) //restricting more than 1920
 //#ifdef Custom
 //CROP_XF = s(1080)
-//
 
+*/
 
-//int stdinfreads = 0; //for debugging
+int stdinfreads = 0; //for debugging
 
 #include <string>
 #include <cstring>

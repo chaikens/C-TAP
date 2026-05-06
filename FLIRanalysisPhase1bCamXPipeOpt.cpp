@@ -1,5 +1,5 @@
 
-/**
+/** FLIRanalysisPhase1bCamXPipeOpt.cpp compiled to Phase1bPipeOut 
 
 Writes result to put in .out file to stdout.
 
@@ -26,6 +26,13 @@ Section 3.2.1 on image analysis for UAP research starting on page 11 of https://
   makes it read parameters from a given CamSett.txt format file.
   Otherwise, it reads CamSett.txt from the current working dir.
 
+  [--movie-scale M][--pixproc-scale P][--user-scale U]
+  See Phase1a These might be used here in the future, since they
+  apply to settings like CROP_** and may apply to further use of 
+  our output.
+
+  [--verbose] ignored for now, may be used again.
+
   (We no longer rewrite Camsett.txt)  
 
   Phase1bPipeOut writes to stdout a one line report for each "golden event"
@@ -34,7 +41,8 @@ Section 3.2.1 on image analysis for UAP research starting on page 11 of https://
   reports.
 
   It writes informative messages to stderr. (Should we retain those better?)
-   (still looking) There are no other external non-standard dependencies or effects.
+   (still looking) There are no other external non-standard dependencies or
+    effects.
 
 Explanation of input, saved in (for now) moviename.int file:
 
