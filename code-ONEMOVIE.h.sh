@@ -69,6 +69,9 @@ cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
 if [ ${REUSE_BMPS}"" != "yes" ]
 then
     echo "Extracting .bmp's" >> $LOG
+    echo ----DEBUG---
+    echo BITMAPS_DIR= $BITMAPS_DIR
+    echo ----DEBUG---
     # BITMAPS_DIR is assurred at the beginning, not sep. for each movie
     rm  -f $BITMAPS_DIR/*
     #aside from saving space, we must delete old bitmaps
@@ -80,24 +83,26 @@ then
 	
     #ffmpeg -xerror -threads 0 -hide_banner -an -i ${movie_file}  thumb%06d.bmp  &> ${RESULTS_DIR}/ffmpeg.outputs 
 
-    #OK diff with brother Full Scaling
-    #FFMPEG_EXTRACT_CMD=
-    #"ffmpeg -xerror -threads 0 -hide_banner -an    \
-	#-i $movie_file                                                    \
-	#thumb%06d.bmp                                                     \
-	#&> $RESULTS_DIR/ffmpeg.outputs"
+    #we now know decimation is necessary for the FLIR algorithm
+    
+    #OK diff with brother Full Scaling We 
+    FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an    \
+	-i $movie_file                             \
+	-vf 'decimate,setpts=N/100/TB'              \
+	thumb%06d.bmp                              \
+	&> $RESULTS_DIR/ffmpeg.outputs"
 
     movie_width=$(widthOfMovie $movie_file)
     movie_height=$(heightOfMovie $movie_file)
     
     ##scaling? We actually do half-scaling and full scaling.
     #OK diff with brother FullScaling 
-    FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an  \
-           -i $movie_file                                                 \
-           -vf                                                            \
-            'scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB'  \
-           thumb%06d.bmp                                                  \
-           &> $RESULTS_DIR/ffmpeg.outputs"
+    #FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an  \
+    #       -i $movie_file                                                 \
+    #       -vf                                                            \
+    #        'scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB'  \
+    #       thumb%06d.bmp                                                  \
+    #       &> $RESULTS_DIR/ffmpeg.outputs"
 
     echo Running >> $LOG
     echo ${FFMPEG_EXTRACT_CMD} >> $LOG
@@ -115,7 +120,7 @@ then
 	echo opening emacs on ffmpeg output
 	emacs ${RESULTS_DIR}/ffmpeg.outputs &
 	echo exiting
-	exit
+	exit 1
     fi
     echo 
     echo "ffmpeg done." >> $LOG
@@ -124,6 +129,7 @@ then
     then
 	echo 'thumb000001.bmp does not exist (in its proper place)'
 	echo or its non-24bit depth is not supported by Phase1a
+	exit 1
     else
 	bmp_width=$(widthOfBmp thumb000001.bmp)
 	bmp_height=$(heightOfBmp thumb000001.bmp)
@@ -438,10 +444,16 @@ do
     #then
     #echo "processing frame number" $frame
     #fi
-    i=$((x-9))  ##scaling?  maybe 9 could remain unscaled
-    j=$((y-9))
-    k=$((x+9))
-    l=$((y+9))
+
+#    i=$((x-9))  ##scaling?  maybe 9 could remain unscaled
+#    j=$((y-9))
+#    k=$((x+9))
+#    l=$((y+9))
+
+    i=$((x-18))  ##scaling?  maybe 9 could remain unscaled
+    j=$((y-18))
+    k=$((x+18))
+    l=$((y+18))
     if [ $frame -lt 10 ]
     then
         pad="00000"
@@ -475,11 +487,11 @@ do
 	#echo -----
 
 	BITMAP_EDIT_CMD=\
-"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke cyan -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
+"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke cyan -strokewidth 2 -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
     else
 	# echo  '$y -lt 800 no branch'
 	BITMAP_EDIT_CMD=\
-"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke lime -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
+"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke lime -strokewidth 2 -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
     fi
     # ..echo 'We will eval' $BITMAP_EDIT_CMD
     eval $BITMAP_EDIT_CMD
