@@ -1,7 +1,17 @@
 echo SOURCED: code-HELPERS-DEFAULTS.h.sh
+JOBNAME=$(basename $0 | sed -n 's/C-TAP-\(..*\).sh/\1/p')
+if [ $JOBNAME"" = "" ]
+then
+    echo Your top level script should be named C-TAP-<jobname>.sh
+    echo not $0
+    echo Sorry you can recode all this though since it is open/free.
+    exit 1
+fi
+
 #
 # defaults
 #
+
 REUSE_BMPS=no
 FAST_FILESYS_DIR_IF_USED=
 DEBUG=false
@@ -14,7 +24,7 @@ RESULTS_DIR="${SOFTWARE_DIR}/RESULTS"
 #For now, we change (mv) its name to save it.
 
 #
-#  Helper functions below
+#  Helper shell functions
 #
 
 #Phase1a reads depth 24 (8x8x8) .bmps only

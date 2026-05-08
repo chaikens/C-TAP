@@ -373,7 +373,7 @@ int main ( int argc, char** argv ) {
   for ( i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
     
     bool GoldenEvent = false; unsigned int NumBools = 0;
-    if ( camera == "Custom" ) {
+    if ( true /*camera == "Custom"*/ ) {
       if ( SignalTruth[i] ) GoldenEvent = true;
     }
     else {
