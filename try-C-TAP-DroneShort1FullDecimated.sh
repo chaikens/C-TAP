@@ -1,6 +1,6 @@
 #!/bin/bash
 source C-TAP-HELPERS
-REUSE_BMPS=no #Do not change to yes except if you already
+REUSE_BMPS=yes #Do not change to yes except if you already
 # had the thumb*.bmp frames extracted and are re-using
 # the script for development and testing of subsequent steps
 # for the same movie and extraction choices.

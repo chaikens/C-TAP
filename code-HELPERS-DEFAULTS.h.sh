@@ -20,7 +20,7 @@ BITMAPS_DIR_NAME="bitmaps"
 SLOW_MOVIE_DIR=$(pwd)
 
 SOFTWARE_DIR=$(pwd)
-RESULTS_DIR="${SOFTWARE_DIR}/RESULTS"
+RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
 #For now, we change (mv) its name to save it.
 
 #

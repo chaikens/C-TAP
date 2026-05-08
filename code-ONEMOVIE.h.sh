@@ -24,9 +24,6 @@ cat /dev/null > $ALL_MESSAGES_PATH
 #MOVIE_BASE=${MOVIE_FILE%.*} #Basename without the DOT
 #should be moviePrefix
 
-echo -----
-echo "${RESULTS_DIR}/$moviePrefix.log.0"
-
 #################code for naming and creating the LOG for this run##############
 touch "${RESULTS_DIR}/$moviePrefix.log.0" #that one's a dummy, so the next
 #numbered one can be computed the first time.
@@ -69,9 +66,6 @@ cd $BITMAPS_DIR  #ffmpeg puts bitmaps in its cwd.
 if [ ${REUSE_BMPS}"" != "yes" ]
 then
     echo "Extracting .bmp's" >> $LOG
-    echo ----DEBUG---
-    echo BITMAPS_DIR= $BITMAPS_DIR
-    echo ----DEBUG---
     # BITMAPS_DIR is assurred at the beginning, not sep. for each movie
     rm  -f $BITMAPS_DIR/*
     #aside from saving space, we must delete old bitmaps
@@ -85,13 +79,6 @@ then
 
     #we now know decimation is necessary for the FLIR algorithm
     
-    #OK diff with brother Full Scaling We 
-    FFMPEG_EXTRACT_CMD="ffmpeg -xerror -threads 0 -hide_banner -an    \
-	-i $movie_file                             \
-	-vf 'decimate,setpts=N/100/TB'              \
-	thumb%06d.bmp                              \
-	&> $RESULTS_DIR/ffmpeg.outputs"
-
     movie_width=$(widthOfMovie $movie_file)
     movie_height=$(heightOfMovie $movie_file)
     
@@ -105,13 +92,16 @@ then
     #       &> $RESULTS_DIR/ffmpeg.outputs"
 
     echo Running >> $LOG
-    echo ${FFMPEG_EXTRACT_CMD} >> $LOG
-    ( echo  ; echo ${FFMPEG_EXTRACT_CMD} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
+    # FFMPEG_EXTRACT_CMD is embedded in ffmpeg_bmp_extract() shell fn from config.
+    echo Extracting bmps with >> $LOG
+    type ffmpeg_bmp_extract >> $LOG
+    echo >> $LOG
+    (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     
     xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
     Extract_xterm_PID=$!  #so we can kill you later.
 	  
-    eval ${FFMPEG_EXTRACT_CMD}
+    ffmpeg_bmp_extract $movie_file $RESULTS_DIR/ffmpeg.outputs
     
     if [ ! $? ]
     then
@@ -232,21 +222,25 @@ Phase1a_xterm_PID=$!  #so we can kill you later.
 
 cd $BITMAPS_PARENT_DIR
 #That's where the C++ image processors expect us to be
- 
+
+cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+#So stage loop can append results.
+
 if [ true ]
 then
     # run Phase1a once on all the frames
     Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
-    #OK diff with brother FullScale
-    Phase1a_cmd_args="$Phase1a_cmd_args ${opt_phase1a_bitmaps} ${OPT_CamSett} --no-crop --camera-index 1 "
-    Phase1a_cmd="${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG #$ALL_MESSAGES_PATH" 
+    Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_phase1a_bitmaps} "
+    Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
+    Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
+    Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
+    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG #$ALL_MESSAGES_PATH"
+
     echo Running
     echo ${Phase1a_cmd}
     ( echo ; echo ${Phase1a_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
     
-    #HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
     eval ${Phase1a_cmd} 
-    #${Phase1a_cmd_args} > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
     err=$?
     if [ ${err} != 0 ]
     then
@@ -279,10 +273,13 @@ else
 	
 	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
 	#OK diff with brother FullScaling
-	Phase1a_cmd_args=" ${Phase1a_cmd_args} ${opt_phase1a_bitmaps} ${OPT_CamSett} --no-crop --camera-index 1 "
+	Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_phase1a_bitmaps} "
+	Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
+	Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
+	
+	Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
 	Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG #$ALL_MESSAGES_PATH"
-	#HUH? commanding ${Phase1a_cmd} makes some shell fail to redirect stdout!
-	#${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+
 	eval ${Phase1a_cmd}  #this does the trick
 	err=$?
 	if [ ${err} != 0 ]
