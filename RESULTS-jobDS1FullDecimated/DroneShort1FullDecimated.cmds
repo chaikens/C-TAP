@@ -1,0 +1,11 @@
+
+ffmpeg_bmp_extract is a function
+ffmpeg_bmp_extract () 
+{ 
+    ffmpeg -hide_banner -y -an -i $1 -vf 'decimate,setpts=N/100/TB' thumb%06d.bmp &> $2
+}
+
+
+/data/GIT/C-TAP/Phase1aPipeOpt 0 444 0 --bitmaps-dir /media/seth/CTAP/bitmaps-jobDS1FullDecimated --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 >> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.log.1 #/data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.mess
+
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.log.1
