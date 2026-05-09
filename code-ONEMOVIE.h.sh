@@ -88,8 +88,10 @@ then
     # FFMPEG_EXTRACT_CMD is embedded in ffmpeg_bmp_extract() shell fn from config.
     echo Extracting bmps with >> $LOG
     type ffmpeg_bmp_extract >> $LOG
+    echo ffmpeg filter is ${FFMPEG_EXTRACT_FILTER} >> $LOG
     echo >> $LOG
     (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
+    echo "FFMPEG_EXTRACT_FILTER=${FFMPEG_EXTRACT_FILTER}" >>${COMMAND_ARCHIVE_PATHNAME}
     
     xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
     xterm_pids+=($!) #for killing 'em
