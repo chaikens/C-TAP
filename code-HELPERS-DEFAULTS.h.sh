@@ -1,4 +1,5 @@
 echo SOURCED: code-HELPERS-DEFAULTS.h.sh
+set -u #NOW, expanding undefined shell variables will give an error like in decent languages!
 JOBNAME=$(basename $0 | sed -n 's/C-TAP-\(..*\).sh/\1/p')
 if [ $JOBNAME"" = "" ]
 then
@@ -104,7 +105,7 @@ function padTo6Digs() {
 function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
 
-echo "See the results in the xterms"
+echo "See the results in the xterms and ${RESULTS_DIR}"
 echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
 if ! read -t 20 yes
 then
@@ -114,10 +115,10 @@ fi
 
 if [ ${yes}"" = "yes" ]
 then
-    kill ${Phase1b_xterm_PID}
-    kill ${Phase1a_xterm_PID}
-    kill ${Phase1b_mess_xterm_PID}
-    kill ${Extract_xterm_PID}
+    if [ ${xterm_pids-none} != "none" ]
+    then
+	kill ${xterm_pids[*]} 
+    fi
 fi
 
 echo $0 Done.

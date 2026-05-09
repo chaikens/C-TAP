@@ -7,16 +7,9 @@ echo "Making Mick West redundant, processing ONI FOIA files..."
 FileName="${moviePrefix}.${ext}"
 echo "FileName=$FileName"
 
-#
-# version 1 logging:
-#
-#Save as a results the literal commands we gave, so one can
-#rerun, debug, etc!
+
 COMMAND_ARCHIVE_PATHNAME=${RESULTS_DIR}/${moviePrefix}.cmds
 cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
-
-ALL_MESSAGES_PATH=${RESULTS_DIR}/${moviePrefix}.mess
-cat /dev/null > $ALL_MESSAGES_PATH
 
 #
 # PipeOpt version logging edited to use v1 vars.
@@ -28,9 +21,9 @@ cat /dev/null > $ALL_MESSAGES_PATH
 touch "${RESULTS_DIR}/$moviePrefix.log.0" #that one's a dummy, so the next
 #numbered one can be computed the first time.
 
-pushd ${RESULTS_DIR}
+pushd ${RESULTS_DIR} > /dev/null
 logn=$( ls $moviePrefix.log.* | sed s/${moviePrefix}.log.// | sort -n | tail -n 1)
-popd
+popd > /dev/null
 ((logn++))
 
 LOG=${RESULTS_DIR}/$moviePrefix.log.$logn
@@ -99,7 +92,7 @@ then
     (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     
     xterm -geometry 160x30+0+180 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
-    Extract_xterm_PID=$!  #so we can kill you later.
+    xterm_pids+=($!) #for killing 'em
 	  
     ffmpeg_bmp_extract $movie_file $RESULTS_DIR/ffmpeg.outputs
     
@@ -133,6 +126,7 @@ else
     echo >> $LOG
     echo "We're reusing movie bitmaps for debugging speed." >> $LOG
     echo >> $LOG
+    (echo ; echo "#Reused bitmaps, so no extract commands."  ) >>${COMMAND_ARCHIVE_PATHNAME}
     rm -f pic*.bmp #only delete images used to make the previous "baby movie"
     if ! depthOfBmpIs24 thumb000001.bmp
     then
@@ -172,32 +166,32 @@ echo "$nframes frames captured" >> $LOG
 # ${moviePrefix}.out
 # ${moviePrefix}.MOV (that's the "baby movie")
 
-echo | cat >>$ALL_MESSAGES_PATH
-echo "Input Origin Report:" | cat  >> $LOG #$ALL_MESSAGES_PATH
-if [ ${movie_width}"" = "" ]
+echo | cat >>$LOG
+echo "Input Origin Report:" | cat  >> $LOG 
+if [ ${REUSE_BMPS} = "yes" ]
 then
-    echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.' >>$LOG #$ALL_MESSAGES_PATH
-    echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height}   >>$LOG #$ALL_MESSAGES_PATH
+    echo 'We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.' >>$LOG 
+    echo 'bmp_width='${bmp_width} 'bmp_height='${bmp_height}   >>$LOG 
 else
-    echo 'We extracted bitmaps from the movie:'  >>$LOG #$ALL_MESSAGES_PATH
-    echo $movie_file >>$LOG #$ALL_MESSAGES_PATH
-    echo 'movie_width='$movie_width 'movie_height='$movie_height >>$LOG #$ALL_MESSAGES_PATH
-    echo 'And, FYI,:' | cat >>$ALL_MESSAGES_PATH
-    echo 'bmp_width='$bmp_width 'bmp_height='$bmp_height >>$LOG #$ALL_MESSAGES_PATH
+    echo 'We extracted bitmaps from the movie:'  >>$LOG 
+    echo $movie_file >>$LOG 
+    echo 'movie_width='$movie_width 'movie_height='$movie_height >>$LOG 
+    echo 'And, FYI,:' | cat >>${LOG}
+    echo 'bmp_width='$bmp_width 'bmp_height='$bmp_height >>$LOG
 fi
 
 if [ $bmp_width"" != "1920" ]
 then
-    echo Until a new version is completed, >>$LOG #$ALL_MESSAGES_PATH
-    echo clipping is done in Phase1a, maybe other stuff is done in Phase1b, >>$LOG #$ALL_MESSAGES_PATH
-    echo based on 1920x1080 bmps, not what you have. >>$LOG #$ALL_MESSAGES_PATH
+    echo Until a new version is completed, >>$LOG 
+    echo clipping is done in Phase1a, maybe other stuff is done in Phase1b, >>$LOG 
+    echo based on 1920x1080 bmps, not what you have. >>$LOG
 else
     if [ $bmp_height"" != "1080" ]
     then
-	echo Until a new version is completed, >>$LOG #$ALL_MESSAGES_PATH
-	echo clipping is done in Phase1a, maybe other stuff is done in Phase1b, >>$LOG #$ALL_MESSAGES_PATH
-	echo based on 1920x1080 bmps, not what you have. >>$LOG #$ALL_MESSAGES_PATH
-	echo Hmm you have 1920 width, but bmp_height=${bmp_height}  >>$LOG #$ALL_MESSAGES_PATH
+	echo Until a new version is completed, >>$LOG 
+	echo clipping is done in Phase1a, maybe other stuff is done in Phase1b, >>$LOG 
+	echo based on 1920x1080 bmps, not what you have. >>$LOG 
+	echo Hmm you have 1920 width, but bmp_height=${bmp_height}  >>$LOG 
     fi
 fi
 
@@ -218,9 +212,8 @@ cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 # Also, this ensures xterm's tail doesn't fail.
 
 xterm -geometry 150x30+0+180 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
-Phase1a_xterm_PID=$!  #so we can kill you later.
+xterm_pids+=($!) #for killing 'em
 
-cd $BITMAPS_PARENT_DIR
 #That's where the C++ image processors expect us to be
 
 cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
@@ -234,7 +227,7 @@ then
     Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
     Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
     Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
-    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG #$ALL_MESSAGES_PATH"
+    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 
     echo Running
     echo ${Phase1a_cmd}
@@ -278,7 +271,7 @@ else
 	Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
 	
 	Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
-	Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG #$ALL_MESSAGES_PATH"
+	Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 
 	eval ${Phase1a_cmd}  #this does the trick
 	err=$?
@@ -301,7 +294,7 @@ else
 	if [ $((u+t)) -gt $nframes ]
 	then
 	    t=$((nframes-u))
-	    fi
+	fi
     done
 fi
 
@@ -310,9 +303,9 @@ echo
 echo Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in"
 echo "${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 
-echo | cat >>$LOG #ALL_MESSAGES_PATH
-echo Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in" >>$LOG #$ALL_MESSAGES_PATH
-echo "${RESULTS_DIR}/${RESULT_OF_1a_BASE}"  >>$LOG #$ALL_MESSAGES_PATH
+echo | cat >>$LOG 
+echo Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in" >>$LOG 
+echo "${RESULTS_DIR}/${RESULT_OF_1a_BASE}"  >>$LOG 
 
 #Someday result files might include comments, so simple wc won't work to get the number of data lines.
     
@@ -325,7 +318,7 @@ cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     
 #so xterm's less doesnt fess. We use less since the result is finished fast.
 xterm -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
-Phase1b_xterm_PID=$!
+xterm_pids+=($!) #for killing 'em
 
 #
 # level for Phase1b first try is 0.5, here----------------------------------------------V---
@@ -340,12 +333,12 @@ echo ${Phase1b_cmd}
 #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
 #${Phase1b_cmd_args} > ${RESULT_DIR}/${RESULT_OF_1b_BASE}
 
-echo "First 1b try:" | cat >> $LOG #
+(echo ; echo "First 1b try command:") | cat >> $LOG 
 
-xterm -geometry 180x30+50+180 -title 'Phase 1b messages'  -e less -f $MESS_1b_FULL_PATH &
-Phase1b_mess_xterm_PID=$!  #so we can kill you later.
-
-echo ${Phase1b_cmd} | cat >> $LOG #ALL_MESSAGES_PATH
+echo ${Phase1b_cmd} >> $LOG
+echo >> $LOG
+echo Phase1b report: >> $LOG
+echo >> $LOG
 eval ${Phase1b_cmd} 
 err=$?
 if [ ${err} != 0 ]
@@ -367,6 +360,7 @@ then
     if [ $n == 0 ]
     then
 	echo "Part deux: electric boogaloo... First try found 0 frames with objects."
+	echo "Part deux: electric boogaloo... First try found 0 frames with objects." >> $LOG
 	
 	#we don't redo Phase1a since current version ignores cloud cover param."
 	#	    echo "We will redo Phase1a"
@@ -398,8 +392,8 @@ then
 	Phase1b_redo_command_args="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs 0.98 "
 	Phase1b_redo_command_args="${Phase1b_redo_command} ${OPT_CamSett} $scaling_cmd_args"
 	Phase1b_redo_command="${Phase1b_redo_command_args} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>> $LOG"
-	( echo  ; echo "${Phase1b_redo_command}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
-	echo "${Phase1b_redo_command}" | cat >> $MESS_1b_FULL_PATH
+	( echo  ; echo "${Phase1b_redo_command}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
+	(echo ; echo "${Phase1b_redo_command}" ; echo Report ) | cat >> $LOG
 	eval $Phase1b_redo_command
 	err=$?
 	if [ ${err} != 0]
@@ -414,6 +408,7 @@ then
 	
 	n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
 	echo "Phase 1B: Re-Done reports $n frames with objects."
+	echo "Phase 1B: Re-Done reports $n frames with objects." >> $LOG
 	
     fi
 fi
@@ -422,8 +417,8 @@ fi
 # don't waste time on empty file OR overloading your HD
 if [ $n -gt 465000 ] || [ $n -eq 0 ]
 then
-    echo "Either too many or too few objects..."
-    echo "On to the next movie, if any"
+    (echo "Either too many or too few objects..." ; echo "On to the next movie, if any" )
+    (echo "Either too many or too few objects..." ; echo "On to the next movie, if any" ) >> $LOG
     continue #top level movie loop
 fi
 # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
@@ -448,8 +443,8 @@ cd ${SOFTWARE_DIR}
 
 if [ $COPYMOVIES ]
 then
-    echo "about to delete input movie"
-    echo $movie_file
+    echo "about to delete input movie" $movie_file
+    echo "about to delete input movie" $movie_file >> $LOG
     rm $movie_file
 fi
     

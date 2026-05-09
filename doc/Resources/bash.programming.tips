@@ -10,6 +10,11 @@ if [ ! $? ]
 setting a variable is var=...  but using a value is ... ${var} ... .
 I've been bugged by  ${var}=  DONT DO THAT (unless you want something else).
 
+(4) FROM  NOW ON, We'll try to do
+set -u
+so expanding an undefined var raises an error and exit instead of expanding to "".
+
+
 
 
 

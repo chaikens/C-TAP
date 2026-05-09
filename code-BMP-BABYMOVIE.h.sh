@@ -1,6 +1,6 @@
 echo SOURCED:  code-BMP-BABYMOVIE.h.sh
 
-pushd ${BITMAPS_PARENT_DIR}
+pushd ${BITMAPS_PARENT_DIR} > /dev/null
 
 ##scaling? x and y are pixel coords.
 cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | while read evt frame extr x y prob
@@ -70,5 +70,5 @@ eval ${make_baby_cmd}
 #ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
     
 
-popd
+popd > /dev/null
 

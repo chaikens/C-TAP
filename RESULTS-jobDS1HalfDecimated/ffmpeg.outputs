@@ -1,69 +1,0 @@
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf58.76.100
-  Duration: 00:02:00.12, start: 0.000000, bitrate: 8340 kb/s
-  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 3840x2160 [SAR 1:1 DAR 16:9], 8015 kb/s, 23.98 fps, 23.98 tbr, 24k tbn, 47.95 tbc (default)
-    Metadata:
-      handler_name    : VideoHandler
-      vendor_id       : [0][0][0][0]
-  Stream #0:1(und): Audio: mp3 (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 320 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-      vendor_id       : [0][0][0][0]
-Stream mapping:
-  Stream #0:0 -> #0:0 (h264 (native) -> bmp (native))
-Press [q] to stop, [?] for help
-Output #0, image2, to 'thumb%06d.bmp':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf58.76.100
-  Stream #0:0(und): Video: bmp, bgr24(pc, gbr/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 19.18 fps, 19.18 tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-      vendor_id       : [0][0][0][0]
-      encoder         : Lavc58.134.100 bmp
-frame=    1 fps=0.0 q=-0.0 size=N/A time=00:00:00.05 bitrate=N/A speed= 0.3x    frame=    9 fps=0.0 q=-0.0 size=N/A time=00:00:00.46 bitrate=N/A dup=0 drop=23 speed=0.682x    frame=   16 fps= 13 q=-0.0 size=N/A time=00:00:00.83 bitrate=N/A dup=0 drop=53 speed=0.702x    frame=   22 fps= 13 q=-0.0 size=N/A time=00:00:01.14 bitrate=N/A dup=0 drop=81 speed=0.677x    frame=   29 fps= 13 q=-0.0 size=N/A time=00:00:01.51 bitrate=N/A dup=0 drop=108 speed=0.686x    frame=   35 fps= 13 q=-0.0 size=N/A time=00:00:01.82 bitrate=N/A dup=0 drop=136 speed=0.675x    frame=   42 fps= 13 q=-0.0 size=N/A time=00:00:02.18 bitrate=N/A dup=0 drop=162 speed=0.684x    frame=   48 fps= 13 q=-0.0 size=N/A time=00:00:02.50 bitrate=N/A dup=0 drop=188 speed=0.675x    frame=   54 fps= 13 q=-0.0 size=N/A time=00:00:02.81 bitrate=N/A dup=0 drop=213 speed=0.667x    frame=   60 fps= 13 q=-0.0 size=N/A time=00:00:03.12 bitrate=N/A dup=0 drop=239 speed=0.663x    frame=   67 fps= 13 q=-0.0 size=N/A time=00:00:03.49 bitrate=N/A dup=0 drop=268 speed=0.668x    frame=   73 fps= 13 q=-0.0 size=N/A time=00:00:03.80 bitrate=N/A dup=0 drop=294 speed=0.664x    frame=   79 fps= 13 q=-0.0 size=N/A time=00:00:04.11 bitrate=N/A dup=0 drop=318 speed=0.66x    frame=   85 fps= 13 q=-0.0 size=N/A time=00:00:04.43 bitrate=N/A dup=0 drop=343 speed=0.657x    frame=   91 fps= 13 q=-0.0 size=N/A time=00:00:04.74 bitrate=N/A dup=0 drop=369 speed=0.654x    frame=   97 fps= 13 q=-0.0 size=N/A time=00:00:05.05 bitrate=N/A dup=0 drop=394 speed=0.652x    frame=  103 fps= 12 q=-0.0 size=N/A time=00:00:05.36 bitrate=N/A dup=0 drop=422 speed=0.65x    frame=  109 fps= 12 q=-0.0 size=N/A time=00:00:05.68 bitrate=N/A dup=0 drop=447 speed=0.649x    frame=  115 fps= 12 q=-0.0 size=N/A time=00:00:05.99 bitrate=N/A dup=0 drop=472 speed=0.647x    frame=  121 fps= 12 q=-0.0 size=N/A time=00:00:06.30 bitrate=N/A dup=0 drop=498 speed=0.646x    frame=  128 fps= 12 q=-0.0 size=N/A time=00:00:06.67 bitrate=N/A dup=0 drop=525 speed=0.649x    frame=  135 fps= 13 q=-0.0 size=N/A time=00:00:07.03 bitrate=N/A dup=0 drop=554 speed=0.653x    frame=  141 fps= 12 q=-0.0 size=N/A time=00:00:07.35 bitrate=N/A dup=0 drop=581 speed=0.651x    frame=  147 fps= 12 q=-0.0 size=N/A time=00:00:07.66 bitrate=N/A dup=0 drop=606 speed=0.65x    frame=  154 fps= 13 q=-0.0 size=N/A time=00:00:08.02 bitrate=N/A dup=0 drop=634 speed=0.653x    frame=  160 fps= 13 q=-0.0 size=N/A time=00:00:08.34 bitrate=N/A dup=0 drop=660 speed=0.652x    frame=  166 fps= 12 q=-0.0 size=N/A time=00:00:08.65 bitrate=N/A dup=0 drop=687 speed=0.65x    frame=  172 fps= 12 q=-0.0 size=N/A time=00:00:08.96 bitrate=N/A dup=0 drop=712 speed=0.649x    frame=  178 fps= 12 q=-0.0 size=N/A time=00:00:09.28 bitrate=N/A dup=0 drop=739 speed=0.648x    frame=  184 fps= 12 q=-0.0 size=N/A time=00:00:09.59 bitrate=N/A dup=0 drop=763 speed=0.647x    frame=  190 fps= 12 q=-0.0 size=N/A time=00:00:09.90 bitrate=N/A dup=0 drop=789 speed=0.646x    frame=  196 fps= 12 q=-0.0 size=N/A time=00:00:10.21 bitrate=N/A dup=0 drop=811 speed=0.645x    frame=  202 fps= 12 q=-0.0 size=N/A time=00:00:10.53 bitrate=N/A dup=0 drop=837 speed=0.644x    frame=  208 fps= 12 q=-0.0 size=N/A time=00:00:10.84 bitrate=N/A dup=0 drop=864 speed=0.643x    frame=  214 fps= 12 q=-0.0 size=N/A time=00:00:11.15 bitrate=N/A dup=0 drop=889 speed=0.643x    frame=  220 fps= 12 q=-0.0 size=N/A time=00:00:11.46 bitrate=N/A dup=0 drop=915 speed=0.642x    frame=  227 fps= 12 q=-0.0 size=N/A time=00:00:11.83 bitrate=N/A dup=0 drop=942 speed=0.644x    frame=  233 fps= 12 q=-0.0 size=N/A time=00:00:12.14 bitrate=N/A dup=0 drop=968 speed=0.644x    frame=  239 fps= 12 q=-0.0 size=N/A time=00:00:12.46 bitrate=N/A dup=0 drop=992 speed=0.643x    frame=  245 fps= 12 q=-0.0 size=N/A time=00:00:12.77 bitrate=N/A dup=0 drop=1020 speed=0.642x    frame=  252 fps= 12 q=-0.0 size=N/A time=00:00:13.13 bitrate=N/A dup=0 drop=1049 speed=0.644x    frame=  259 fps= 12 q=-0.0 size=N/A time=00:00:13.50 bitrate=N/A dup=0 drop=1077 speed=0.646x    frame=  265 fps= 12 q=-0.0 size=N/A time=00:00:13.81 bitrate=N/A dup=0 drop=1104 speed=0.646x    frame=  271 fps= 12 q=-0.0 size=N/A time=00:00:14.12 bitrate=N/A dup=0 drop=1128 speed=0.645x    frame=  277 fps= 12 q=-0.0 size=N/A time=00:00:14.44 bitrate=N/A dup=0 drop=1154 speed=0.644x    frame=  283 fps= 12 q=-0.0 size=N/A time=00:00:14.75 bitrate=N/A dup=0 drop=1180 speed=0.644x    frame=  289 fps= 12 q=-0.0 size=N/A time=00:00:15.06 bitrate=N/A dup=0 drop=1206 speed=0.644x    frame=  295 fps= 12 q=-0.0 size=N/A time=00:00:15.37 bitrate=N/A dup=0 drop=1230 speed=0.643x    frame=  301 fps= 12 q=-0.0 size=N/A time=00:00:15.69 bitrate=N/A dup=0 drop=1254 speed=0.642x    frame=  307 fps= 12 q=-0.0 size=N/A time=00:00:16.00 bitrate=N/A dup=0 drop=1280 speed=0.642x    frame=  313 fps= 12 q=-0.0 size=N/A time=00:00:16.31 bitrate=N/A dup=0 drop=1306 speed=0.642x    frame=  319 fps= 12 q=-0.0 size=N/A time=00:00:16.63 bitrate=N/A dup=0 drop=1333 speed=0.641x    frame=  325 fps= 12 q=-0.0 size=N/A time=00:00:16.94 bitrate=N/A dup=0 drop=1358 speed=0.641x    frame=  332 fps= 12 q=-0.0 size=N/A time=00:00:17.30 bitrate=N/A dup=0 drop=1385 speed=0.642x    frame=  338 fps= 12 q=-0.0 size=N/A time=00:00:17.62 bitrate=N/A dup=0 drop=1413 speed=0.642x    frame=  345 fps= 12 q=-0.0 size=N/A time=00:00:17.98 bitrate=N/A dup=0 drop=1439 speed=0.643x    frame=  351 fps= 12 q=-0.0 size=N/A time=00:00:18.29 bitrate=N/A dup=0 drop=1464 speed=0.643x    frame=  357 fps= 12 q=-0.0 size=N/A time=00:00:18.61 bitrate=N/A dup=0 drop=1490 speed=0.642x    frame=  363 fps= 12 q=-0.0 size=N/A time=00:00:18.92 bitrate=N/A dup=0 drop=1516 speed=0.642x    frame=  370 fps= 12 q=-0.0 size=N/A time=00:00:19.29 bitrate=N/A dup=0 drop=1544 speed=0.643x    frame=  376 fps= 12 q=-0.0 size=N/A time=00:00:19.60 bitrate=N/A dup=0 drop=1571 speed=0.643x    frame=  383 fps= 12 q=-0.0 size=N/A time=00:00:19.96 bitrate=N/A dup=0 drop=1599 speed=0.644x    frame=  389 fps= 12 q=-0.0 size=N/A time=00:00:20.28 bitrate=N/A dup=0 drop=1624 speed=0.644x    frame=  395 fps= 12 q=-0.0 size=N/A time=00:00:20.59 bitrate=N/A dup=0 drop=1650 speed=0.644x    frame=  401 fps= 12 q=-0.0 size=N/A time=00:00:20.90 bitrate=N/A dup=0 drop=1676 speed=0.643x    frame=  408 fps= 12 q=-0.0 size=N/A time=00:00:21.27 bitrate=N/A dup=0 drop=1704 speed=0.644x    frame=  413 fps= 12 q=-0.0 size=N/A time=00:00:21.53 bitrate=N/A dup=0 drop=1729 speed=0.643x    frame=  420 fps= 12 q=-0.0 size=N/A time=00:00:21.89 bitrate=N/A dup=0 drop=1755 speed=0.644x    frame=  425 fps= 12 q=-0.0 size=N/A time=00:00:22.15 bitrate=N/A dup=0 drop=1779 speed=0.642x    frame=  431 fps= 12 q=-0.0 size=N/A time=00:00:22.47 bitrate=N/A dup=0 drop=1804 speed=0.642x    frame=  438 fps= 12 q=-0.0 size=N/A time=00:00:22.83 bitrate=N/A dup=0 drop=1831 speed=0.643x    frame=  444 fps= 12 q=-0.0 Lsize=N/A time=00:00:23.14 bitrate=N/A dup=0 drop=1860 speed=0.643x    
-video:2697323kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
-ffmpeg now makes a baby movie.
-Input #0, image2, from 'pic*.bmp':
-  Duration: 00:00:02.62, start: 0.000000, bitrate: N/A
-  Stream #0:0: Video: bmp, bgra, 1920x1080, 60 fps, 60 tbr, 60 tbn, 60 tbc
-Stream mapping:
-  Stream #0:0 -> #0:0 (bmp (native) -> h264 (libx264))
-Press [q] to stop, [?] for help
-[libx264 @ 0x5a594cd151c0] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
-[libx264 @ 0x5a594cd151c0] profile High, level 4.2, 4:2:0, 8-bit
-[libx264 @ 0x5a594cd151c0] 264 - core 163 r3060 5db6aa6 - H.264/MPEG-4 AVC codec - Copyleft 2003-2021 - http://www.videolan.org/x264.html - options: cabac=1 ref=3 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=7 psy=1 psy_rd=1.00:0.00 mixed_ref=1 me_range=16 chroma_me=1 trellis=1 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=-2 threads=12 lookahead_threads=2 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=2 keyint=250 keyint_min=25 scenecut=40 intra_refresh=0 rc_lookahead=40 rc=crf mbtree=1 crf=25.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
-Output #0, mov, to '/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimated/DroneShort1HalfDecimated.MOV':
-  Metadata:
-    encoder         : Lavf58.76.100
-  Stream #0:0: Video: h264 (avc1 / 0x31637661), yuv420p(tv, progressive), 1920x1080, q=2-31, 60 fps, 15360 tbn
-    Metadata:
-      encoder         : Lavc58.134.100 libx264
-    Side data:
-      cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
-frame=    1 fps=0.0 q=0.0 size=       0kB time=00:00:00.00 bitrate=N/A speed=N/A    frame=   37 fps=0.0 q=0.0 size=       0kB time=00:00:00.00 bitrate=N/A speed=   0x    frame=   55 fps= 54 q=0.0 size=       0kB time=00:00:00.00 bitrate=N/A speed=   0x    frame=   85 fps= 56 q=33.0 size=       0kB time=00:00:00.43 bitrate=   0.7kbits/s speed=0.284x    frame=  118 fps= 58 q=33.0 size=       0kB time=00:00:00.98 bitrate=   0.3kbits/s speed=0.483x    frame=  151 fps= 59 q=33.0 size=       0kB time=00:00:01.53 bitrate=   0.2kbits/s speed=0.602x    frame=  157 fps= 50 q=-1.0 Lsize=     339kB time=00:00:02.56 bitrate=1081.3kbits/s speed=0.819x    
-video:336kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.781770%
-[libx264 @ 0x5a594cd151c0] frame I:1     Avg QP:24.51  size: 67346
-[libx264 @ 0x5a594cd151c0] frame P:39    Avg QP:25.71  size:  4438
-[libx264 @ 0x5a594cd151c0] frame B:117   Avg QP:28.51  size:   881
-[libx264 @ 0x5a594cd151c0] consecutive B-frames:  0.6%  0.0%  0.0% 99.4%
-[libx264 @ 0x5a594cd151c0] mb I  I16..4: 45.0% 43.3% 11.7%
-[libx264 @ 0x5a594cd151c0] mb P  I16..4:  1.4%  0.2%  0.1%  P16..4: 11.1%  0.5%  1.6%  0.0%  0.0%    skip:85.1%
-[libx264 @ 0x5a594cd151c0] mb B  I16..4:  0.0%  0.0%  0.0%  B16..8:  9.9%  0.1%  0.0%  direct: 0.0%  skip:90.0%  L0:31.2% L1:68.8% BI: 0.1%
-[libx264 @ 0x5a594cd151c0] 8x8 transform intra:30.2% inter:72.5%
-[libx264 @ 0x5a594cd151c0] coded y,uvDC,uvAC intra: 13.6% 27.9% 7.1% inter: 0.6% 1.5% 0.1%
-[libx264 @ 0x5a594cd151c0] i16 v,h,dc,p:  3% 27%  6% 64%
-[libx264 @ 0x5a594cd151c0] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 25% 13% 48%  2%  4%  3%  4%  1%  2%
-[libx264 @ 0x5a594cd151c0] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 20% 14% 30%  6%  6%  6%  6%  6%  6%
-[libx264 @ 0x5a594cd151c0] i8c dc,h,v,p: 67% 20% 12%  1%
-[libx264 @ 0x5a594cd151c0] Weighted P-Frames: Y:0.0% UV:0.0%
-[libx264 @ 0x5a594cd151c0] ref P L0: 72.3%  8.3% 13.2%  6.3%
-[libx264 @ 0x5a594cd151c0] ref B L0: 85.0% 13.0%  2.0%
-[libx264 @ 0x5a594cd151c0] ref B L1: 95.3%  4.7%
-[libx264 @ 0x5a594cd151c0] kb/s:1050.28
