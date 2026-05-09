@@ -429,91 +429,9 @@ fi
 # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
 
 
-cd ${BITMAPS_PARENT_DIR}
-
 echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
+source "${SOFTWARE_DIR}/code-BMP-BABYMOVIE.h.sh"
 
-##scaling? x and y are pixel coords.
-cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | while read evt frame extr x y prob
-do
-    ((++frame))
-    #if (( $frame %5 == 0 ))
-    #then
-    #echo "processing frame number" $frame
-    #fi
-
-#    i=$((x-9))  ##scaling?  maybe 9 could remain unscaled
-#    j=$((y-9))
-#    k=$((x+9))
-#    l=$((y+9))
-
-    i=$((x-18))  ##scaling?  maybe 9 could remain unscaled
-    j=$((y-18))
-    k=$((x+18))
-    l=$((y+18))
-    if [ $frame -lt 10 ]
-    then
-        pad="00000"
-    elif [ $frame -lt 100 ]
-    then
-        pad="0000"
-    elif [ $frame -lt 1000 ]
-    then
-        pad="000"
-    elif [ $frame -lt 10000 ]
-    then
-        pad="00"
-    elif [ $frame -lt 100000 ]
-    then
-        pad="0"
-    else
-        pad=""
-    fi
-    
-    if [ $y -lt 800 ]
-    then
-	# echo '$y -lt 800 yes branch'
-	#Remember, we're in ${BITMAPS_PARENT_DIR}
-	#scaling?  Convert command works in terms of pixel coords, it must.
-
-	#echo -----
-	#echo $(pwd)
-	#echo "BITMAPS_PARENT_DIR=${BITMAPS_PARENT_DIR}"
-	#echo "BITMAPS_DIR_NAME=${BITMAPS_DIR_NAME}"
-	#echo "BITMAPS_DIR=${BITMAPS_DIR}"
-	#echo -----
-
-	BITMAP_EDIT_CMD=\
-"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke cyan -strokewidth 2 -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
-    else
-	# echo  '$y -lt 800 no branch'
-	BITMAP_EDIT_CMD=\
-"convert ${BITMAPS_DIR}/thumb$pad$frame.bmp -fill none -stroke lime -strokewidth 2 -draw 'circle $i,$j $k,$l' ${BITMAPS_DIR}/pic$pad$frame.bmp"
-    fi
-    # ..echo 'We will eval' $BITMAP_EDIT_CMD
-    eval $BITMAP_EDIT_CMD
-done
-    
-echo "Breaking Lue's NDA...make a movie of them"
-cd ${BITMAPS_DIR}
-#We just had added the pic*.bmp frames for the 'baby movie'
-EXT="MOV" #NOT same as ext above!
-#mogrify -resize 640x360 "*" *.bmp #mogrify -format jpg *.bmp
-echo "ffmpeg now makes a baby movie." | cat >> ${RESULTS_DIR}/ffmpeg.outputs
-ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${EXT} &>> $RESULTS_DIR/ffmpeg.outputs 
-
-#ffmpeg docs:
-#
-# -f image2 -pattern_type glob -i 'pic*.bmp'
-# is for "demultiplexing" a collection identical format images selected by the filename glob.
-#
-# -vcodec libx264 -crf 25
-#
-# -pix_fmt yuv420p 
-#
-    
-#ffmpeg -i ${moviePrefix}.${ext} -filter:v "transpose=1,transpose=1" flipped.mp4
-    
 # We're done with I/O thru the bitmaps dir
 cd ${SOFTWARE_DIR}
 

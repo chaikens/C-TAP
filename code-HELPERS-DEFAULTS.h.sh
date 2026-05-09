@@ -75,6 +75,32 @@ function heightOfMovie() {
     ffprobe -v quiet  -show_streams $1 | sed -n 's/^height=\([1-9][0-9]*\)$/\1/p'
     }
 
+function padTo6Digs() {
+    if [ $1 -lt 10 ]
+    then
+        pad="00000"
+    elif [ $1 -lt 100 ]
+    then
+        pad="0000"
+    elif [ $1 -lt 1000 ]
+    then
+        pad="000"
+    elif [ $1 -lt 10000 ]
+    then
+        pad="00"
+    elif [ $1 -lt 100000 ]
+    then
+        pad="0"
+    else
+	if [ !$? ]
+	then
+	    return 1
+	fi
+        pad=""
+    fi
+    echo "${pad}$1"
+}
+
 function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
 
