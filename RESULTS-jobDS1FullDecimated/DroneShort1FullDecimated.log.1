@@ -1,0 +1,52 @@
+./C-TAP-jobDS1FullDecimated.sh
+Sat May 9 07:25:35 PM EDT 2026
+commit 77248dae
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+Extracting .bmp's
+Running
+Extracting bmps with
+ffmpeg_bmp_extract is a function
+ffmpeg_bmp_extract () 
+{ 
+    ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &> $2
+}
+ffmpeg filter is -vf decimate,setpts=N/100/TB
+
+ffmpeg done.
+444 frames captured
+
+Input Origin Report:
+We extracted bitmaps from the movie:
+/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+movie_width=3840 movie_height=2160
+And, FYI,:
+bmp_width=3840 bmp_height=2160
+Until a new version is completed,
+clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+based on 1920x1080 bmps, not what you have.
+/data/GIT/C-TAP/Phase1aPipeOpt  called!
+new_bitmaps_dir /media/seth/CTAP/bitmaps-jobDS1FullDecimated
+Compile Time and CamSett crop constants will be *2 before comparison with a pix coord.
+camera_index setting inExclusionZone is 1
+/data/GIT/C-TAP/Phase1aPipeOpt MinThr=14 SubThr=20
+/data/GIT/C-TAP/Phase1aPipeOpt gets 3840x2160 .bmp files.
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+
+Phase1a computed 443 difference lines in
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.int
+
+First 1b try command:
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.int 443 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.log.1
+
+Phase1b report:
+
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimated/DroneShort1FullDecimated.int .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 160.1 +/- 1.79 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 161 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 77.89 +/- 13.96
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 79
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 82
