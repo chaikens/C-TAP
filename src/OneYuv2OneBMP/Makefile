@@ -1,4 +1,4 @@
-all: depend YUVToBMPStreamFilter YUVtoBMPStreamFilterByFormula install
+all: depend YUVToBMPStreamFilter YUVToBMPStreamFilterByFormula install
 .PHONY : all
 
 progs : random_image TestOneYuv2OneBmp analyzeBMP 
@@ -163,6 +163,8 @@ TestOneYuv2OneBmp.o: OneYuv2OneBmp.h mustbelittleendian.h bmp.h
 TestOneYuv2OneBmp.o: yuv2bmpConstants.cpp
 YUVToBMPStreamFilter.o: OneYuv2OneBmp.h mustbelittleendian.h bmp.h
 YUVToBMPStreamFilter.o: yuv2bmpConstants.cpp
+YUVToBMPStreamFilterByFormula.o: OneYuv2OneBmp.h mustbelittleendian.h bmp.h
+YUVToBMPStreamFilterByFormula.o: yuv2bmpConstants.cpp
 analyzeBMP.o: bmp.h mustbelittleendian.h
 bmp.o: bmp.h mustbelittleendian.h
 random_image.o: bmp.h mustbelittleendian.h

@@ -54,8 +54,8 @@ int main(int argc, char *argv[])
 	{
 	  for(unsigned int Y = 0; Y < 256; Y++)
 	    {
-	      size_t px = 16*U + (Y & 0xFF);
-	      size_t py = 16*V + (Y >>   4);
+	      size_t px = 16*U + (Y & 0xF);//must be 15=0xF=00001111, NOT 0xFF dum.
+	      size_t py = 16*V + (Y >>  4);
 	      Ys[4096*py + px] = Y;
 	      Us[(4096/2)*(py/2) + (px/2) ] = U;
 	      Vs[(4096/2)*(py/2) + (px/2) ] = V;
