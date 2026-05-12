@@ -13,12 +13,18 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
-#if we reuse bitmaps, make sure here to specify the BITMAPS_DIR_NAME!
-REUSE_BMPS=no
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
-BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
-BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED
-BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
+
+ARCHITECTURE="framefile"
+#"framefile" #vs #pipeline
+
+if [ $ARCHITECTURE = "framefile" ]
+then		   
+       REUSE_BMPS=no
+       BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
+       BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
+       BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
+fi
 
 ###########END OF YOUR-SYSCONF###
 source code-SYSCONFIG.h.sh      #
@@ -33,7 +39,7 @@ ext=mp4
 #      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 #
 
-movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
+movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
 
 #################################
 source code-MOVIES.h.sh         #
@@ -58,41 +64,41 @@ OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 #Whilst our C++ commands use Unix style --double-dash-dash-sep.
 
 #For FULL FRAME with DECIMATION extraction by ffmpeg
-#FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
+#Also, the 2nd filter setpts is set presentation timestamps
+FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 
 #for HALF-RESOLUTION with DECIMATION extraction.
-FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+#FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
 
 #Settings below are used for both the pipeline and frame .bmp architectures
 
-#For FULL FRAME, (DECIMATED) RESOLUTION
-# These are used for both pipeline and frame .bmp architectures.
-# COMMENTED OUT
-#     MOVIE_TO_FRAME_DIV=1  #used by pipe arch, but not yet here.
-#     MOVIE_SCALE_OPTION="--movie-scale 2"
-#     PIXPROC_SCALE_OPTION="--pixproc-scale 1"
-#     USER_SCALE_OPTION="--user-scale 1"
-#     OTHER_OPTIONS="--no-crop --camera-index 1"
-#     #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
-#     #and also named a camera for it.
+#for FULL FRAME, (DECIMATED) RESOLUTION
 
-#for HALF FRAME, (DECIMATED) extraction.
-
-MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
-MOVIE_SCALE_OPTION="--movie-scale 1"
+MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
+MOVIE_SCALE_OPTION="--movie-scale 2"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
 OTHER_OPTIONS="--no-crop --camera-index 1"
-
 #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
+#and also named a camera for it.
+
+#for HALF FRAME, (DECIMATED) extraction.
+# COMMENTED OUT
+#    MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
+#    MOVIE_SCALE_OPTION="--movie-scale 1"
+#    PIXPROC_SCALE_OPTION="--pixproc-scale 1"
+#    USER_SCALE_OPTION="--user-scale 1"
+#    OTHER_OPTIONS="--no-crop --camera-index 1"
+
+#In the Phase1a C++ program, we wrote
+#an exclusion zone function for DroneShort1,
 #and also named a camera for it.  
-     
-#We're refactoring this from TESTING/TestPipelineOPT where
-#we had after defining the above,
-#source DoOneMoviePipeCommon.h.sh
+
+RUN_EXPLANATION="ffmpeg .mp4----> decimation---->dir of .bmp files -----> (Phase1a dir reading)  > movie.int > (Phase1bPipe) > file.out  This is coded by $0"
+echo $RUN_EXPLANATION
 
 ####################################
 source code-ANALYSIS.h.sh          #

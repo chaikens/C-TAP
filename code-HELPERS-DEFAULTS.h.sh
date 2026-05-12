@@ -9,19 +9,38 @@ then
     exit 1
 fi
 
-#
+read -t 18 -p "Keep running any xterm windows?(no, or yes is default)" 
+if [ $REPLY"x" = "nox" ]
+then
+    killall xterm
+fi
+
+
 # defaults
 #
 
-REUSE_BMPS=no
-FAST_FILESYS_DIR_IF_USED=
+RUN_EXPLANATION=""
 DEBUG=false
+SOFTWARE_DIR=$(pwd)
+FAST_FILESYS_DIR_IF_USED=
+RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
+
+#
+# for ARCHITECTURE=framefile only
+#
+REUSE_BMPS=no
 BITMAPS_PARENT_DIR=$(pwd)
 BITMAPS_DIR_NAME="bitmaps"
 SLOW_MOVIE_DIR=$(pwd)
 
-SOFTWARE_DIR=$(pwd)
-RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
+#for ARCHITECTURE=pipeline only
+PIPE_DIR=${SOFTWARE_DIR}
+
+#Good only for framefile for now; for pipeline
+#is set to "no" in code-SYSCONFIG.h.sh
+MAKE_BABY_MOVIE="yes"
+
+
 #For now, we change (mv) its name to save it.
 
 #
@@ -123,5 +142,14 @@ fi
 
 echo $0 Done.
 exit 0
+}
+
+function uptimenow(){
+    cat /proc/uptime | sed -n 's/\([0-9]*\.[0-9]*\) .*/\1/p'
+    
+}
+
+function numdif(){
+    echo $(dc -e "$1 $2 - p")
 }
 

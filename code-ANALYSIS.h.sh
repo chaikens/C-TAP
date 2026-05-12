@@ -1,18 +1,23 @@
 echo SOURCED: code-ANALYSIS.h.sh
 
-#check if $BITMAPS_DIR is null
-opt_phase1a_bitmaps="--bitmaps-dir $BITMAPS_DIR"
+#check if $BITMAPS_DIR is null if we are not reusing bitmaps..I think that's done??
+if [ $ARCHITECTURE = "framefile" ]
+then
+    opt_phase1a_bitmaps="--bitmaps-dir $BITMAPS_DIR"
+    #Note Phase1a --pipeline REJECTS --bitmaps-dir option. 
+fi
+
 opt_scaling="${MOVIE_SCALE_OPTION} ${PIXPROC_SCALE_OPTION} ${USER_SCALE_OPTION}"
 
-#for pipelined frames: ffmpeg_pipe_extract input-movie-filename
-# PIPE.yuv should be a named Unix pipe.
+#for pipelined frames: ffmpeg_pipe_extract input-movie-filename pipe-filename-with-yuv
+# It should be a named Unix pipe.
 #Writes to PIPE.yuv, the .yuv extension specifies raw format to ffmpeg
 #This should run in a shell background (i.e., separate process).
 #If not, concurrency will not occur and, what's worse, kernal VM
 #might become exhaused from all those raw video
 #frames.  (They are 54/2 bytes smaller than half the size of .bmp frames.)
 function ffmpeg_pipe_extract() {
-    ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} PIPE.yuv &>ffmpeg.log
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &>${RESULTS_DIR}/ffmpeg.log
 }
 
 #for .bmp frames: ffmpeg_bmp_extract <movie_file-file-name> <logfile>
@@ -20,5 +25,5 @@ function ffmpeg_pipe_extract() {
 #a big mostly boring herd of hogs to occupy your disk; but keeping
 #them is convenient to make a movie of the interesting ones.
 ffmpeg_bmp_extract() {
-    ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &>$2
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &>$2
 }
