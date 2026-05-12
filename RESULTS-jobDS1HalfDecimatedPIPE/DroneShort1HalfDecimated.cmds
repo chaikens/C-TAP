@@ -1,0 +1,14 @@
+ffmpeg_pipe_extract is a function
+ffmpeg_pipe_extract () 
+{ 
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &> ${RESULTS_DIR}/ffmpeg.log
+}
+-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB
+
+/data/GIT/C-TAP/YUVToBMPStreamFilter 1920 1080 < /data/GIT/C-TAP/PIPE.yuv > /data/GIT/C-TAP/PIPE.bmp 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+
+
+/data/GIT/C-TAP/Phase1aPipeOpt --pipeline 0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 < /data/GIT/C-TAP/PIPE.bmp >> /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+
+
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1

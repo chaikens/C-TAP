@@ -1,0 +1,299 @@
+(base) seth@turtle:/data/GIT/C-TAP$ date; echo ----- ; echo ------ ; ./C-TAP-demo.sh ; echo ----- ; echo -----; date; echo -------------- 
+Tue May 12 01:49:04 PM EDT 2026
+-----
+------
+#!/bin/bash -v
+# run with -v so we see the commands
+
+echo "This will demonstrate our 4 development cases"
+This will demonstrate our 4 development cases
+###################################################
+#                                                 #
+#     Half Resolution .bmp extracted by ffmpeg    #
+#                                                 #
+###################################################
+./C-TAP-jobDS1HalfDecimatedFRAME.sh
+SOURCED: code-HELPERS-DEFAULTS.h.sh
+Keep running any xterm windows?(no, or yes is default)no
+xterm: no process found
+Running your job jobDS1HalfDecimatedFRAME
+YOUR-SYSCONF-jobDS1HalfDecimatedFRAME
+SOURCED: code-SYSCONFIG.h.sh
+YOUR-MOVIES-jobDS1HalfDecimatedFRAME
+SOURCED: code-MOVIES.h.sh
+YOUR-ANALYSIS-jobDS1HalfDecimatedFRAME
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1HalfDecimatedFRAME.sh
+SOURCED: code-ANALYSIS.h.sh
+SOURCED: c-TAP-DOIT.h.sh
+make: 'Phase1aPipeOpt' is up to date.
+make: 'Phase1bPipeOpt' is up to date.
+Movie dir /data/GIT/C-TAP and programs /data/GIT/C-TAP are on the same filesystem
+We will process this (these) 1 movie file(s).
+/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
+
+Begin processing 1 of 1 movie file(s)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=DroneShort1HalfDecimated
+We got movie_file=/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=DroneShort1HalfDecimated.mp4
+Uptime we started on /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4 is
+20582.04 seconds.
+
+Your run explanation:
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1HalfDecimatedFRAME.sh
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+SOURCED: code-FRAMEFILE-EXTRACT-1A.h.sh
+/media/seth/CTAP/bitmaps-jobDS1HalfDecimatedFRAME
+no
+ffmpeg is extracting frames into many many .bmp files
+stated at 20583.57 sec.
+See progress in the ffmpeg extract bitmaps window. Now's a good coffee break time.
+extraction done at 20622.81 sec.
+That took 39.24 seconds.
+
+
+
+Beginning Phase1a
+
+Running
+/data/GIT/C-TAP/Phase1aPipeOpt 0 444 0 --bitmaps-dir /media/seth/CTAP/bitmaps-jobDS1HalfDecimatedFRAME --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 >> /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.log.1
+
+Phase1a computed 443 difference lines in
+/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int
+
+Beginning Phase1b at 20630.02 sec.
+
+Running
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.log.1
+
+First try of Phase1b reported 180 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.out
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BMP-BABYMOVIE.h.sh
+Breaking Lue's NDA...make a movie of them
+Cosmic consciousness has been achieved!!
+from yet another movie 1 of 1.
+Finished movie /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4 at
+uptime 20647.29 seconds.
+that took 65.25 wall clock seconds.
+True, full consciousness can now be reasserted by you poor human user.
+See the results in the xterms and /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME
+Type yes to kill the xterms. Or, no, or wait 20sec:yes
+./C-TAP-jobDS1HalfDecimatedFRAME.sh Done.
+
+########################################################
+#                                                      #
+#     Half Resolution piped yuv extracted by ffmpeg    #
+#  converted to .bmp by our code piped to Phase1a      #
+#                                                      #
+########################################################
+./C-TAP-jobDS1HalfDecimatedPIPE.sh
+SOURCED: code-HELPERS-DEFAULTS.h.sh
+Keep running any xterm windows?(no, or yes is default)no
+xterm: no process found
+Running your job jobDS1HalfDecimatedPIPE
+YOUR-SYSCONF-jobDS1HalfDecimatedPIPE
+SOURCED: code-SYSCONFIG.h.sh
+YOUR-MOVIES-jobDS1HalfDecimatedPIPE
+SOURCED: code-MOVIES.h.sh
+YOUR-ANALYSIS-jobDS1HalfDecimatedPIPE
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1HalfDecimatedPIPE.sh
+SOURCED: code-ANALYSIS.h.sh
+SOURCED: c-TAP-DOIT.h.sh
+make: 'Phase1aPipeOpt' is up to date.
+make: 'Phase1bPipeOpt' is up to date.
+Movie dir /data/GIT/C-TAP and programs /data/GIT/C-TAP are on the same filesystem
+We will process this (these) 1 movie file(s).
+/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
+
+Begin processing 1 of 1 movie file(s)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=DroneShort1HalfDecimated
+We got movie_file=/data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=DroneShort1HalfDecimated.mp4
+Uptime we started on /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4 is
+20669.94 seconds.
+
+Your run explanation:
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1HalfDecimatedPIPE.sh
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+./C-TAP-jobDS1HalfDecimatedPIPE.sh STARTING Phase1aPipeOpt
+/proc/uptime=20670.44 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /data/GIT/C-TAP/Phase1aPipeOpt --pipeline  0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt  --movie-scale 1 --pixproc-scale 1 --user-scale 1  --no-crop --camera-index 1  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+Finished: 20715.00
+./C-TAP-jobDS1HalfDecimatedPIPE.sh FINISHED returned 0, took wallclock time 44.56 sec.
+
+Beginning Phase1b at 20715.01 sec.
+
+Running
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+
+First try of Phase1b reported 76 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.out
+
+No baby movie today, someone said no, or our pipeline can't do it yet.
+Cosmic consciousness has been achieved!!
+from yet another movie 1 of 1.
+Finished movie /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4 at
+uptime 20715.02 seconds.
+that took 45.08 wall clock seconds.
+True, full consciousness can now be reasserted by you poor human user.
+See the results in the xterms and /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE
+Type yes to kill the xterms. Or, no, or wait 20sec:yes
+./C-TAP-jobDS1HalfDecimatedPIPE.sh Done.
+
+###################################################
+#                                                 #
+#     FULL Resolution .bmp extracted by ffmpeg    #
+#         Phase1b fails                           #
+###################################################
+./C-TAP-jobDS1FullDecimatedFRAME.sh
+SOURCED: code-HELPERS-DEFAULTS.h.sh
+Keep running any xterm windows?(no, or yes is default)no
+xterm: no process found
+Running your job jobDS1FullDecimatedFRAME
+YOUR-SYSCONF-jobDS1FullDecimatedFRAME
+SOURCED: code-SYSCONFIG.h.sh
+YOUR-MOVIES-jobDS1FullDecimatedFRAME
+SOURCED: code-MOVIES.h.sh
+YOUR-ANALYSIS-jobDS1FullDecimatedFRAME
+ffmpeg .mp4----> decimation---->dir of .bmp files -----> (Phase1a dir reading) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedFRAME.sh
+SOURCED: code-ANALYSIS.h.sh
+SOURCED: c-TAP-DOIT.h.sh
+make: 'Phase1aPipeOpt' is up to date.
+make: 'Phase1bPipeOpt' is up to date.
+Movie dir /data/GIT/C-TAP and programs /data/GIT/C-TAP are on the same filesystem
+We will process this (these) 1 movie file(s).
+/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+
+Begin processing 1 of 1 movie file(s)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=DroneShort1FullDecimated
+We got movie_file=/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=DroneShort1FullDecimated.mp4
+Uptime we started on /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 is
+20728.71 seconds.
+
+Your run explanation:
+
+ffmpeg .mp4----> decimation---->dir of .bmp files -----> (Phase1a dir reading) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedFRAME.sh
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+SOURCED: code-FRAMEFILE-EXTRACT-1A.h.sh
+/media/seth/CTAP/bitmaps-jobDS1FullDecimatedFRAME
+no
+ffmpeg is extracting frames into many many .bmp files
+stated at 20729.24 sec.
+See progress in the ffmpeg extract bitmaps window. Now's a good coffee break time.
+extraction done at 20792.18 sec.
+That took 62.94 seconds.
+
+
+
+Beginning Phase1a
+
+Running
+/data/GIT/C-TAP/Phase1aPipeOpt 0 444 0 --bitmaps-dir /media/seth/CTAP/bitmaps-jobDS1FullDecimatedFRAME --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 >> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.log.1
+
+Phase1a computed 443 difference lines in
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int
+
+Beginning Phase1b at 20842.82 sec.
+
+Running
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.log.1
+
+First try of Phase1b reported 8 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.out
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BMP-BABYMOVIE.h.sh
+Breaking Lue's NDA...make a movie of them
+Cosmic consciousness has been achieved!!
+from yet another movie 1 of 1.
+Finished movie /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 at
+uptime 20846.30 seconds.
+that took 117.59 wall clock seconds.
+True, full consciousness can now be reasserted by you poor human user.
+See the results in the xterms and /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME
+Type yes to kill the xterms. Or, no, or wait 20sec:OK. Time for asking done, leaving the xterms.
+Kill them manually or use ./killxterms.sh
+./C-TAP-jobDS1FullDecimatedFRAME.sh Done.
+
+########################################################
+#                                                      #
+#     Full Resolution piped yuv extracted by ffmpeg    #
+#  converted to .bmp by our code piped to Phase1a      #
+#          Phase1b fails                               #
+########################################################
+./C-TAP-jobDS1FullDecimatedPIPE.sh
+SOURCED: code-HELPERS-DEFAULTS.h.sh
+Keep running any xterm windows?(no, or yes is default)no
+Running your job jobDS1FullDecimatedPIPE
+YOUR-SYSCONF-jobDS1FullDecimatedPIPE
+SOURCED: code-SYSCONFIG.h.sh
+YOUR-MOVIES-jobDS1FullDecimatedPIPE
+SOURCED: code-MOVIES.h.sh
+YOUR-ANALYSIS-jobDS1FullDecimatedPIPE
+ffmpeg .mp4----> decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedPIPE.sh
+SOURCED: code-ANALYSIS.h.sh
+SOURCED: c-TAP-DOIT.h.sh
+make: 'Phase1aPipeOpt' is up to date.
+make: 'Phase1bPipeOpt' is up to date.
+Movie dir /data/GIT/C-TAP and programs /data/GIT/C-TAP are on the same filesystem
+We will process this (these) 1 movie file(s).
+/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+
+Begin processing 1 of 1 movie file(s)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=DroneShort1FullDecimated
+We got movie_file=/data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=DroneShort1FullDecimated.mp4
+Uptime we started on /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 is
+20879.76 seconds.
+
+Your run explanation:
+
+ffmpeg .mp4----> decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedPIPE.sh
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+./C-TAP-jobDS1FullDecimatedPIPE.sh STARTING Phase1aPipeOpt
+/proc/uptime=20880.25 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /data/GIT/C-TAP/Phase1aPipeOpt --pipeline  0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt  --movie-scale 2 --pixproc-scale 1 --user-scale 1  --no-crop --camera-index 1  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.log.1
+Finished: 20953.90
+./C-TAP-jobDS1FullDecimatedPIPE.sh FINISHED returned 0, took wallclock time 73.65 sec.
+
+Beginning Phase1b at 20953.91 sec.
+
+Running
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.log.1
+
+First try of Phase1b reported 0 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.out
+
+Part deux: electric boogaloo... First try found 0 frames with objects.
+Phase 1B: Re-Done reports 0 frames with objects.
+Either too many or too few objects...
+On to the next movie, if any
+Finished movie /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 at
+uptime 20953.94 seconds.
+that took 74.18 wall clock seconds.
+True, full consciousness can now be reasserted by you poor human user.
+See the results in the xterms and /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE
+Type yes to kill the xterms. Or, no, or wait 20sec:yes
+./C-TAP-jobDS1FullDecimatedPIPE.sh Done.
+
+-----
+-----
+Tue May 12 01:55:30 PM EDT 2026
+--------------
+(base) seth@turtle:/data/GIT/C-TAP$ 

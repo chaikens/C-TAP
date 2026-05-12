@@ -1,0 +1,15 @@
+
+ffmpeg_bmp_extract is a function
+ffmpeg_bmp_extract () 
+{ 
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &> $2
+}
+
+FFMPEG_EXTRACT_FILTER=-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB
+
+/data/GIT/C-TAP/Phase1aPipeOpt 0 444 0 --bitmaps-dir /media/seth/CTAP/bitmaps-jobDS1HalfDecimatedFRAME --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 >> /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.log.1
+
+/data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.log.1
+
+ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/DroneShort1HalfDecimated.MOV &>> /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME/ffmpeg.outputs
+

@@ -1,0 +1,140 @@
+INFO: ffmpeg .mp4----> decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedPIPE.sh
+CMD: ./C-TAP-jobDS1FullDecimatedPIPE.sh
+TIME: Tue May 12 01:54:07 PM EDT 2026
+PGM: commit 10fd35ca
+PGM:
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+CMD: The frame extraction command is
+CMD:
+ffmpeg_pipe_extract is a function
+ffmpeg_pipe_extract () 
+{ 
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &> ${RESULTS_DIR}/ffmpeg.log
+}
+INFO: Frame resolution is Movie resolution / 1
+INFO: Extracted frames width=3840 height=2160 yuvsizeb=12441600
+INFO: Processing 3840x2160 frames from /data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+STEP: STARTING pipeline EXTRACTION- at 20880.24 seconds.
+CMD:
+/data/GIT/C-TAP/YUVToBMPStreamFilter 3840 2160 < /data/GIT/C-TAP/PIPE.yuv > /data/GIT/C-TAP/PIPE.bmp 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.log.1
+
+TIME: Started YUVToBMPStreamFilter at /proc/uptime=20880.24 seconds.
+STEP: ./C-TAP-jobDS1FullDecimatedPIPE.sh STARTING Phase1aPipeOpt
+TIME: /proc/uptime=20880.25 sec., please wait; See progress in Phasa1a .int window.
+CMD:
+CMD: /data/GIT/C-TAP/Phase1aPipeOpt --pipeline 0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 < /data/GIT/C-TAP/PIPE.bmp >> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.log.1
+
+/data/GIT/C-TAP/Phase1aPipeOpt  called!
+Compile Time and CamSett crop constants will be *2 before comparison with a pix coord.
+camera_index setting inExclusionZone is 1
+/data/GIT/C-TAP/Phase1aPipeOpt MinThr=14 SubThr=20
+/data/GIT/C-TAP/Phase1aPipeOpt gets a stream of 3840x2160 .bmps
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+YUVToBMPStreamFilter transformed 444 images.
+	Command being timed: "/data/GIT/C-TAP/YUVToBMPStreamFilter 3840 2160"
+	User time (seconds): 24.95
+	System time (seconds): 4.19
+	Percent of CPU this job got: 39%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:13.38
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 36052
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 17
+	Minor (reclaiming a frame) page faults: 6352
+	Voluntary context switches: 168446
+	Involuntary context switches: 2022
+	Swaps: 0
+	File system inputs: 2720
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+	Command being timed: "ffmpeg -hide_banner -y -an -i /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 -vf decimate,setpts=N/100/TB /data/GIT/C-TAP/PIPE.yuv"
+	User time (seconds): 114.50
+	System time (seconds): 2.13
+	Percent of CPU this job got: 158%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:13.62
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 401948
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 100329
+	Voluntary context switches: 1352760
+	Involuntary context switches: 5089
+	Swaps: 0
+	File system inputs: 72944
+	File system outputs: 152
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+	Command being timed: "/data/GIT/C-TAP/Phase1aPipeOpt --pipeline 0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 2 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1"
+	User time (seconds): 29.48
+	System time (seconds): 2.47
+	Percent of CPU this job got: 43%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:13.44
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 52180
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 12303
+	Voluntary context switches: 167148
+	Involuntary context switches: 2237
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 128
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+
+TIME: Finishted: 20953.90
+TIME: ./C-TAP-jobDS1FullDecimatedPIPE.sh FINISHED returned 0, took wallclock time 73.65 sec.
+INFO: Find Phase1aPipeOpt results in  /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int
+CMD:
+CMD: First 1b try command:
+CMD: /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.log.1
+
+INFO: Phase1b report:
+
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 164.4 +/- 9.68 (units of 0-255)
+So, setting a minimum threshold of 9.0 SIGMA = 251 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 78.51 +/- 13.88
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 80
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 82
+INFO: Part deux: electric boogaloo... First try found 0 frames with objects.
+CMD:
+CMD: /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int 0.98  --CamSett-file /data/GIT/C-TAP/CamSett.txt  > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.log.1
+Report
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedPIPE/DroneShort1FullDecimated.int .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 164.4 +/- 9.68 (units of 0-255)
+So, setting a minimum threshold of 9.0 SIGMA = 251 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 78.51 +/- 13.88
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 80
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 82
+INFO: Phase 1B: Re-Done reports 0 frames with objects.
+TIME: Phase 1B finished at 20953.93 sec
+TIME: Took .02 sec.
+INFO: Either too many or too few objects...
+On to the next movie, if any
+TIME: finish at 20953.94 seconds.
+TIME: net 74.18 seconds.

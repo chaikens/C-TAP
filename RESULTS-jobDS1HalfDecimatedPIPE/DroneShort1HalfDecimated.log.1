@@ -1,0 +1,123 @@
+INFO: ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1HalfDecimatedPIPE.sh
+CMD: ./C-TAP-jobDS1HalfDecimatedPIPE.sh
+TIME: Tue May 12 01:50:38 PM EDT 2026
+PGM: commit 10fd35ca
+PGM:
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+CMD: The frame extraction command is
+CMD:
+ffmpeg_pipe_extract is a function
+ffmpeg_pipe_extract () 
+{ 
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &> ${RESULTS_DIR}/ffmpeg.log
+}
+INFO: Frame resolution is Movie resolution / 2
+INFO: Extracted frames width=1920 height=1080 yuvsizeb=3110400
+INFO: Processing 1920x1080 frames from /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4
+STEP: STARTING pipeline EXTRACTION- at 20670.43 seconds.
+CMD:
+/data/GIT/C-TAP/YUVToBMPStreamFilter 1920 1080 < /data/GIT/C-TAP/PIPE.yuv > /data/GIT/C-TAP/PIPE.bmp 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+
+TIME: Started YUVToBMPStreamFilter at /proc/uptime=20670.44 seconds.
+STEP: ./C-TAP-jobDS1HalfDecimatedPIPE.sh STARTING Phase1aPipeOpt
+TIME: /proc/uptime=20670.44 sec., please wait; See progress in Phasa1a .int window.
+CMD:
+CMD: /data/GIT/C-TAP/Phase1aPipeOpt --pipeline 0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1 < /data/GIT/C-TAP/PIPE.bmp >> /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+
+/data/GIT/C-TAP/Phase1aPipeOpt  called!
+camera_index setting inExclusionZone is 1
+/data/GIT/C-TAP/Phase1aPipeOpt MinThr=14 SubThr=20
+/data/GIT/C-TAP/Phase1aPipeOpt gets a stream of 1920x1080 .bmps
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+YUVToBMPStreamFilter transformed 444 images.
+	Command being timed: "/data/GIT/C-TAP/YUVToBMPStreamFilter 1920 1080"
+	User time (seconds): 7.00
+	System time (seconds): 1.16
+	Percent of CPU this job got: 18%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:44.30
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 16340
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 78
+	Minor (reclaiming a frame) page faults: 1728
+	Voluntary context switches: 41891
+	Involuntary context switches: 5598
+	Swaps: 0
+	File system inputs: 15712
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+	Command being timed: "ffmpeg -hide_banner -y -an -i /data/GIT/C-TAP/DroneShort1HalfDecimated.mp4 -vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB /data/GIT/C-TAP/PIPE.yuv"
+	User time (seconds): 108.89
+	System time (seconds): 1.22
+	Percent of CPU this job got: 247%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:44.56
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 367292
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 1
+	Minor (reclaiming a frame) page faults: 88440
+	Voluntary context switches: 347215
+	Involuntary context switches: 8977
+	Swaps: 0
+	File system inputs: 73208
+	File system outputs: 32
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+	Command being timed: "/data/GIT/C-TAP/Phase1aPipeOpt --pipeline 0 100000000 0 --CamSett-file /data/GIT/C-TAP/CamSett.txt --movie-scale 1 --pixproc-scale 1 --user-scale 1 --no-crop --camera-index 1"
+	User time (seconds): 8.05
+	System time (seconds): 0.71
+	Percent of CPU this job got: 19%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:44.32
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 15956
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 3189
+	Voluntary context switches: 40068
+	Involuntary context switches: 2350
+	Swaps: 0
+	File system inputs: 40
+	File system outputs: 128
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+
+TIME: Finishted: 20715.00
+TIME: ./C-TAP-jobDS1HalfDecimatedPIPE.sh FINISHED returned 0, took wallclock time 44.56 sec.
+INFO: Find Phase1aPipeOpt results in  /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int
+CMD:
+CMD: First 1b try command:
+CMD: /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.log.1
+
+INFO: Phase1b report:
+
+/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE/DroneShort1HalfDecimated.int .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 94.0 +/- 7.11 (units of 0-255)
+So, setting a minimum threshold of 7.0 SIGMA = 143 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 34.92 +/- 13.86
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 36
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
+TIME: finish at 20715.02 seconds.
+TIME: net 45.08 seconds.

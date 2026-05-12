@@ -1,0 +1,81 @@
+INFO: ffmpeg .mp4----> decimation---->dir of .bmp files -----> (Phase1a dir reading) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedFRAME.sh
+CMD: ./C-TAP-jobDS1FullDecimatedFRAME.sh
+TIME: Tue May 12 01:51:36 PM EDT 2026
+PGM: commit 10fd35ca
+PGM:
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+STEP: Extracting .bmp's
+STEP: Running
+PGM: Extracting bmps with
+ffmpeg_bmp_extract is a function
+ffmpeg_bmp_extract () 
+{ 
+    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &> $2
+}
+PGM: ffmpeg filter is -vf decimate,setpts=N/100/TB
+PGM:
+TIME: ffmpeg extraction started at 20729.24 sec.
+	Command being timed: "ffmpeg -hide_banner -y -an -i /data/GIT/C-TAP/DroneShort1FullDecimated.mp4 -vf decimate,setpts=N/100/TB thumb%06d.bmp"
+	User time (seconds): 125.97
+	System time (seconds): 5.80
+	Percent of CPU this job got: 209%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:02.94
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 500264
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 279383
+	Voluntary context switches: 17787
+	Involuntary context switches: 5660
+	Swaps: 0
+	File system inputs: 50816
+	File system outputs: 21581992
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+TIME: extraction done at 20792.18, took 62.94 sec.
+STEP:ffmpeg done.
+INFO: 444 frames captured
+INFO:
+INFO: Input Origin Report:
+INFO: We extracted bitmaps from the movie:
+INFO: /data/GIT/C-TAP/DroneShort1FullDecimated.mp4
+INFO: movie_width=3840 movie_height=2160
+INFO: And, FYI,:
+INFO: bmp_width=3840 bmp_height=2160
+DEVEL: Until a new version is completed,
+DEVEL: clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+DEVEL: based on 1920x1080 bmps, not what you have.
+/data/GIT/C-TAP/Phase1aPipeOpt  called!
+new_bitmaps_dir /media/seth/CTAP/bitmaps-jobDS1FullDecimatedFRAME
+Compile Time and CamSett crop constants will be *2 before comparison with a pix coord.
+camera_index setting inExclusionZone is 1
+/data/GIT/C-TAP/Phase1aPipeOpt MinThr=14 SubThr=20
+/data/GIT/C-TAP/Phase1aPipeOpt gets 3840x2160 .bmp files.
+Just before k loop, where they are used
+CROP_XI=100 CROP_XF=900 CROP_YI=0 CROP_YF=1919
+Option no-crop has been activated: CROP_var cropping not done.
+INFO:
+INFO: Phase1a computed 443 difference lines in
+INFO: /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int
+CMD:
+CMD: First 1b try command:
+CMD: /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.out 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.log.1
+
+INFO: Phase1b report:
+
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME/DroneShort1FullDecimated.int .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 160.1 +/- 1.79 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 161 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 77.89 +/- 13.96
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 79
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 82
+TIME: finish at 20846.30 seconds.
+TIME: net 117.59 seconds.
