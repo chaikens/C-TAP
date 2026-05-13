@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<CamSett name="DroneShort1">
+  <setting smallestThr='0'/>
+  <setting biggestThr="254"/>
+  <setting smallestPix="0"/>
+  <setting biggestPix="67"/>
+  <setting SkewGaussAmpl="0.633"/>
+  <setting SkewGaussXi="1.97"/>
+  <setting SkewGaussOmega="1.89"/>
+  <setting SkewGaussAlpha="2.5"/>
+  <setting NumPixAbvThrSumMin="0"/>
+  <setting NumPixAbvThrSumMax="3"/>
+  <setting SubThr="20"/>
+  <setting RewFram="0"/>
+  <setting ForFram="-2"/>
+  <setting FramBefNew="1"/>
+  <setting FracYes="1.0"/>
+  <setting CROP_XI="100"/>
+  <setting CROP_XF="900"/>
+  <setting CROP_YI="0"/>
+  <setting CROP_YF="1919"/>
+  <setting mainThreshold="14"/>
+</CamSett>
