@@ -1,7 +1,6 @@
-CXXFLAGS = -g -Wno-format-security
+all: yuvSelectMulti
 
-yuvSelectFilter: yuvSelectFilter.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
+CXXFLAGS = -g -Wno-format-security
 
 yuvSelectMulti: yuvSelectMulti.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
