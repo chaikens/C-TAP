@@ -1,4 +1,4 @@
-all: yuvSelectMulti
+all: yuvSelectMulti YUVToBMPStreamFilter
 
 CXXFLAGS = -O3
 #CXXFLAGS = -g
@@ -6,6 +6,8 @@ CXXFLAGS = -O3
 yuvSelectMulti: yuvSelectMulti.cpp bmp.h bmp.o yuvtobmpT.o yuvtobmpT.h UnivI420pUnc4096x4096.o
 	$(CXX) $(CXXFLAGS) -Wno-format-security bmp.o UnivI420pUnc4096x4096.o yuvtobmpT.o  $< -o $@
 
+YUVToBMPStreamFilter : YUVToBMPStreamFilter.cpp bmp.h bmp.o yuvtobmpT.o yuvtobmpT.h UnivI420pUnc4096x4096.o
+	$(CXX) $(CXXFLAGS) bmp.o UnivI420pUnc4096x4096.o yuvtobmpT.o $< -o $@
 
 UnivI420pUnc4096x4096.yuv : MakeUnivI420pUnc.cpp
 	$(CXX) $(CXXFLAGS)  MakeUnivI420pUnc.cpp
