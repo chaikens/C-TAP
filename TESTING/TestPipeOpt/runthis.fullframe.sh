@@ -1,3 +1,4 @@
+#!/bin/bash
 killall xterm
 
 #This script expects all software and data are (linked) in the curr. working dir. (CWD). 
@@ -55,16 +56,16 @@ xterm -geometry 100x50+1300+0 -sb -title 'C-TAP LOG' -e tail -f $LOG &
 
 ################################################################################
 
-make -C ../.. &>> $LOG #ensure filters are up to date. -C means do it in specified dir.
-makeRet=$?
-if [ $makeRet != 0 ]
-then
-    echo Make at toplevel returned error code $makeRet. | cat >>$LOG
-    echo Make at toplevel returned error code $makeRet.
-    echo Check this out before continuing.  Here is the log.
-    cat $LOG
-    exit 1
-fi
+#make -C ../.. &>> $LOG #ensure filters are up to date. -C means do it in specified dir.
+#makeRet=$?
+#if [ $makeRet != 0 ]
+#then
+#    echo Make at toplevel returned error code $makeRet. | cat >>$LOG
+#    echo Make at toplevel returned error code $makeRet.
+#    echo Check this out before continuing.  Here is the log.
+#    cat $LOG
+#    exit 1
+#fi
 
 
 ####################################################################################
@@ -96,7 +97,7 @@ xterm -geometry 150x46+0+0 -title 'ffmpeg mp4->raw yuv stream' -e tail -f ffmpeg
 DO_ONE_MOVIE_SHELL_SCRIPT=./DoOneMovieFullFrames1ab.sh                             #
 #                                                                                  #
 ####################################################################################
-/usr/bin/time -o ${MOVIE_BASE}.time \
+/usr/bin/time --verbose -o ${MOVIE_BASE}.time \
      -f 'real    %U\nuser  %E\nsys      %S' \
      ${DO_ONE_MOVIE_SHELL_SCRIPT} \
      $MOVIE_FILE $LOG &
