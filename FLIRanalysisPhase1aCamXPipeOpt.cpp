@@ -38,7 +38,7 @@
                     and reports from Phase1b.   
                     Settings architecture still under development.
 
-   [--verbose]   Used in previous version, ignored, may be used again.
+   [--verbose]   Used for debugging.
 
    It writes to stdout a one line report for each adjacent 
    pairs of frames. The index at each line beginning
@@ -187,6 +187,7 @@ int stdinfreads = 0; //for debugging
 #include <cstring>
 using namespace std;
 
+int vb = 0; //verbose bool
 FILE* fd0 = 0;
 
 // Camera settings will eventually be systematized.
@@ -568,7 +569,7 @@ int readFirstBMPToAandAllocB()
   // extract image height and width from header
   width = *(int*)&info[18];
   height = *(int*)&info[22];
-  fprintf(stderr, "%s gets a stream of %ux%u .bmps\n", progname, width, height);
+  fprintf(stderr, "%s gets stdin stream of %ux%u .bmps\n", progname, width, height);
   //cerr << width << " " << height << endl;
 
   //scaling??
@@ -1051,7 +1052,7 @@ static int get_our_options( int *argc, char **argv[])
       {"no-crop",  no_argument, &no_crop, 1 },         //5
       {"camera-index", required_argument, 0, 0},       //6
       {"pipeline", no_argument, &pipeline, 1},        //7 top of file
-      {"verbose", no_argument, 0, 0},                 //8 ignored for regression devel.
+      {"verbose", no_argument, &vb, 1},                 //8 ignored for regression devel.
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
