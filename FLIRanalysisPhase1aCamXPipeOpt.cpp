@@ -188,7 +188,7 @@ int stdinfreads = 0; //for debugging
 using namespace std;
 
 int vb = 0; //verbose bool
-FILE* fd0 = 0;
+FILE* fpin = stdin; //Might change, default ok when we are a filter.
 
 // Camera settings will eventually be systematized.
 // For now, defining this macro makes only Custom be used.
@@ -550,26 +550,21 @@ void readSubsequentBMP(char* filename, unsigned char *dest)
 int readFirstBMPToAandAllocB()
 {
   int i;
-  /* GLOBAL! */
-  fd0 = //stdin;
-    fdopen(0, "r");
-  // in case we make the pipe input more flexible and check errors.
-  // if( !f ) {
-  //   error(1, errno, "Opening first frame %s failed.", filename);
-  // }
+  //FILE* fpin //
+
   unsigned char info[54];
   size_t readret;
   // read the 54-byte header
-  readret = fread(info, 54, 1, fd0);
-  //if(verbose) {
-  //  stdinfreads++;
-  //  fprintf(stderr, "%dth read. readret=%ld.\n", stdinfreads, readret);
-  //}
+  readret = fread(info, 54, 1, fpin);
+  if(vb) {
+    stdinfreads++;
+    fprintf(stderr, "readFirstBMP: %dth read of header. readret=%ld.\n", stdinfreads, readret);
+  }
   
   // extract image height and width from header
   width = *(int*)&info[18];
   height = *(int*)&info[22];
-  fprintf(stderr, "%s gets stdin stream of %ux%u .bmps\n", progname, width, height);
+  if(vb) fprintf(stderr, "%s gets stdin stream of %ux%u .bmps\n", progname, width, height);
   //cerr << width << " " << height << endl;
 
   //scaling??
@@ -580,11 +575,11 @@ int readFirstBMPToAandAllocB()
 
   // read the rest of the data at once
   // MYSTERY WE GET EOF HERE!!
-  readret = fread(BMP_A, imgsizeb, 1, fd0);
-  //if(verbose) {
-  //  stdinfreads++;
-  //  fprintf(stderr, "%dth read. readret=%ld. errno=%d feof=%d\n", stdinfreads, readret, errno, feof(fd0));
-  //}
+  readret = fread(BMP_A, imgsizeb, 1, fpin);
+  if(vb) {
+    stdinfreads++;
+    fprintf(stderr, "readFirstBMP stream %dth read pixels. readret=%ld. errno=%d feof=%d\n", stdinfreads, readret, errno, feof(fpin));
+  }
   if( 1 != readret ){
     if( readret < 0 ) {
       error(1, errno, "First frame: Reading stdin failed.");
@@ -593,7 +588,7 @@ int readFirstBMPToAandAllocB()
 	error(1, errno, "First frame: When reading image data, only %ld of %u read.", readret, imgsizeb);
       }
     }
-  // don't close fd0!
+  // don't close fpin!
   frameCnt = 1;
   
   for(int i = 0; i < imgsizeb; i += 3)
@@ -608,42 +603,40 @@ int readFirstBMPToAandAllocB()
 
 int readSubsequentBMP(unsigned char *dest)
 {
-  //FILE* fd0 = stdin;
-  //fd0 is now global
-  //if( !fd0 ) {
+  //FILE* fpin = stdin; //initialized in global decl.
+  //fpin is now global
+  //if( !fpin ) {
   //  error(1, errno, "Opening %dth frame %s failed.", frameCnt+1, filename);
   //}
   unsigned char info[54];
   size_t readret;
 
-  //if(verbose) fprintf(stderr, "readSubs for header after %dth read\n", stdinfreads);
+  if(vb) fprintf(stderr, "readSubseq stream for header after %dth read\n", stdinfreads);
   
   // read the 54-byte header or detect EOF! feof != 0 means EOF.
-  readret = fread(info, 54, 1, fd0);
-  //if(verbose){
-  //  stdinfreads++; fprintf(stderr, "%dth read, \n", stdinfreads);
-  //}
+  readret = fread(info, 54, 1, fpin);
+  if( readret < 0 ) {
+    error(1, errno, "Subsequent stream bmps: fread ret %ld header from stdin failed, not EOF?", readret);
+  }
+
   if( readret != 1){
-    //if(verbose) fprintf(stderr, "readret!=1, = %ld\n", readret);
-    if( feof(fd0) != 0 ) {
+    if(vb) fprintf(stderr, "readSubseq bmp stream readret!=1, = %ld\n", readret);
+    if( feof(fpin) != 0 ) {
       //There are no more bitmaps to process.
       // Should we clear the error?  I think so
       // since I hope we can process multiple movies
       // this way, which will entail replacing the
       // ffmpeg movie->bitmaps process and our pipe
       // from it.
-      clearerr(fd0);
+      if(vb) fprintf(stderr, "input fp is not at feof, we will clear.\n");
+      clearerr(fpin);
       return 1;
     }
-    if( readret < 0 ) {
-      error(1, errno, "Subsequent frames: Reading header from stdin failed but NOT from EOF!");
-    }
-    else {
-	error(1, errno, "Subsequent frames: On reading header, only %ld of %u read.", readret, 54);
-      }
-    }
+  }
+  //Good case, go on.
   
   // extract image height and width from header
+  // check consistency of size?? Paranoia hits.
   //scaling?
   if( width   != *(int*)&info[18] ||
       height  != *(int*)&info[22]  ) {
@@ -656,18 +649,20 @@ int readSubsequentBMP(unsigned char *dest)
   }
   
   // read the rest of the data at once
-  readret = fread(dest, imgsizeb, 1, fd0);
-  //if(verbose) {
-  //stdinfreads++; fprintf(stderr,"%dth read\n", stdinfreads);
-  //}
+  readret = fread(dest, imgsizeb, 1, fpin);
   if( 1 != readret ){
     if( readret < 0 ) {
-      error(1, errno, "Subsequent frames: Reading a whole bitmaps data failed.");
+      error(1, errno, "Subsequent stream pixel data: Reading a whole bitmaps data failed.");
     }
     else {
-	error(1, errno, "Subsequent frames: Only %ld of %u read, wrong bitmap fmt", readret, imgsizeb);
+	error(1, errno, "Subsequent stream pixel data: Only %ld of %u read, wrong bitmap fmt", readret, imgsizeb);
       }
-    }
+  }
+
+  //still good
+  if(vb) {
+    stdinfreads++; fprintf(stderr,"%dth stream read of pixel data \n", stdinfreads);
+  }
 
   frameCnt++;
   
@@ -680,8 +675,6 @@ int readSubsequentBMP(unsigned char *dest)
 
   return 0; //So caller will know to try another.
 }
-
-
 
 //
 // Below, code any bool predicates for camera exclusion zones.
@@ -1072,7 +1065,6 @@ static int get_our_options( int *argc, char **argv[])
       case 5: /*no_crop set by getopt_long action on long_options[] */
 	break;
       case 6: camera_index = atoi(optarg); /*cstring*/ break;
-      case 8: fprintf(stderr, "%s Ignored Option --verbose\n", (*argv)[0]);
       }
     }
   }

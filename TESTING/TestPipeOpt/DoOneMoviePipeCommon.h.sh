@@ -159,7 +159,7 @@ echo $( cat /proc/uptime ) | sed -n 's/\([0-9]*\.[0-9]*\) .*/\1 seconds, will bl
 
 #Dont output to a pipe for now, we want to keep the .int file anyway
 #so this shell waits don't run in background with & -------- here -------V
-Phase1a_cmd="./Phase1aPipeOpt --pipeline ${user_options} 0 10000000 < PIPE.bmp >  ${result_of_1a} 2>> $LOG"
+Phase1a_cmd="./Phase1aPipeOpt --verbose --pipeline ${user_options} 0 10000000 < PIPE.bmp >  ${result_of_1a} 2>> $LOG"
 ( echo ; echo ${Phase1a_cmd}; echo ) | cat >> $LOG
 eval ${Phase1a_cmd}
 RET=$?
