@@ -1,0 +1,312 @@
+#ifndef CTAP_bmp_included
+#define CTAP_bmp_included
+// we have bmps with bits offsets 54 and 138..
+// Microsoft bitmap images use 1st quadrant Mathamatical Coordinates
+//  (0,0) is image's lower left corner
+//  (width-1,height-1) is upper right corner
+
+//#include "mustbelittleendian.h"
+//only developed for g++ little endian (like Linux PCs)
+
+#include <cstdint>
+#include <cstddef>
+#include <error.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+using namespace std;
+
+// bgr ordering, in reverence to Microsoft Access is programmed bytewise (not int32)
+// so we needn't be concerned with little vs big endian byte orders.
+struct  __attribute__((packed)) bgrtriple //just for optimization sake, compiler
+{ public:                              //can pass and return this structure in one 32bit word.
+  uint8_t tb; uint8_t tg; uint8_t tr;
+  bgrtriple(uint8_t ib, uint8_t ig, uint8_t ir) :
+    tb(ib), tg(ig), tr(ir) {  }
+};
+
+typedef struct __attribute__((packed)) BITMAP_FILEHEADER {
+  unsigned char Signature[2];
+  uint32_t FileSize;
+  uint16_t Reserved1;
+  uint16_t Reserved2;
+  uint32_t OffsetToData;
+} BITMAP_FILEHEADER;
+
+//
+// Wikipedia says there are 7 kinds of DIB, Bitmap information headers
+// also, they all have 32 bit fields.
+// the 40 byte one is BITMAPINFOHEADER
+//
+// Versions after BITMAPINFOHEADER only add fields to the end of the header of the previous version.
+//
+
+typedef struct __attribute__((packed)) BITMAPINFOHEADER {
+  int32_t MySize;            /* Wikipedia says its signed. */
+  int32_t Width;
+  int32_t Height;
+  uint16_t NColorPlanes;     /* Wikipedia says must be 1 */
+  uint16_t BitsPerPixel;     /* aka Depth */
+  uint32_t CompressionMeth;  /* 0=BI_RGB none, most common */
+  uint32_t SizeOfRawBmpData; /* could be 0 for BI_RGB */
+  int32_t ResolutionHoriz;   /* pixels/meter */
+  int32_t ResolutionVert;
+  uint32_t ColorsInPalette;  /* 0 to default to 2^n */
+  uint32_t NImportantColors; /* Usually ignored, 0 if all colors are used. */
+} BITMAPINFOHEADER;
+
+typedef struct __attribute__((packed)) CLASSICBMPHEADERS {
+  BITMAP_FILEHEADER fileHeader;
+  BITMAPINFOHEADER infoHeader;
+} CLASSICBMPHEADERS;
+
+CLASSICBMPHEADERS *makeClassicHeaders ( int width, int height );
+// given width and height, allocates and completely sets a 
+// classic bitmap header (with 40-byte BITMAPINFOHEADER).
+// Returns a pointer P to it.
+// The storage is given to the caller; Deallocate it to avoid mem leaks with
+// delete P;
+
+typedef struct __attribute__((packed)) FULLBITMAP {
+public:
+  const CLASSICBMPHEADERS headers;
+  uint8_t bytes[];
+
+  bool drawRect( uint16_t xmin, uint16_t rwidth,
+		uint16_t ymin, uint16_t rheight,
+		uint8_t r, uint8_t g, uint8_t b );
+} FULLBITMAP;
+
+
+FULLBITMAP *makeClassicBitmap (int width, int height );
+// given width and height, allocates and completely sets a 
+// classic bitmap (with 40-byte BITMAPINFOHEADER) for 0 (all Black) image.
+// Returns a pointer P to it.
+// The headers are declared constant since there is no need to modify them.
+// The storage is given to the caller; Deallocate it to avoid mem leaks with
+// delete P;
+
+void flipClassicBitmap( FULLBITMAP *pbm );
+// Handy, temporary solution to upside-down results.
+// It's more efficient to store the rows in the right place when generating them!
+
+/**
+ *  Our BMclass
+ */
+
+class BMclass
+{
+ public:
+  uint32_t width;
+  uint32_t height;
+  uint32_t sizeofRow;
+  uint32_t WH;
+  uint8_t *pD;
+  uint8_t *pHs;
+  
+  /** Allocates and initializes.  
+   *  no destructor yet.
+   */
+  BMclass( uint32_t w, uint32_t h) :
+    width(w), height(h), sizeofRow(3*w)
+    {
+      WH = w*h;
+      pHs = (uint8_t *) makeClassicBitmap( width, height);
+      pD  = pHs + 54;
+      //cerr << "BMclass constructor thinks w=" << w << endl;
+      //cerr << "BMclass constructor thinks width=" << width << endl;
+      //cerr << "BMclass constructor thinks sizeofRow=" << sizeofRow << endl;
+    }
+
+  /** Embeds given classic bmp <- pDin 
+   * should be used only in OneYuv2OneBMP and eventually removed.
+   */
+  BMclass( uint32_t w, uint32_t h, uint8_t *pDin, uint8_t *pHs )
+  {
+    width = w; height = h; pD = pDin; pHs = pHs;
+    WH = width*height;
+    sizeofRow = 3*width;
+  }
+
+  /** msgs to cout, writes /tmp/BMclassShowOff.bmp or keepfile
+      runs ffplay, deletes if keepfile == 0.
+  */
+  void looksee(void) { looksee(0, 0); }
+  
+  void looksee(const char* msg) { looksee( msg, 0); }
+
+  void looksee(const char *msg, const char *keepfile);
+
+  /** Writing methods. If fail, error exit; so ret void.
+   */
+  void write(void)
+  {
+    write(stdout);
+  }
+  
+  void write(FILE *stream)
+  {
+    if ( (1 != (fwrite( pHs , 54,  1, stream)))
+	 ||
+	 (1 != (fwrite(pD, WH*3, 1, stream))))
+      {
+	error(1, errno, "BMclass::write(FILE *)  Cant write to FILE stream.");
+      }
+  }
+
+  void write(int fd)
+  {
+    FILE *s;
+    if (!(s = fdopen(fd, "w")))
+      {
+	error(1, errno, "BMclass::write(int fd) Cant open fd %d", fd);
+      }
+    write(s);
+  }
+
+  void write( string fns )
+  {
+    FILE *s;
+    if( !(s = fopen(fns.c_str(), "w")))
+      {
+	error(1, errno, "BMclass::write(char *fn) Cant open %s", fns.c_str());
+      }
+    write(s);
+  }
+
+  /** Access a row or a pixel
+   * by pixel (row, column) coordinate
+   * via (old fashioned) C pointer
+   * eg:
+   * BMclass *bm;
+   * *(bm->pR( 1, 2 ))[0] = 125;
+   * make this pixel halfway blue
+   * rather than a C++ & reference.
+   */
+  uint8_t *pR( uint32_t row )
+  {
+    return pD + sizeofRow*(height - row - 1);
+      //sizeofRow*row;  //for regression testing during refactoring.. 
+  }
+  uint8_t *pPix( uint32_t row, uint32_t col )
+  {
+    return pR(row) + 3*col;
+  }
+
+  //pixel color reading functions.
+  uint8_t b(uint8_t row, uint32_t col)
+  {
+    return *(pPix(row, col) + 0);
+  }
+  uint8_t g(uint8_t row, uint32_t col)
+  {
+    return *(pPix(row, col) + 1);
+  }
+  uint8_t r(uint8_t row, uint8_t col)
+  {
+    return *(pPix(row, col) + 2);
+  }
+  
+};
+
+////////////////////UNUSED STUFF///////////////////////////////
+/*  maybe later..
+class  __attribute__((packed)) GBR
+{
+ public:
+  uint8_t gbyte;
+  uint8_t bbyte;
+  uint8_t rbyte;
+  GBR( uint8_t Y, uint8_t U; uint8_t V );
+};
+*/
+
+////////// Microsoft's information and extension, not used (yet) by C-TAP ////
+// Wikipedia says there are 7 kinds of DIB, Bitmap information headers
+// also, they all have 32 bit fields.
+// the 40 byte one is BITMAPINFOHEADER
+//
+// Versions after BITMAPINFOHEADER only add fields to
+// the end of the header of the previous version.
+//
+
+
+//
+// 138-14=124, so the other header we have is BITMAPV5HEADER (the biggest!)
+// wikip says it's written by the GIMP!
+//
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapv5header
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
+/*
+typedef struct tagBITMAPINFOHEADER {
+  uint32_t biSize;
+  int32_t  biWidth;
+  int32_t  biHeight;
+  uint16_t  biPlanes;
+  uint16_t  biBitCount;
+  uint32_t biCompression;
+  uint32_t biSizeImage;
+  int32_t  biXPelsPerMeter;
+  int32_t  biYPelsPerMeter;
+  uint32_t biClrUsed;
+  uint32_t biClrImportant;
+} BITMAPINFOHEADER, *LPBITMAPINFOHEADER, *PBITMAPINFOHEADER;
+*/
+
+// from
+// https://stackoverflow.com/questions/20864752/how-is-defined-the-data-type-fxpt2dot30-in-the-bmp-file-structure
+//[...] FXPT2DOT30 [...] which means that they are
+// interpreted as fixed-point values with a 2-bit integer part and a 30-bit fractional part.
+
+//
+// Microsoft's user.h (under our doc/Resources/) defines FXPT2DOT30 as LONG, so:
+//
+
+/****************************************UNUSED UNUSED UNUSED**********************************
+typedef int32_t FXPT2DOT30;
+
+//from https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-ciexyz
+typedef struct CIEXYZ {
+  FXPT2DOT30 ciexyzX;
+  FXPT2DOT30 ciexyzY;
+  FXPT2DOT30 ciexyzZ;
+} CIEXYZ;
+
+
+typedef struct CIEXYZTRIPLE {
+  CIEXYZ ciexyzRed;
+  CIEXYZ ciexyzGreen;
+  CIEXYZ ciexyzBlue;
+} CIEXYZTRIPLE;
+
+typedef struct __attribute__((packed)) BITMAPV5HEADER {
+  uint32_t        bV5Size;
+  int32_t         bV5Width;
+  int32_t         bV5Height;
+  uint16_t        bV5Planes;
+  uint16_t        bV5BitCount;
+  uint32_t        bV5Compression;
+  uint32_t        bV5SizeImage;
+  int32_t         bV5XPelsPerMeter;
+  int32_t         bV5YPelsPerMeter;
+  uint32_t        bV5ClrUsed;
+  uint32_t        bV5ClrImportant;
+  uint32_t        bV5RedMask;
+  uint32_t        bV5GreenMask;
+  uint32_t        bV5BlueMask;
+  uint32_t        bV5AlphaMask;
+  uint32_t        bV5CSType;
+  CIEXYZTRIPLE    bV5Endpoints;
+  uint32_t        bV5GammaRed;
+  uint32_t        bV5GammaGreen;
+  uint32_t        bV5GammaBlue;
+  uint32_t        bV5Intent;
+  uint32_t        bV5ProfileData;
+  uint32_t        bV5ProfileSize;
+  uint32_t        bV5Reserved;
+} BITMAPV5HEADER;
+***************************************UNUSED UNUSED UNUSED*************************************/
+
+
+#endif

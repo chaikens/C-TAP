@@ -28,39 +28,62 @@ optional options:
 
   This program doesn't look inside yuv frames except to convert them to .bmps,
   but assumes their length is (3*width*height)/2, which is for I420p format.
- (So you can can psychodelic fun with random input.)
+ (So you can can psychedelic fun with random input.)
 */
-
+#include <string>
 #include <stdio.h>
 #include <error.h>
 #include <errno.h>
 #include <iostream>
 #include <getopt.h>
 #include <stdint.h> //for bytes=uint8_t
+#include "bmp.h"
+#include "yuvtobmpT.h"
+#include <cassert>
+#include <unistd.h> //for syscalls like read()
 using namespace std;
 
-static char usage[] = "yuvSelectMult WidthxHeight framenums-fd yuvinput-fd [one --option required]\n\
+static const char usage[] = "yuvSelectMult WidthxHeight framenums-fd yuvinput-fd [one --option required]\n\
 -fd's are small integers.\n";
 
+//common data from command line arguments, since raw files don't have metadata
+//we ONLY support I420p ones.
+static char *cmd;  //will =argv[0], for messages.
+
+static  unsigned int width, height;
+
+//common required fds from command line arguments
+static int fnsfd = -1;
+static int yuvinfd = -1;
+
 //options
-static int vb = 0;
+static int vb = 0;                     //verbose
 static int do_yuv_stream_out = 0;
 static int yuvoutfd = -1;
 static int do_bmp_stream_out = 0;
 static int bmpoutfd = -1;
 static int do_bmp_dir_out = 0;
-static char *bmpdirpath = 0;
-static const char *bmpnameprefix = "thumb";
-static const char *bmpconversion = 0;
-static const char *selinefmt = "%d";
+static char *bmpdirpath = 0;           //used if do_bmp_dir_out
+static string bmpdirpaths = "";
+static string bmpnameprefixs = "thumb";
+static string bmpconversions = ""; //no choices yet
+static const char *selinefmt = "%d";  //to parse a file of frame numbers.
+
 //FILE POINTERS
 static FILE *fnsFP = 0;    //required, frame numbers wanted
 static FILE *yuvinFP = 0;  //required, yuv frame input stream
 static FILE *yuvoutFP = 0; //optional, yuv frame output stream
-static FILE *bmpoutFP = 0;
+static FILE *bmpoutFP = 0; //optional, bmp frame output stream
 
+static class BMclass *pBM; //for when we make bmps
 
 static int get_our_options( int *argc, char **argv[]);
+static char *padnumto6( unsigned int n)
+{
+  static char buf[7];
+  sprintf(buf, "%06u", n); //it puts null in buf[6]
+  return buf;
+}
 
 static void optionprocess() {
   int sum = do_yuv_stream_out + do_bmp_stream_out + do_bmp_dir_out;
@@ -76,6 +99,12 @@ static void optionprocess() {
       }
   }
 
+  if( do_bmp_stream_out || do_bmp_dir_out )
+    {
+      if(vb) { cerr << "Making a BMclass width=" << width << " height=" << height << endl; }
+      pBM = new BMclass(width, height);
+    }
+      
   if( do_bmp_stream_out ) {
     bmpoutFP = fdopen(bmpoutfd, "w");
     if ( ! bmpoutFP ) {
@@ -88,18 +117,65 @@ static void optionprocess() {
 
 uint8_t *yuvbuf = 0;
 
+/** totrash( fd, ntogo )
+ *  uses read system call to read nb bytes from file descriptor fd
+    only for the purpose of advancing the read position by nb.
+    See below for the strategy idea.
+*/
+size_t totrash( int fd, size_t ntogo)
+{ 
+
+  const size_t pagesize = 4096;  //i486!  
+  const unsigned int npages = 500;
+  const size_t nchunk = pagesize*npages;
+  static uint8_t a[pagesize*npages] __attribute__ ((aligned( pagesize )));  //One page in bss.
+  //Idea: We have the kernel file read repeatedly and memory write into only one page
+  //so the data we ignore (almost?) never goes beyond the 1st level cache or makes a page fault.
+  //Maybe reading larger numbers of pages at a time will perform better by amortizing the
+  //read system call overhead. Maybe a huge page will help!
+
+  
+  ssize_t ret;
+  while( ntogo > 0 )
+    {
+      size_t ntoread = nchunk;
+      if( ntogo <= nchunk )
+	{
+	  ntoread = nchunk - ntogo;
+	}
+      
+      ret = read(fd, a, ntoread);
+      if( ret > 0 )
+	{
+	  ntogo = ntogo - ret;
+	}
+      else {
+	if( ret < 0 )
+	{
+	  error(1, errno, "%s throwaway read %lu more bytes from %d failed.", cmd, ntogo, fd);
+	  return 1;
+	}
+      }
+    } //loop end
+  return 0;  //means EOF, done
+}
+
 int main(int argc, char *argv[]) {
+  cmd = argv[0]; //for messages
   get_our_options(&argc, &argv); //lops off specified --options, just --verbose for now.
-  unsigned int width, height;
-  int fnsfd, yuvinfd, yuvoutfd;
+
+  if(vb) { cerr << "Hi. yuvSelectMulti is verbose" << endl; }
+
   int ret; //let's reuse, ugh.
   if( argc != 4 ) //after --format arg processing, cmd + dims + wantedfd + inputfd
     {
-      error(1, 0, usage);
-    }
+      cerr << endl << "argc=" << argc << endl;
+      for (int i = 0; i<argc; i++)
+	cerr << "argv[" << i << "]=" << argv[i] << endl;
+      cerr << usage << endl << "Will crash now...hope I'm compiled for debugging.. wwwwoooo!!VvvvvBANG." << endl;
+      assert(0);
+     }
   
-  optionprocess(); //Check consistency and do settings that vary with options.
-
   // 1st required arg: WWWWxHHHH 
   if ( 2 != (ret = sscanf(argv[1],"%ux%u", &width, &height)))
     {
@@ -139,56 +215,115 @@ int main(int argc, char *argv[]) {
       error(1,errno, "Cant open fd %d for reading yuvs to stdio FILE.", yuvinfd);
     }
 
+  optionprocess(); //Check consistency and do settings that vary with options.
+
   //Frame numbers will start at 1.
   int fcount = 0;
   int fwanted;
   int gotcount = 0;
   int didreadframe = 0;
   
+  if(vb) {
+    cerr << "do_bmp_stream_out=" << do_bmp_stream_out
+         << " do_bmp_dir_out=" << do_bmp_dir_out
+         << " do_yuv_stream_out=" << do_yuv_stream_out << endl;
+  }
+
+
   //Loop to read the next wanted frame number into------V----- 
   while ( (didreadframe = fscanf(fnsFP, selinefmt, &fwanted), didreadframe) == 1  ) {
     //Loop to read the next available frames up to and including the latest wanted one.
     while ( fwanted >= (fcount+1) ) {
-      size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
-      if ( rret != 1 ) {
-	cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
-	     << fwanted << " was wanted. ???" << endl;
-	return 1;  //out of reading wanted frame number loop
-      }
-      fcount++; //yup, we read a frame.
-      if(vb) cerr << "Did read frame " << fcount << endl;
-      
-      if( fwanted == fcount ) {
-	//We love you! 3 mutually exclusive use cases:
-	if( do_yuv_stream_out ) {
-	  if(vb) cerr << "Try to output frame " << fcount << endl;
-	  size_t wret = fwrite( yuvbuf, yuvsize, 1, yuvoutFP );
-	  if( wret != 1 ) {
-	    error( 1, errno, "Failure to write frame %ul to output stream.", fwanted);
+      bool fwasread = false;
+      if( fwanted == (fcount+1) ) {
+	//We will love you! But let yuvtobmpT read from the stream if we want a bmp.
+	if( do_bmp_stream_out || do_bmp_dir_out )
+	  {
+	    //Yes, we have a handy BMclass <- pBM ready to write bgr data into
+	    //We'll just fill it and then write it all.  One might write pixel by
+	    //pixel, my guess is that's not worth it for performance.
+
+	    if (yuvtobmpT( yuvinFP, pBM ) )  //gets w/h from *pBM,
+	                                      //no erronous return inplemented yet.
+	      {
+		cerr << "yuvtobmpT returned error." << endl;
+	      }
+	    fwasread = true;
+	    fcount++;
+	    if(vb) cerr << "Did read and made bmp of frame " << fcount << endl;
+	    gotcount++;
+
+	    if( do_bmp_stream_out )
+	      {
+		if(vb) {
+		  cerr << "doing do_bmp_stream_out to pBM->write to a FP." << endl;}
+		pBM->write(bmpoutFP);
+	      }
+	    if( do_bmp_dir_out )
+	      {
+		string d = bmpdirpaths
+		  + string("/")
+		  + bmpnameprefixs
+		  + string (padnumto6(fcount))
+		  + string (".bmp");
+		if(vb) {cerr << "Trying to write " << d << endl;}
+		const char *s = d.c_str();
+		if(vb) {cerr << "That, in C string form, is " << s << endl;}
+		pBM->write( s );
+	      }
 	  }
-	  else
-	    if(vb) cerr << "Wrote frame " << fcount << endl;
-	  gotcount++;
-	}
-	//in the other two, WE convert the yuv to a .bmp
-	if( do_bmp_stream_out ) {
-	}
 	
-	if( do_bmp_dir_out ) {
-	}
+	if( do_yuv_stream_out ) {
+	    size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
+	    if ( rret != 1 ) {
+	      cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+		   << fwanted << " was wanted. ???" << endl;
+	      return 1;  //out of reading wanted frame number loop
+	    }
+	    fwasread = true;
+	    fcount++; //yup, we read a frame.
+	    if(vb) { cerr << "Did read frame " << fcount << endl; }
+	    if(vb) { cerr << "Try to output frame " << fcount << endl; }
+	    size_t wret = fwrite( yuvbuf, yuvsize, 1, yuvoutFP );
+	    if( wret != 1 ) {
+	      error( 1, errno, "Failure to write frame %ul to output stream.", fwanted);
+	    }
+	    else {
+	      if(vb) cerr << "Wrote frame " << fcount << endl;
+	    }
+	    gotcount++;
+	  }
+	
       }
       else {
+	fcount++;
+	if( !fwasread ) {
+	  /*   old way of discarding a frame */
+	    size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
+	    if ( rret != 1 ) {
+	     cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+	   	   << fwanted << " was wanted. ???" << endl;
+	     return 1;  //out of reading wanted frame number loop
+	   }
+	   fwasread = true;
+	   
+	  // new way.. Use file descriptor (syscall handle) instead of copFILE * (stdio buffered stream handle.
+	  //if ( totrash( yuvinfd, yuvsize ) )
+	  //  { error(1, 0, "%s totrash call failed", argv[0]); }
+	  //  else {
+	  //    fwasread = true;
+	  //  }
+	}
 	if(vb) cerr << "Skip frame " << fcount << endl;
 	//We ignore the unwanted boring picture, overpaint its space with next.
       }
     }
   }
-  if(vb)
-    {
+  if(vb) {
       cerr << argv[0] << " Done. "
 	   << fcount << " frames read. "
 	   << gotcount << " frames selected. Bye." << endl;
-    }
+  }
   return 0;
 }
 
@@ -243,13 +378,13 @@ static int get_our_options( int *argc, char **argv[])
 	  }
 	break;
       case 3:
-	bmpdirpath = optarg;
+	bmpdirpaths = string(optarg);
 	break;
       case 4:
-	bmpconversion = optarg;
+	bmpconversions = optarg;
 	break;
       case 5:
-	bmpnameprefix = optarg;
+	bmpnameprefixs = string(optarg);
 	break;
       case 6:
 	selinefmt = optarg;
