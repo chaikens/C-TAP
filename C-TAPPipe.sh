@@ -1,4 +1,5 @@
 #!/bin/bash
+source C-TAP-HELPERS
 #
 # manual settings
 #
@@ -71,7 +72,7 @@ movie_files="$SLOW_MOVIE_DIR/DroneShort1.$ext"
 SOFTWARE_DIR=$(pwd)
 
 # where our results are written
-RESULTS_DIR="`pwd`/RESULTS"
+RESULTS_DIR="`pwd`/RESULTS-$(mydate)"
 
 # RESULTS:
 #

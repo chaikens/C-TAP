@@ -69,3 +69,7 @@ echo $0 Done.
 exit 0
 }
 
+function mydate() {
+ echo $(date +%m-%d-%R)
+ }
+ 

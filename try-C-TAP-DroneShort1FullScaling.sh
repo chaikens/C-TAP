@@ -147,7 +147,7 @@ movie_files="$SLOW_MOVIE_DIR/DroneShort1FullScaling.$ext"
 SOFTWARE_DIR=$(pwd)
 
 # Where our results are written
-RESULTS_DIR="${SOFTWARE_DIR}/RESULTS"
+RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-$(mydate)"
 #That makes it convenient to archive them with git, except for movies
 #and big images.  The baby movie .MOV is not too big for normal filesystems.
 
