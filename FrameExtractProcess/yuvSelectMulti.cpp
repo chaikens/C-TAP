@@ -117,49 +117,6 @@ static void optionprocess() {
 
 uint8_t *yuvbuf = 0;
 
-/** totrash( fd, ntogo )
- *  uses read system call to read nb bytes from file descriptor fd
-    only for the purpose of advancing the read position by nb.
-    See below for the strategy idea.
-*/
-size_t totrash( int fd, size_t ntogo)
-{ 
-
-  const size_t pagesize = 4096;  //i486!  
-  const unsigned int npages = 500;
-  const size_t nchunk = pagesize*npages;
-  static uint8_t a[pagesize*npages] __attribute__ ((aligned( pagesize )));  //One page in bss.
-  //Idea: We have the kernel file read repeatedly and memory write into only one page
-  //so the data we ignore (almost?) never goes beyond the 1st level cache or makes a page fault.
-  //Maybe reading larger numbers of pages at a time will perform better by amortizing the
-  //read system call overhead. Maybe a huge page will help!
-
-  
-  ssize_t ret;
-  while( ntogo > 0 )
-    {
-      size_t ntoread = nchunk;
-      if( ntogo <= nchunk )
-	{
-	  ntoread = nchunk - ntogo;
-	}
-      
-      ret = read(fd, a, ntoread);
-      if( ret > 0 )
-	{
-	  ntogo = ntogo - ret;
-	}
-      else {
-	if( ret < 0 )
-	{
-	  error(1, errno, "%s throwaway read %lu more bytes from %d failed.", cmd, ntogo, fd);
-	  return 1;
-	}
-      }
-    } //loop end
-  return 0;  //means EOF, done
-}
-
 int main(int argc, char *argv[]) {
   cmd = argv[0]; //for messages
   get_our_options(&argc, &argv); //lops off specified --options, just --verbose for now.
@@ -228,13 +185,22 @@ int main(int argc, char *argv[]) {
          << " do_bmp_dir_out=" << do_bmp_dir_out
          << " do_yuv_stream_out=" << do_yuv_stream_out << endl;
   }
-
-
   //Loop to read the next wanted frame number into------V----- 
   while ( (didreadframe = fscanf(fnsFP, selinefmt, &fwanted), didreadframe) == 1  ) {
     //Loop to read the next available frames up to and including the latest wanted one.
     while ( fwanted >= (fcount+1) ) {
       bool fwasread = false;
+      int g = fgetc(yuvinFP);
+      if(vb) cerr << cmd << " fgetc got " << g << endl;
+      if( g == EOF ) {
+	cerr << cmd << "end of input stream when frame "
+	     << fwanted << "was wanted and "
+	     << fcount << " frames were read" << endl;
+	fclose( yuvinFP );
+	return 1;
+      }
+      int ung = ungetc(g, yuvinFP);
+      if(vb) cerr << cmd << " did ungetc got " << ung << endl;
       if( fwanted == (fcount+1) ) {
 	//We will love you! But let yuvtobmpT read from the stream if we want a bmp.
 	if( do_bmp_stream_out || do_bmp_dir_out )
@@ -242,17 +208,17 @@ int main(int argc, char *argv[]) {
 	    //Yes, we have a handy BMclass <- pBM ready to write bgr data into
 	    //We'll just fill it and then write it all.  One might write pixel by
 	    //pixel, my guess is that's not worth it for performance.
-
+	    
 	    if (yuvtobmpT( yuvinFP, pBM ) )  //gets w/h from *pBM,
-	                                      //no erronous return inplemented yet.
+	      //no erronous return inplemented yet.
 	      {
 		cerr << "yuvtobmpT returned error." << endl;
+		error(1, 0, "%s yuvtobmpT returned error.", cmd);
 	      }
-	    fwasread = true;
 	    fcount++;
 	    if(vb) cerr << "Did read and made bmp of frame " << fcount << endl;
 	    gotcount++;
-
+	    
 	    if( do_bmp_stream_out )
 	      {
 		if(vb) {
@@ -273,14 +239,14 @@ int main(int argc, char *argv[]) {
 	      }
 	  }
 	
-	if( do_yuv_stream_out ) {
+	else {
+	  if( do_yuv_stream_out ) {
 	    size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
 	    if ( rret != 1 ) {
 	      cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
 		   << fwanted << " was wanted. ???" << endl;
 	      return 1;  //out of reading wanted frame number loop
 	    }
-	    fwasread = true;
 	    fcount++; //yup, we read a frame.
 	    if(vb) { cerr << "Did read frame " << fcount << endl; }
 	    if(vb) { cerr << "Try to output frame " << fcount << endl; }
@@ -293,37 +259,29 @@ int main(int argc, char *argv[]) {
 	    }
 	    gotcount++;
 	  }
-	
-      }
-      else {
-	fcount++;
-	if( !fwasread ) {
-	  /*   old way of discarding a frame */
-	    size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
-	    if ( rret != 1 ) {
-	     cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
-	   	   << fwanted << " was wanted. ???" << endl;
-	     return 1;  //out of reading wanted frame number loop
-	   }
-	   fwasread = true;
-	   
-	  // new way.. Use file descriptor (syscall handle) instead of copFILE * (stdio buffered stream handle.
-	  //if ( totrash( yuvinfd, yuvsize ) )
-	  //  { error(1, 0, "%s totrash call failed", argv[0]); }
-	  //  else {
-	  //    fwasread = true;
-	  //  }
 	}
-	if(vb) cerr << "Skip frame " << fcount << endl;
+      }
+      else { // fwanted > (fcount + 1) Sorry Charlie.
+	size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
+	if ( rret != 1 ) {
+	  cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+	       << fwanted << " was wanted. ???" << endl;
+	  return 1;  //out of reading wanted frame number loop
+	}
+	fcount++;
+	if(vb) cerr << cmd << "Skip frame " << fcount << endl;
 	//We ignore the unwanted boring picture, overpaint its space with next.
       }
     }
-  }
+  } //Wanted list loop ends.
+  
   if(vb) {
-      cerr << argv[0] << " Done. "
-	   << fcount << " frames read. "
-	   << gotcount << " frames selected. Bye." << endl;
+    cerr << cmd << " Done. "
+	 << fcount << " frames read. "
+	 << gotcount << " frames selected. Bye." << endl;
   }
+  fclose(fnsFP);
+  fclose(yuvinFP);
   return 0;
 }
 
