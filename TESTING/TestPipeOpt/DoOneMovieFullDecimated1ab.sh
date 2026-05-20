@@ -19,7 +19,10 @@
 #*/
 
 function ffmpeg_pipe_extract() {
-    ffmpeg -hide_banner -y -i $@ PIPE.yuv &> ffmpeg.log
+    ffmpeg -hide_banner -y -i $1 \
+	   -vf                   \
+	   "decimate,setpts=N/100/TB" \
+	   PIPE.yuv &> ffmpeg.log
     }
 
      MOVIE_TO_FRAME_DIV=1

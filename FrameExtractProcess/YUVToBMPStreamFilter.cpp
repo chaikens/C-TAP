@@ -52,17 +52,17 @@ uint8_t *yuvbuf = 0;
 int main(int argc, char *argv[]) {
   get_our_options(&argc, &argv); //lops off specified --options, just --verbose for now.
 
-  if(vb) { cerr << "Hi. yuvSelectMulti is verbose" << endl; }
+  if(vb) { cerr << "Hi. " << cmd << " is verbose" << endl; fflush(stderr); }
 
   optionprocess(); //(nothing for now). Check consistency and do settings that vary with options.
 
   int ret; //let's reuse, ugh.
   if( argc != 3 ) //after --format arg processing, cmd + width + height
     {
-      cerr << endl << "argc=" << argc << endl;
+      cerr << endl << "argc=" << argc << endl << flush;
       for (int i = 0; i<argc; i++)
-	cerr << "argv[" << i << "]=" << argv[i] << endl;
-      cerr << usage << endl << "Will crash now...hope I'm compiled for debugging.. wwwwoooo!!VvvvvBANG." << endl;
+	cerr << "argv[" << i << "]=" << argv[i] << endl << flush;
+      cerr << usage << endl << "Will crash now...hope I'm compiled for debugging.. wwwwoooo!!VvvvvBANG." << endl << flush;
       assert(0);
      }
   
@@ -85,15 +85,30 @@ int main(int argc, char *argv[]) {
 
   pBM = new BMclass(width, height);
   
+  //Seems I have to use logic from OneYUVtoOneBmp
+  
+  int firstc;
+   //Apparently, Unix doesn't make feof(..) != 0 until
+              //after we try to read!
+  unsigned int imgCount = 0;
+  while( (firstc = fgetc(yuvinFP)) != EOF )
+    { //There is stuff to work on!
+      ungetc(firstc, yuvinFP);
 
+      if (yuvtobmpT( yuvinFP, pBM ) )  //gets w/h from *pBM,
+      //no erronous return inplemented yet.
+	{
+	  cerr << "yuvtobmpT returned error." << endl << flush;
+	}
 
-  if (yuvtobmpT( yuvinFP, pBM ) )  //gets w/h from *pBM,
-    //no erronous return inplemented yet.
-    {
-      cerr << "yuvtobmpT returned error." << endl;
+      pBM->write(); //BMClass::write is overloaded. 
+      imgCount++;
+      if(vb) { fprintf(stderr, "\rImage%d", imgCount); fflush(stderr); }
     }
-
-  pBM->write(bmpoutFP); //BMClass::write is overloaded. All versions are implemented by fwrite
+  
+  fprintf(stderr, "%s transformed %d images.\n", cmd, imgCount); fflush(stderr);
+  fclose(yuvinFP);
+  fclose(stdout);
   return 0;
 }
 
