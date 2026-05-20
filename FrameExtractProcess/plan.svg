@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="11in"
+   height="8.5in"
+   viewBox="0 0 279.4 215.9"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb, 2024-10-09)"
+   sodipodi:docname="plan.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="in"
+     inkscape:zoom="1.0217435"
+     inkscape:cx="669.44394"
+     inkscape:cy="347.93468"
+     inkscape:window-width="1872"
+     inkscape:window-height="1016"
+     inkscape:window-x="48"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showgrid="true">
+    <inkscape:grid
+       id="grid1"
+       units="in"
+       originx="0"
+       originy="0"
+       spacingx="25.4"
+       spacingy="25.4"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="4"
+       enabled="true"
+       visible="true"
+       snapvisiblegridlinesonly="false" />
+    <inkscape:grid
+       id="grid3"
+       units="in"
+       originx="0"
+       originy="0"
+       spacingx="3.175"
+       spacingy="3.175"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="4"
+       enabled="true"
+       visible="false"
+       snapvisiblegridlinesonly="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="marker26"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path26" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker24"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path24" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker12"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path12" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ArrowWide"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Wide arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:none;stroke:context-stroke;stroke-width:1;stroke-linecap:butt"
+         d="M 3,-3 0,0 3,3"
+         transform="rotate(180,0.125,0)"
+         sodipodi:nodetypes="ccc"
+         id="path1" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="12.7"
+       y="25.4"
+       id="text3"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="25.4">.mp4 or </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="29.809711"
+         id="tspan5">other</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="34.219425"
+         id="tspan4">movie</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect5"
+       width="17.827003"
+       height="15.995931"
+       x="10.136497"
+       y="21.126358"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="44.369041"
+       y="28.080278"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         style="stroke-width:0.264583"
+         x="44.369041"
+         y="28.080278">ffmpeg &lt;&gt; PIPE.yuv</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect6"
+       width="41.274998"
+       height="8.5249996"
+       x="41.774998"
+       y="22.725"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       d="M 41.274999,28.575 Z"
+       id="path6" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       d="M 41.274999,28.575 Z"
+       id="path7" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#ArrowWide)"
+       d="M 28.575,28.575 H 41.274999"
+       id="path8" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="12.7"
+       y="44.450001"
+       id="text8"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="44.450001">scaling,</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="48.859715"
+         id="tspan9">decimation,</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="53.269424"
+         id="tspan10">frame rate,</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="57.679138"
+         id="tspan11">etc.</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect11"
+       width="25.4"
+       height="19.049999"
+       x="9.5249996"
+       y="41.274998"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker12)"
+       d="M 34.925,50.799999 H 57.149999 V 31.75"
+       id="path11" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="12.7"
+       y="66.674995"
+       id="text12"><tspan
+         sodipodi:role="line"
+         id="tspan12"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="66.674995">seq. of </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="71.084709"
+         id="tspan13">{frame num;</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="75.494423"
+         id="tspan14"> other data</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="79.904137"
+         id="tspan15">re frame}</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect15"
+       width="28.574999"
+       height="19.049999"
+       x="9.5249996"
+       y="63.5"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="12.7"
+       y="85.724998"
+       id="text16"><tspan
+         sodipodi:role="line"
+         id="tspan16"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="85.724998">sequence</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="12.7"
+         y="90.134712"
+         id="tspan17">format</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect17"
+       width="28.574999"
+       height="9.5249996"
+       x="9.5249996"
+       y="82.549995"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="92.074997"
+       y="25.4"
+       id="text18"><tspan
+         sodipodi:role="line"
+         id="tspan18"
+         style="stroke-width:0.264583"
+         x="92.074997"
+         y="25.4">yuv frame</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="92.074997"
+         y="29.809711"
+         id="tspan20">selector</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:"
+       id="rect21"
+       width="19.049999"
+       height="9.5249996"
+       x="92.074997"
+       y="22.225"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="M 38.245886,73.025 H 62.854114"
+       id="path21" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="m 37.758352,87.312495 h 25.08329"
+       id="path22" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect22"
+       width="19.049999"
+       height="28.574999"
+       x="63"
+       y="64"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;marker-end:url(#marker24);paint-order:markers fill stroke"
+       d="M 82.155913,73.283952 101.6,73.024999 V 31.75"
+       id="path23"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="m 82.549999,28.575 h 9.524997"
+       id="path25" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="82.991005"
+       y="61.030575"
+       id="text26"><tspan
+         sodipodi:role="line"
+         id="tspan26"
+         style="stroke-width:0.264583"
+         x="82.991005"
+         y="61.030575">frame</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="82.991005"
+         y="65.440285"
+         id="tspan27">numbers</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="82.991005"
+         y="69.849998"
+         id="tspan34">FN</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="129.83604"
+       y="24.905277"
+       id="text28"><tspan
+         sodipodi:role="line"
+         id="tspan28"
+         style="stroke-width:0.264583"
+         x="129.83604"
+         y="24.905277">yuv-&gt;.bmp</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="129.83604"
+         y="29.314991"
+         id="tspan29">converter</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect29"
+       width="25.400005"
+       height="11.700002"
+       x="126.5"
+       y="19.550001"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="M 111.125,25.399999 H 127"
+       id="path29" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.9;stroke-linecap:round;stroke-dasharray:2.7, 1.8;stroke-dashoffset:0.36;stroke-opacity:0.933685;marker-end:url(#marker26);paint-order:markers fill stroke"
+       d="m 119.7886,25.556801 v 19.05 h 38.1"
+       id="path30" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="m 152.4,25.399999 h 6.35 v 41.275"
+       id="path31" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="m 101.6,38.1 h 34.925 v -6.35"
+       id="path32" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="161.925"
+       y="28.574999"
+       id="text32"><tspan
+         sodipodi:role="line"
+         id="tspan32"
+         style="stroke-width:0.264583"
+         x="161.925"
+         y="28.574999">Let's do only</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="161.925"
+         y="32.984711"
+         id="tspan33">files for now.</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="161.925"
+         y="37.394424"
+         id="tspan35">frameFN.bmp</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect35"
+       width="41.274998"
+       height="22.225"
+       x="139.2"
+       y="67.174995"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.999995;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.933685;marker-end:url(#marker26);paint-order:markers fill stroke"
+       d="M 82.984175,85.983952 138.79367,85.724999"
+       id="path35"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="90.580917"
+       y="82.055275"
+       id="text36"><tspan
+         sodipodi:role="line"
+         id="tspan36"
+         style="stroke-width:0.264583"
+         x="90.580917"
+         y="82.055275">FNs, other data</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="9.5249996"
+       y="98.424995"
+       id="text37"><tspan
+         sodipodi:role="line"
+         id="tspan37"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="98.424995">Example: .out format is</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="102.83471"
+         id="tspan38">&lt;eventno&gt; &lt;frameno&gt; &lt;x&gt; &lt;y&gt; &lt;prob&gt;</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="107.24442"
+         id="tspan39">so we may use format=</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="111.65414"
+         id="tspan45" /><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="116.06384"
+         id="tspan40">sscanf(line, &quot;%*d %d&quot;, &amp;fno, &amp;x, &amp;y)</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="120.47356"
+         id="tspan41">fprintf(FNpipe,&quot;%d&quot;,fno);</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="9.5249996"
+         y="124.88327"
+         id="tspan42">fprintf(FNDATpipe,&quot;%d %d %d&quot;, fno, x, y);</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="44.450001"
+       y="69.849998"
+       id="text43"><tspan
+         sodipodi:role="line"
+         id="tspan43"
+         style="stroke-width:0.264583"
+         x="44.450001"
+         y="69.849998">line</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="42.289261"
+       y="85.675041"
+       id="text44"><tspan
+         sodipodi:role="line"
+         id="tspan44"
+         style="stroke-width:0.264583"
+         x="42.289261"
+         y="85.675041">format</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.12000026;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect45"
+       width="79.375"
+       height="14.975"
+       x="6.7999992"
+       y="111.575"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect46"
+       width="15.575"
+       height="6.0499916"
+       x="41.424999"
+       y="82.699997"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="92.074997"
+       y="92.074997"
+       id="text47"><tspan
+         sodipodi:role="line"
+         id="tspan47"
+         style="stroke-width:0.264583"
+         x="92.074997"
+         y="92.074997">eg {FN, x, y}</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="146.05"
+       y="76.199997"
+       id="text48"><tspan
+         sodipodi:role="line"
+         id="tspan48"
+         style="stroke-width:0.264583"
+         x="146.05"
+         y="76.199997">eg Imagemagick</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="146.05"
+         y="80.609711"
+         id="tspan49">convert draw</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.9;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="m 180.975,79.374999 h 31.74999"
+       id="path49" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="215.89999"
+       y="76.199997"
+       id="text50"><tspan
+         sodipodi:role="line"
+         id="tspan50"
+         style="stroke-width:0.264583"
+         x="215.89999"
+         y="76.199997">EG, dir of picFN.bmp</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="215.89999"
+         y="80.609711"
+         id="tspan51">files</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="219.075"
+       y="69.849998"
+       id="text52"><tspan
+         sodipodi:role="line"
+         id="tspan52"
+         style="stroke-width:0.264583"></tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.899999;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect52"
+       width="41.274998"
+       height="9.5249996"
+       x="213.175"
+       y="73.474998"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="209.46904"
+       y="99.631485"
+       id="text53"><tspan
+         sodipodi:role="line"
+         id="tspan53"
+         style="stroke-width:0.264583"
+         x="209.46904"
+         y="99.631485">EG,</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="209.46904"
+         y="104.0412"
+         id="tspan54">ffmpeg  -i pic*.bmp baby.MOV</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.899999;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect54"
+       width="57.149998"
+       height="12.7"
+       x="206.375"
+       y="95.25"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.899999;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="M 231.77499,82.549999 V 95.249996"
+       id="path55" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52777px;line-height:1.25;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:none;stroke-width:0.264583"
+       x="222.25"
+       y="120.65"
+       id="text55"><tspan
+         sodipodi:role="line"
+         id="tspan55"
+         style="stroke-width:0.264583"
+         x="222.25"
+         y="120.65">baby.MOV</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.899999;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke"
+       id="rect55"
+       width="25.4"
+       height="6.3499999"
+       x="219.075"
+       y="117.475"
+       rx="1.7763721e-15"
+       ry="1.7763721e-15" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.899999;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0.453544;stroke-opacity:0.933685;paint-order:markers fill stroke;marker-end:url(#marker26)"
+       d="m 231.77499,107.95 v 9.525"
+       id="path56" />
+  </g>
+</svg>
