@@ -70,6 +70,6 @@ exit 0
 }
 
 function mydate() {
- echo $(date +%m-%d-%R)
+ echo $(date +%m-%d-%R) #Shell doesn't like colons
  }
  
