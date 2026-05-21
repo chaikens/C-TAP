@@ -10,6 +10,14 @@ Begin children loop (will recurse).
 1Attr name=name val="DroneShort1"
 1End attr loop.
 1Begin children loop (will recurse).
+12Node name=""
+12Node valu="
+  #attributes must be quoted
+  "
+12Begin attribute loop
+12End attr loop.
+12Begin children loop (will recurse).
+12End children loop (recursion done).
 12Node name="smallestThr"
 12Node valu=""
 12Begin attribute loop
