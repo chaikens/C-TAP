@@ -5,6 +5,22 @@
 using namespace std;
 using namespace pugi;
 
+
+
+/* notes 
+
+(1) We could skip comments, document node, and whitespace in plain text elts
+by setting flags during parsing, see
+
+https://pugixml.org/docs/manual.html#loading.options
+
+(2) Missing items (name, value, etc) are documented in
+https://pugixml.org/docs/manual.html#access.nodedata
+
+(3) Parse plain text nodes (for our setting values) as kinds of numbers:
+https://pugixml.org/docs/manual.html#access.text
+*/
+
 void ind( int l )
 {
   for (int i = 0; i < l; i++) cout << (i+1);
@@ -13,6 +29,7 @@ void ind( int l )
 
 void traverse(xml_node n, int l)
 {
+  ind(l); cout << "Node type=" << '"' << n.type() << '"' << endl;
   ind(l); cout << "Node name=" << '"' << n.name() << '"' << endl;
   ind(l); cout << "Node valu=" << '"' << n.value() << '"' << endl;
   ind(l); cout << "Begin attribute loop" << endl;
@@ -36,6 +53,7 @@ int main(int argc, char *argv[])
 {
   xml_document doc;
   if(!argv[1]) { error(1, 0, "Must give something.xml argument."); }
+  cout << "node_element=" << node_element << endl;
   xml_parse_result pres = doc.load_file(argv[1]);
   cout << "Load status=" << pres.description() << endl;
   xml_node top = doc.first_child();
