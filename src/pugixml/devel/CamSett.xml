@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<Camera name="DroneShort1">
+  <smallestThr type="ui" legi="0">
+    0
+  </smallestThr>
+  <biggestThr type="ui" legi="1">
+                         254
+  </biggestThr>
+  <smallestPix type="ui" legi="2">
+    0
+  </smallestPix>
+  <biggestPix type="ui" legi="3">
+    67
+  </biggestPix>
+  <SkewGaussAmpl type="uf" legi="4">
+    0.633
+  </SkewGaussAmpl>
+  <SkewGaussXi type="uf" legi="5">
+    1.97
+  </SkewGaussXi>
+  <SkewGaussOmega type="uf" legi="6">
+    1.89
+  </SkewGaussOmega>
+  <SkewGaussAlpha type="uf" legi="7">
+    2.5
+  </SkewGaussAlpha>
+  <NumPixAbvThrSumMin type="ui" legi="8">
+    0
+  </NumPixAbvThrSumMin>
+  <NumPixAbvThrSumMax type="ui" legi="9">
+    3
+  </NumPixAbvThrSumMax>
+  <SubThr type="ui" legi="10">
+    20
+  </SubThr>
+  <RewFram type="ui" legi="11">
+    0
+  </RewFram>
+  <ForFram type="si" legi="12">
+    -2
+  </ForFram>
+  <FramBefNew type="ui" legi="13">
+    1
+  </FramBefNew>
+  <FracYes type="uf" legi="14">
+    1.0
+  </FracYes>
+  <CROP_XI type="ui" legi="15">
+    100
+  </CROP_XI>
+  <CROP_XF type="ui" legi="16">
+    900
+  </CROP_XF>
+  <CROP_YI type="ui" legi="17">
+    0
+  </CROP_YI>
+  <CROP_YF type="ui" legi="18">
+    1919
+  </CROP_YF>
+  <mainThreshold type="ui" legi="19">
+    14
+  </mainThreshold>
+</Camera>
