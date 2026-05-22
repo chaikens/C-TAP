@@ -2,6 +2,12 @@ echo SOURCED:  code-BMP-BABYMOVIE.h.sh
 
 pushd ${BITMAPS_PARENT_DIR} > /dev/null
 
+#The baby movie is composed of selected by Phase1b and reported in .out
+#The code below adds a cirle around the point specified in the .out file
+# and then makes a movie of them.
+
+rm -f pic*.bmp #only delete images used to make the previous "baby movie"
+
 ##scaling? x and y are pixel coords.
 cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | while read evt frame extr x y prob
 do
@@ -16,17 +22,17 @@ do
 #    k=$((x+9))
 #    l=$((y+9))
 
-    i=$((x-18))  ##scaling?  maybe 9 could remain unscaled
-    j=$((y-18))
-    k=$((x+18))
-    l=$((y+18))
+    i=$((x-BABY_MOVIE_CIRCLE_RAD_PIX))  ##scaling?  maybe 9 could remain unscaled
+    j=$((y-BABY_MOVIE_CIRCLE_RAD_PIX))
+    k=$((x+BABY_MOVIE_CIRCLE_RAD_PIX))
+    l=$((y+BABY_MOVIE_CIRCLE_RAD_PIX))
+
+    ct=$(numquotintnz $BABY_MOVIE_CIRCLE_RAD_PIX 9) #circle thickness
 
     frameDigbmp="$(padTo6Digs $frame).bmp"
     inbmpPaName="${BITMAPS_DIR}/thumb${frameDigbmp}"
     outbmpPaName="${BITMAPS_DIR}/pic${frameDigbmp}"
    
-    stkw="2"
-
     if [ $y -lt 800 ]
     then
 	color="cyan"
@@ -35,7 +41,7 @@ do
     fi
 
     BITMAP_EDIT_CMD="convert ${inbmpPaName} "
-    BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -fill none -stroke ${color} -strokewidth ${stkw}"
+    BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -fill none -stroke ${color} -strokewidth ${ct}"
     BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -draw 'circle $i,$j $k,$l' "
     BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} ${outbmpPaName}"
 

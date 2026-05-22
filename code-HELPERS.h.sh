@@ -187,6 +187,17 @@ function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
 
 echo "See the results in the xterms and ${RESULTS_DIR}"
+
+if [ ${KILL_XTERMS_DONT_ASK}"x" = yes"x" ]
+then
+    if [ ${xterm_pids-none} != "none" ]
+    then
+	kill ${xterm_pids[*]} 
+    fi
+    echo $0 Done.
+    exit 0
+fi
+
 echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
 if ! read -t 20 yes
 then
@@ -215,7 +226,16 @@ function numdif(){
     echo $(dc -e "$1 $2 - p")
 }
 
+function numquotintnz(){
+    echo $(dc -e "1 Sa $1 $2 / d 0 =a p")
+}
+#### clumsy old fashioned reverse polish calc
+## used to calc the pixel width for a small circle.
+### we store in reg-a (Sa) a 1 to return if the / is 0
+### and duplicate the quotient to return if not!
+### =a puts reg-a's 1 in the stack if quot==0.  UGH.
 
 function mydate() {
- echo $(date +%b%d-%H-%M%S ) #Shell doesn't like colons
+    echo $(date +%b%d-%H-%M%S ) # May22-13-1435 MonthDay-Hr-MinSec
+                                #Shell doesn't like colons
 }

@@ -8,9 +8,6 @@ FileName="${moviePrefix}.${ext}"
 echo "FileName=$FileName"
 
 
-COMMAND_ARCHIVE_PATHNAME=${RESULTS_DIR}/${moviePrefix}.cmds
-cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
-
 #
 # PipeOpt version logging edited to use v1 vars.
 #
@@ -18,7 +15,8 @@ cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
 #should be moviePrefix
 
 #################code for naming and creating the LOG for this run##############
-touch "${RESULTS_DIR}/$moviePrefix.log.0" #that one's a dummy, so the next
+touch "${RESULTS_DIR}/$moviePrefix.log.0"
+#that one's a dummy, so the next
 #numbered one can be computed the first time.
 
 pushd ${RESULTS_DIR} > /dev/null
@@ -29,15 +27,19 @@ popd > /dev/null
 LOG=${RESULTS_DIR}/$moviePrefix.log.$logn
 #Devel: Idea make copies of .int, .cmds, and .out (ffmpeg.output too?) with .ext.$logn
 
-cat /dev/null > $LOG #start with an empty log.
+#cat /dev/null > $LOG #start with an empty log.
+echo FIRST LINE OF LOG > $LOG
+
+COMMAND_ARCHIVE_PATHNAME=${RESULTS_DIR}/${moviePrefix}.cmds.$logn
+cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
 
 start_time_one_movie=$(uptimenow)
 echo Uptime we started on $movie_file is
 echo $start_time_one_movie seconds.
 echo "TIME:" $start_time_one_movie seconds. >>$LOG
 
-#if [ ${RUN_EXPLANATION}"X" != "X" ]
-#then
+if [ "${RUN_EXPLANATION}X" != "X" ]
+then
    echo
    echo > $LOG
    echo Your run explanation:
@@ -46,7 +48,7 @@ echo "TIME:" $start_time_one_movie seconds. >>$LOG
    echo > $LOG
    echo ${RUN_EXPLANATION}
    echo "INFO:" ${RUN_EXPLANATION} > $LOG
-#fi
+fi
 
 #It's a good idea to first commit the scripts, programs, settings, etc to be tested.
 #   Of course, the test results will go into the next commit, but at least
@@ -57,7 +59,12 @@ echo "TIME:" $( date )  >>$LOG
 echo "PGM:" $gitcommit  >>$LOG
 ( echo "PGM:"; git remote --verbose )  >>$LOG #Worldwide readers of the log can get the software!
 
-xterm -geometry 150x80+1000+0 -sb -title 'C-TAP LOG' -e tail -f $LOG &
+if [ $KEEP_ANY_OLD_XTERMS"x" == "x" ]
+then
+    killall -q xterm 
+fi
+
+xterm -geometry 150x80+1000+0 -sb -title 'C-TAP LOG --==## type cap-F to continue. ##==--' -e less -f $LOG &
 xterm_pids+=($!) #for killing 'em
 ################################################################################
 

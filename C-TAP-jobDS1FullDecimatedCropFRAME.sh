@@ -22,7 +22,7 @@ ARCHITECTURE="framefile"
 
 if [ $ARCHITECTURE = "framefile" ]
 then		   
-       REUSE_BMPS=no
+       REUSE_BMPS=yes #no
        BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
        BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
        BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
@@ -34,7 +34,7 @@ source code-SYSCONFIG.h.sh      #
 echo YOUR-MOVIES-$JOBNAME       #
 #################################
 
-ext=mp4
+ext=mp4 #For input movies.
 
 #Here is an example of how to configure a directory
 # full of movies for C-TAP's research, not testing.
@@ -44,7 +44,7 @@ ext=mp4
 movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
 
 #################################
-source code-MOVIES.h.sh         #
+source code-MOVIES.h.sh         # (nothing for now)
 #################################
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
@@ -83,7 +83,12 @@ MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
 MOVIE_SCALE_OPTION="--movie-scale 2"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--no-crop --camera-index 1"
+OTHER_OPTIONS="--camera-index 1"
+#Since we dont have cropping CamSett setting for this scale fully worked out,
+#we are using this brute force way of cropping as was done for successful half resolution
+#tests.  These are (manually) double of our starting software version.
+#Note we DONT do --no-crop now.
+PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI=200 --CROP_XF=1800 --CROP_YI=0 --CROP_YF=3839"
 #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
 #and also named a camera for it.
 

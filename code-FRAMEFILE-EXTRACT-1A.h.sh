@@ -1,6 +1,6 @@
 echo SOURCED: code-FRAMEFILE-EXTRACT-1A.h.sh
-echo $BITMAPS_DIR
-echo $REUSE_BMPS
+echo "bitmaps dir="${BITMAPS_DIR}
+echo "will we reuse bitmaps?"${REUSE_BMPS}
 
 pushd $BITMAPS_DIR  > /dev/null #ffmpeg puts bitmaps in its cwd.
     
@@ -43,8 +43,8 @@ then
     # FFMPEG_EXTRACT_CMD is embedded in ffmpeg_bmp_extract() shell fn from config.
     echo "PGM:" Extracting bmps with >> $LOG
     type ffmpeg_bmp_extract >> $LOG
-    echo "PGM:" ffmpeg filter is ${FFMPEG_EXTRACT_FILTER} >> $LOG
-    echo "PGM:">> $LOG
+    echo "PGM:" ffmpeg filter is "${FFMPEG_EXTRACT_FILTER}" >> $LOG
+    echo "PGM:" >> $LOG
     (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     echo "FFMPEG_EXTRACT_FILTER=${FFMPEG_EXTRACT_FILTER}" >>${COMMAND_ARCHIVE_PATHNAME}
     
@@ -97,7 +97,8 @@ else
     echo "INFO:" "We're reusing movie bitmaps for debugging speed." >> $LOG
     echo >> $LOG
     (echo ; echo "#Reused bitmaps, so no extract commands."  ) >>${COMMAND_ARCHIVE_PATHNAME}
-    rm -f pic*.bmp #only delete images used to make the previous "baby movie"
+    #move to where baby movie is made 
+    #rm -f pic*.bmp #only delete images used to make the previous "baby movie"
     if ! depthOfBmpIs24 thumb000001.bmp
     then
 	echo 'thumb000001.bmp does not exist (in its proper place)'
@@ -180,6 +181,7 @@ then
     Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
     Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
     Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
+    Phase1a_cmd_args="${Phase1a_cmd_args} ${PHASE1A_OTHER_OPTIONS} "
     Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 
     echo Running
@@ -224,6 +226,7 @@ else
 	Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
 	
 	Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
+	Phase1a_cmd_args="${Phase1a_cmd_args} ${PHASE1A_OTHER_OPTIONS} "
 	Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 
 	eval ${Phase1a_cmd}  #this does the trick

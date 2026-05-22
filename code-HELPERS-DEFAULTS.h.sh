@@ -11,21 +11,23 @@ then
     exit 1
 fi
 
-read -t 18 -p "Keep running any xterm windows?(no, or yes is default)" 
-if [ $REPLY"x" = "nox" ]
-then
-    killall xterm
-fi
-
-
+#
 # defaults
 #
 
+KEEP_ANY_OLD_XTERMS="" #user preference, also in case programs named xterm are used 
 RUN_EXPLANATION=""
 DEBUG=false
 SOFTWARE_DIR=$(pwd)
 FAST_FILESYS_DIR_IF_USED=
 RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}-$(mydate)"
+
+BABY_MOVIE_CIRCLE_RAD_PIX=9
+
+#Other and future uses will not use this, it's referred in the Phase1a command.
+PHASE1A_OTHER_OPTIONS=""
+
+
 
 #
 # for ARCHITECTURE=framefile only

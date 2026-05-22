@@ -219,8 +219,6 @@ static const char default_bitmaps_dir[] = "bitmaps";
 static const char default_CamSett_file[] = "CamSett.txt";
 int no_crop = 0; //scaleCD
 
-int pipeline = 0;  //Default is legacy bmp reading version.
-                 //Set by --pipeline option.
 
 //scaling? will use this everywhere including width and height
 typedef uint16_t pixCoord; //scaleCD
@@ -228,6 +226,15 @@ typedef uint16_t pixCoord; //scaleCD
 //Maybe, someday, the pixCoord type will be a C++ class, with
 //useful member functions and supporting better type checking.
 //
+
+int cropargs = 0; //--crop-args option forces CROP_[X,Y][I,F]
+                  //get_our_options cases counts this up to 4.
+pixCoord argCROP_XI, argCROP_XF, argCROP_YI, argCROP_YF;
+                  //values to be gotton from arguments
+
+
+int pipeline = 0;  //Default is legacy bmp reading version.
+                 //Set by --pipeline option.
 
 //might be modified by get_our_options()
 pixCoord Mscale = 1; //original movies
@@ -450,7 +457,7 @@ void readFirstBMPToAandAllocB(char* filename)
   uint8_t info[54];
   size_t readret;
   // read the 54-byte header
-  fread(info, sizeof(unsigned char), 54, f);
+  readret = fread(info, sizeof(unsigned char), 54, f);
 
   // extract image height and width from header
   //scaling?
@@ -812,6 +819,29 @@ static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
 
 int camera_index = 0;
 
+void optionprocess()
+{
+  if( cropargs != 0 ) {
+    if (cropargs != 4) {
+      error(1, 0, "CROP_[X,Y][I,F] options: Must give none or all 4!");
+    }
+    // cropargs == 4
+    if( no_crop ) {
+      cerr << progname << "WARNING: both CROP_[X,Y][I,F] option and no-crop options were given. We will not crop." << endl;
+      cropargs = 0;
+    }
+    else {
+      cerr << progname << " CROP values we be set from args : " << endl;
+      cerr << "Top-Bot: CROP_XI=" << argCROP_XI << " CROPXF=" << argCROP_XF << endl;
+      cerr << "Lft-Rht: CROP_YI=" << argCROP_YI << " CROPYF=" << argCROP_YF << endl;
+      /* We should use these values, from the argv, for cropping no matter what */
+      /*  pixCoord argCROP_XI, argCROP_XF, argCROP_YI, argCROP_YF; */
+      /* Maybe do more here. */
+    }
+  }
+  //We exited or we are done argCROP options.  Other option processing can go here.
+}
+
 int main( int argc, char** argv ) {
   progname = argv[0];
   cerr << progname << "  called!" << endl;
@@ -821,7 +851,7 @@ int main( int argc, char** argv ) {
   // these files are in cwd are used.
   // --pipeline is a option, default is to read .bmp files.
 
-
+  optionprocess();
   //Scaling
   if((Pscale > Mscale) || Pscale*(Mscale/Pscale) != Mscale)
     {
@@ -869,12 +899,13 @@ int main( int argc, char** argv ) {
   if( !file ) {
     error(1, errno, "CamSett.txt file missing from CWDir.");
   }
-  
+
+  size_t ret;
   for ( unsigned short k = 0; k < 20; ++k ) {
-    fscanf ( file, "%s %lf", line, &temp );
+    ret = fscanf ( file, "%s %lf", line, &temp );
     CamSett.push_back(temp);
   }
-  fscanf ( file, "%s", line ); fclose(file);
+  ret = fscanf ( file, "%s", line ); fclose(file);
   unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   fprintf(stderr,"%s MinThr=%u SubThr=%u\n", progname, MinThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
@@ -899,23 +930,31 @@ int main( int argc, char** argv ) {
   unsigned char* dataOld = BMP_B; //variables used for
   unsigned char* dataNew = BMP_A; //double buffering
 
-    cerr << "Just before k loop, where they are used" << endl 
+    cerr << "CROP values before any overiding by --crop-args option." << endl 
    <<  "CROP_XI=" << CROP_XI  << " CROP_XF=" << CROP_XF
    << " CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
 
     
-  int i_loop_from = height-1-CROP_XI;  //so, for now CROPS should certainly 
-  int i_loop_ge   = height-CROP_XF;    //be in the Pcoord system.
-  int j_loop_from = CROP_YI;
-  int j_loop_lt   = CROP_YF;
-    
-  if (no_crop) {
-    i_loop_from = height-1;
-    i_loop_ge   = 0;
-    j_loop_from = 0;
-    j_loop_lt   = width;
-    cerr << "Option no-crop has been activated: CROP_var cropping not done." << endl; 
-  }
+    int i_loop_from, i_loop_ge, j_loop_from, j_loop_lt;
+    if(no_crop) {
+      i_loop_from = height-1;
+      i_loop_ge   = 0;
+      j_loop_from = 0;
+      j_loop_lt   = width;
+      cerr << "Option no-crop has been activated: CROP_var cropping will not be done." << endl;
+    }
+    else {
+      if(cropargs) {
+	CROP_XI = argCROP_XI;
+	CROP_XF = argCROP_XF;
+	CROP_YI = argCROP_YI;
+	CROP_YF = argCROP_XF;
+      }
+      i_loop_from = height-1-CROP_XI;  //so, for now CROPS should certainly
+      i_loop_ge   = height-CROP_XF;    //be in the Pcoord system.
+      j_loop_from = CROP_YI;
+      j_loop_lt   = CROP_YF;
+    }
 
   //We can terminate the loop either by specifying a
   //range of frame numbers, or, only in pipeline
@@ -1052,6 +1091,13 @@ static int get_our_options( int *argc, char **argv[])
       {"camera-index", required_argument, 0, 0},       //6
       {"pipeline", no_argument, &pipeline, 1},        //7 top of file
       {"verbose", no_argument, 0, 0},                 //8 ignored for regression devel.
+
+      {"crop-args", no_argument, 0, 0},      //9
+      {"CROP_XI", required_argument, 0, 0},          //10
+      {"CROP_XF", required_argument, 0, 0},          //11
+      {"CROP_YI", required_argument, 0, 0},          //12
+      {"CROP_YF", required_argument, 0, 0},          //13
+
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -1071,7 +1117,11 @@ static int get_our_options( int *argc, char **argv[])
       case 5: /*no_crop set by getopt_long action on long_options[] */
 	break;
       case 6: camera_index = atoi(optarg); /*cstring*/ break;
-      case 8: fprintf(stderr, "%s Ignored Option --verbose\n", (*argv)[0]);
+      case 8: fprintf(stderr, "%s Ignored Option --verbose\n", (*argv)[0]); break;
+      case 10: cropargs++; argCROP_XI = atoi(optarg); break;
+      case 11: cropargs++; argCROP_XF = atoi(optarg); break;
+      case 12: cropargs++; argCROP_YI = atoi(optarg); break;
+      case 13: cropargs++; argCROP_YF = atoi(optarg); break;
       }
     }
   }

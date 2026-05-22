@@ -13,8 +13,9 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
-FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
+KILL_XTERMS_DONT_ASK="yes"
 
+FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 
 ARCHITECTURE="pipeline"
 #"framefile" #vs pipeline
