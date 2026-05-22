@@ -217,5 +217,5 @@ function numdif(){
 
 
 function mydate() {
- echo $(date +%b-%m-%M-%S) #Shell doesn't like colons
+ echo $(date +%b%d-%H-%M%S ) #Shell doesn't like colons
 }
