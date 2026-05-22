@@ -126,18 +126,19 @@ function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
 
 echo "See the results in the xterms and ${RESULTS_DIR}"
-echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
-if ! read -t 20 yes
-then
-    echo OK. Time for asking done, leaving the xterms.
-    echo Kill them manually or use ./killxterms.sh
-fi
 
-if [ ${yes}"" = "yes" ]
+if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]
 then
     if [ ${xterm_pids-none} != "none" ]
     then
 	kill ${xterm_pids[*]} 
+    fi
+else
+    echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
+    if ! read -t 20 yes
+    then
+	echo OK. Time for asking done, leaving the xterms.
+	echo Kill them manually or use ./killxterms.sh
     fi
 fi
 
@@ -149,16 +150,14 @@ function uptimenow(){
     cat /proc/uptime | sed -n 's/\([0-9]*\.[0-9]*\) .*/\1/p'
     
 }
-
 function numdif(){
     echo $(dc -e "$1 $2 - p")
 }
-
-
 function mydate() {
     echo $(date +%b%d-%H-%M%S) #May22-19-2513 MonDay-Hr-MnSc
 }
-
+# numquotintzn M N echos rounddown(M/N) if this non-zero, 1 if zero.
+# for pixel width of circles.
 function numquotintnz(){
     echo $(dc -e "1 Sa $1 $2 / d 0 =a p")
 }

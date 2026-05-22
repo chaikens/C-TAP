@@ -22,7 +22,7 @@ ARCHITECTURE="pipeline"
 
 if [ $ARCHITECTURE = "framefile" ]
 then		   
-       REUSE_BMPS=no
+       REUSE_BMPS=yes
        BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
        BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
        BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
