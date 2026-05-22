@@ -231,22 +231,22 @@ Line19 Value=14(ignored Key =mainThreshold=)
     //10  min neg diff Red, neg#. (min -R)  (- its mean)=:GlobPixMean[3](>=0)
     //11      where x	    
     //12      where y	    
-    //13  max pos diff Green, neg#. (min -G)(- its mean)=:GlobPixMean[4](>=0)
+    //13  min neg diff Green, neg#. (min -G)(- its mean)=:GlobPixMean[4](>=0)
     //14      where x        
     //15      where y
-    //16  max pos diff Blue, neg#  (min +B) (- its mean)=:GlobPixMean[5](>=0)
+    //16  min neg diff Blue, neg#  (min -B) (- its mean)=:GlobPixMean[5](>=0)
     //17     where x	    
     //18     where y
     
-    //19  #pixels with +R >= (max +R) - thresh
+    //19  #pixels with +R >= (max +R) - thresh  <<-mainThreshold from CamSett (< 255)
     //20  #pixels with +G >= (max +G) - thresh
     //21  #pixels with +B >= (max +B) - thresh
     //22  #pixels with -R <= (min -R) + thresh
     //23  #pixels with -G <= (min -G) + thresh
     //24  #pixels with -B <= (min -B) + thresh
 
-    //25  var name used below:NumPixAbvSubThrSum    its mean=:GlobPixMean[6]
-    //  Total number of pixels above the threshold, for all 6 +/- RGBs
+    //25  var name used below:NumPixAbvSubThrSum its mean=:GlobPixMean[6]
+    //  Total number of pixels within range set by SubThr from CamSett, for all 6 +/- RGBs
     //  If the same pixel beats threshold for more than one of 6 cases,
     //  a the count is incremented for each case.
     // See FLIRanalysisPhase1aCamX.cpp of course.

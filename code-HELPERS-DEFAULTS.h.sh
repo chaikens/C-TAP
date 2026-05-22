@@ -1,5 +1,7 @@
 echo SOURCED: code-HELPERS-DEFAULTS.h.sh
 set -u #NOW, expanding undefined shell variables will give an error like in decent languages!
+source code-HELPERS.h.sh
+
 JOBNAME=$(basename $0 | sed -n 's/C-TAP-\(..*\).sh/\1/p')
 if [ $JOBNAME"" = "" ]
 then
@@ -9,21 +11,22 @@ then
     exit 1
 fi
 
-read -t 18 -p "Keep running any xterm windows?(no, or yes is default)" 
-if [ $REPLY"x" = "nox" ]
-then
-    killall xterm
-fi
-
-
+#
 # defaults
 #
 
+KEEP_ANY_OLD_XTERMS="" #user preference, also in case programs named xterm are used 
 RUN_EXPLANATION=""
 DEBUG=false
 SOFTWARE_DIR=$(pwd)
 FAST_FILESYS_DIR_IF_USED=
-RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
+RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}-$(mydate)"
+
+BABY_MOVIE_CIRCLE_RAD_PIX=9
+
+#Other and future uses will not use this, it's referred in the Phase1a command.
+PHASE1A_OTHER_OPTIONS=""
+
 
 #
 # for ARCHITECTURE=framefile only
@@ -40,8 +43,6 @@ PIPE_DIR=${SOFTWARE_DIR}
 #is set to "no" in code-SYSCONFIG.h.sh
 MAKE_BABY_MOVIE="yes"
 
-
-#For now, we change (mv) its name to save it.
 
 #
 #  Helper shell functions
@@ -155,5 +156,13 @@ function numdif(){
 
 
 function mydate() {
- echo $(date +%m-%d-%R) #Shell doesn't like colons
+    echo $(date +%b%d-%H-%M%S) #May22-19-2513 MonDay-Hr-MnSc
 }
+
+function numquotintnz(){
+    echo $(dc -e "1 Sa $1 $2 / d 0 =a p")
+}
+# clumsy reverse polish calculator.
+# Reg-a:=1 so we can put on top of stack if $1/$2 = 0.
+# Push nums, /, if top == 0, push Reg-a's 1, else keep the quot.
+# pop-print the 1 or the quot.

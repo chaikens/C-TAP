@@ -1,0 +1,113 @@
+#!/usr/bin/bash
+#              (hmm---no comment can follow bash above)#
+#FOR STANDARD USAGE, EDIT ONLY      #
+#THE FILE-NAME OF THIS SCRIPT       #
+#AND CODE OUTSIDE BOXES LIKE THIS.  #
+#THE FILE-NAME SHOULD HAVE THE FORM #
+#  C-TAP-<jobname>.sh               #
+source code-HELPERS-DEFAULTS.h.sh   #
+echo Running your job $JOBNAME      #
+#####################################
+
+############################
+echo YOUR-SYSCONF-$JOBNAME #
+############################
+
+KILL_XTERMS_DONT_ASK="yes"
+
+FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
+
+ARCHITECTURE="framefile"
+#"framefile" #vs #pipeline
+
+if [ $ARCHITECTURE = "framefile" ]
+then		   
+       REUSE_BMPS=yes #no
+       BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
+       BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
+       BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
+fi
+
+###########END OF YOUR-SYSCONF###
+source code-SYSCONFIG.h.sh      #
+#################################
+echo YOUR-MOVIES-$JOBNAME       #
+#################################
+
+ext=mp4 #For input movies.
+
+#Here is an example of how to configure a directory
+# full of movies for C-TAP's research, not testing.
+#      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
+#
+
+movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
+
+#################################
+source code-MOVIES.h.sh         # (nothing for now)
+#################################
+echo YOUR-ANALYSIS-$JOBNAME     #
+#################################
+
+OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+
+#Not done yet: when we specify pipelining here, and include the below
+#analysis options, that is what is done.  We'll look at TESTING/TestPipeOpt code
+#to do that.
+
+#The FLIR Algorithm requires the frame sequence to be decimated.
+#So, frame times get lost when extracted!
+
+#ffmpeg option notes.  We use
+## option -vf (alias -filter:v) <video filter script> 
+# Eventually we may want to use -filter_complex
+
+#Beware: ffmpeg option names are -single_dash_underscore_sep.
+#Whilst our C++ commands use Unix style --double-dash-dash-sep.
+
+#For FULL FRAME with DECIMATION extraction by ffmpeg
+#Also, the 2nd filter setpts is set presentation timestamps
+FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
+
+#for HALF-RESOLUTION with DECIMATION extraction.
+#FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+
+#See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
+# single output options.
+
+#Settings below are used for both the pipeline and frame .bmp architectures
+
+#for FULL FRAME, (DECIMATED) RESOLUTION
+
+MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
+MOVIE_SCALE_OPTION="--movie-scale 2"
+PIXPROC_SCALE_OPTION="--pixproc-scale 1"
+USER_SCALE_OPTION="--user-scale 1"
+OTHER_OPTIONS="--camera-index 1"
+#Since we dont have cropping CamSett setting for this scale fully worked out,
+#we are using this brute force way of cropping as was done for successful half resolution
+#tests.  These are (manually) double of our starting software version.
+#Note we DONT do --no-crop now.
+PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI=200 --CROP_XF=1800 --CROP_YI=0 --CROP_YF=3839"
+#In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
+#and also named a camera for it.
+
+#for HALF FRAME, (DECIMATED) extraction.
+# COMMENTED OUT
+#    MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
+#    MOVIE_SCALE_OPTION="--movie-scale 1"
+#    PIXPROC_SCALE_OPTION="--pixproc-scale 1"
+#    USER_SCALE_OPTION="--user-scale 1"
+#    OTHER_OPTIONS="--no-crop --camera-index 1"
+
+#In the Phase1a C++ program, we wrote
+#an exclusion zone function for DroneShort1,
+#and also named a camera for it.  
+
+RUN_EXPLANATION="ffmpeg .mp4----> decimation---->dir of .bmp files -----> (Phase1a dir reading)  > movie.int > (Phase1bPipe) > file.out  This is coded by $0"
+echo $RUN_EXPLANATION
+
+####################################
+source code-ANALYSIS.h.sh          #
+source code-DOIT.h.sh              #
+####################################

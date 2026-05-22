@@ -1,0 +1,386 @@
+node_element=2
+Load status=No error
+Node type="1"
+Node name=""
+Node valu=""
+Begin attribute loop
+End attr loop.
+Begin children loop (will recurse).
+1Node type="2"
+1Node name="Camera"
+1Node valu=""
+1Begin attribute loop
+1Attr name=name val="DroneShort1"
+1End attr loop.
+1Begin children loop (will recurse).
+12Node type="3"
+12Node name=""
+12Node valu="
+  #attributes must be quoted
+  "
+12Begin attribute loop
+12End attr loop.
+12Begin children loop (will recurse).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="smallestThr"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="0"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    0
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="biggestThr"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="1"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+                         254
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="smallestPix"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="2"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    0
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="biggestPix"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="3"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    67
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="SkewGaussAmpl"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="uf"
+12Attr name=legi val="4"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    0.633
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="SkewGaussXi"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="uf"
+12Attr name=legi val="5"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    1.97
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="SkewGaussOmega"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="uf"
+12Attr name=legi val="6"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    1.89
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="SkewGaussAlpha"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="uf"
+12Attr name=legi val="7"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    2.5
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="NumPixAbvThrSumMin"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="8"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    0
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="NumPixAbvThrSumMax"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="9"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    3
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="SubThr"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="10"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    20
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="RewFram"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="11"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    0
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="ForFram"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="si"
+12Attr name=legi val="12"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    -2
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="FramBefNew"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="13"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    1
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="FracYes"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="uf"
+12Attr name=legi val="14"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    1.0
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="CROP_XI"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="15"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    100
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="CROP_XF"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="16"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    900
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="CROP_YI"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="17"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    0
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="CROP_YF"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="18"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    1919
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+12Node type="2"
+12Node name="mainThreshold"
+12Node valu=""
+12Begin attribute loop
+12Attr name=type val="ui"
+12Attr name=legi val="19"
+12End attr loop.
+12Begin children loop (will recurse).
+123Node type="3"
+123Node name=""
+123Node valu="
+    14
+  "
+123Begin attribute loop
+123End attr loop.
+123Begin children loop (will recurse).
+123End children loop (recursion done).
+12End children loop (recursion done).
+1End children loop (recursion done).
+End children loop (recursion done).
