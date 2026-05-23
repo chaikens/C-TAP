@@ -127,7 +127,7 @@ fi
 #    TB is the Time Base of the input timestamps (usually 1/framerate)
 #
 
-nframes=`ls  | wc -l`
+nframes=`ls thumb*.bmp | wc -w`
 echo "INFO:" "$nframes frames captured" >> $LOG
 
 #echo ${moviePrefix}
