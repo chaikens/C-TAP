@@ -24,7 +24,13 @@ optional options:
    It must have a conversion specification for EVERY field in each line, so fscanf will scan over
    the whole line before the next line.  Thus %*<char> should be used to skip fields.
    EG. Use default '%d' for just frame numbers; 
-    you can do --seline-fmt '%*d %d %*d %*d %*d %*f' for C-TAP .out file lines. 
+    you can do --seline-fmt '%*d %d %*d %*d %*d %*f' for C-TAP .out file lines.
+--offset noff
+   number noff is added to each frame number to obtain which
+   frame is taken.  (So if noff=1, the first input frame is skipped.)
+   It will cause a warning and extract fewer frames than requested.
+   When frames are stored in a directory, their names will bear their original numbers.
+      
 
   This program doesn't look inside yuv frames except to convert them to .bmps,
   but assumes their length is (3*width*height)/2, which is for I420p format.
@@ -68,6 +74,7 @@ static string bmpdirpaths = "";
 static string bmpnameprefixs = "thumb";
 static string bmpconversions = ""; //no choices yet
 static const char *selinefmt = "%d";  //to parse a file of frame numbers.
+static int offset = 0;
 
 //FILE POINTERS
 static FILE *fnsFP = 0;    //required, frame numbers wanted
@@ -187,6 +194,7 @@ int main(int argc, char *argv[]) {
   }
   //Loop to read the next wanted frame number into------V----- 
   while ( (didreadframe = fscanf(fnsFP, selinefmt, &fwanted), didreadframe) == 1  ) {
+    fwanted = fwanted + offset;
     //Loop to read the next available frames up to and including the latest wanted one.
     while ( fwanted >= (fcount+1) ) {
       bool fwasread = false;
@@ -301,12 +309,13 @@ static int get_our_options( int *argc, char **argv[])
     int option_index = 0;
     static struct option long_options[] = {
       {"verbose", no_argument, &vb, 1},  //0
-      {"yuv-out-fd", required_argument, &do_yuv_stream_out, 1},  //1
-      {"bmp-out-fd", required_argument, &do_bmp_stream_out, 1},  //2
-      {"bmp-out-dirpath", required_argument, &do_bmp_dir_out, 1},       //3
-      {"bmp-conversion", required_argument, 0, 0 },                     //4
-      {"bmp-prefix", required_argument, 0, 0},                     //5
-      {"seline-fmt", required_argument, 0, 0},                     //6
+      {"yuv-out-fd", required_argument, &do_yuv_stream_out, 1},   //1
+      {"bmp-out-fd", required_argument, &do_bmp_stream_out, 1},   //2
+      {"bmp-out-dirpath", required_argument, &do_bmp_dir_out, 1}, //3
+      {"bmp-conversion", required_argument, 0, 0 },               //4
+      {"bmp-prefix", required_argument, 0, 0},                    //5
+      {"seline-fmt", required_argument, 0, 0},                    //6
+      {"offset", required_argument, 0, 0},                        //7
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -346,6 +355,17 @@ static int get_our_options( int *argc, char **argv[])
 	break;
       case 6:
 	selinefmt = optarg;
+	break;
+      case 7:
+	ret = sscanf(optarg, "%d", &offset);
+	if(ret == 0)
+	  {
+	    error(1, 0, "badly formatted --offset %s.", optarg);
+	  }
+	if( offset < 0 )
+	  {
+	    error(1, 0, "Negative --offset %d not supported (yet).", offset);
+	  }
 	break;
       }
     }
