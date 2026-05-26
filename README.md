@@ -1,7 +1,7 @@
 # C-TAP Intro
 Please check out Section 3.2.1 on image analysis for UAP research starting on page 11 of https://arxiv.org/pdf/2312.00558
 # C-TAP
-You're on the reorg branch.
+You're on the devel-pipeline branch.
 =======
 To try this out, get the 125Mb movie named DroneShort1.mp4 from
 Google drive folder https://drive.google.com/drive/folders/15EOdKlvIPG9ORDVy3WBh5rX8cFSmmVQ7 .  
@@ -10,23 +10,30 @@ If you don't have access, contact Matthew Szydagis at <matthew.szydagis@gmail.co
 The results of today's 4-way comparison are visible in the 4 directories
 RESULTS-jobDS1[Full,Half]Decimated[FRAME,PIPE].
 
-A shell run of all 4 is in C-TAP-demo.shellrun
-
 Try it yourself:
 First, put DroneShort1.mp4 in  this directory.
 
 Then, edit directory entries in
 the 4 C-TAP-jobDS1*.sh files for your system.
 
-Finally, execute C-TAP-demo.sh
+Finally, execute DEMO.sh
+A shell run of all 4 is in DEMO.shellrun.txt
 
+The results and logs for the 4 demo runs, except for the .MOV baby movies, are in the
+directories symbolically linked from DemoFullFrame DemoFullPipe DemoHalfFrame DemoHalfPipe.
+
+We now have pipelining and .bmp frame storage as options to the same system. The results 
+show that for this test movie, the (1) .bmp disk storage architecture and (2) architecture
+to pipe extract raw YUV images through our table-based YUV-BMP converter to the first
+phase of the FLIR algorithm 
+images yield identical results. This is true even though there are small differences
+between the .bmps produced by ffmpeg and our converter.
 
 The other movies in that Google drive folder are (1) for very short
 tests and (2) testing the functionality automatically iterating over
 a collection of movies.
 
-Stay tuned (I hope < 1 week) for Version 2.0, with like this, pipelining
-and .bmp frame storage as options to the same system, and improved configuration
+ and improved configuration
 (CamSett.txt) management, to demonstrate the cropping functionality.
 
 v1.0 (in the main branch) is mild refactorization of the original C-TAP. 
