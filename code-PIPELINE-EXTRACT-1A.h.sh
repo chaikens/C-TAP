@@ -129,8 +129,8 @@ rm -f ${bmppipe}
 mknod ${bmppipe} p
 
 now=$(uptimenow)
-echo "STEP:" 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at $now seconds.' >> $LOG
-echo 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at $now seconds.'
+echo "STEP:" 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at ' ${now} "seconds." >> $LOG
+echo 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at ' $now "seconds."
 
 
 $(ffmpeg_pipe_extract ${movie_file}) & #MUST BE IN BACKGROUND!!
