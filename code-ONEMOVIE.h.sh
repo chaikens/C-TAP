@@ -65,7 +65,8 @@ then
     killall -q xterm 
 fi
 
-xterm -geometry 150x80+1000+0 -sb -title 'C-TAP LOG --==## type cap-F to continue. ##==--' -e less -f $LOG &
+xterm -geometry 150x80+1000+0 -sb -title 'C-TAP LOG' -e less +F -f $LOG &
+#option +F acts like user types F (continue after end of file)
 xterm_pids+=($!) #for killing 'em
 ################################################################################
 

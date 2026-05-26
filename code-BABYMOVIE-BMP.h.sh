@@ -13,9 +13,7 @@ echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 ##SHOULD BE SCALED!!
 ##circles with center (above)< sky_limit are cyan, below lime (ImageMagick coords.)
 sky_limit=800
-BABY_MOVIE_CIRCLE_RAD_PIX=25;
-ct=7 #$(numquotintnz $BABY_MOVIE_CIRCLE_RAD_PIX 9) #circle thickness
-
+BABY_MOVIE_CIRCLE_RAD_DIV=240;
 
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
@@ -62,10 +60,24 @@ echo 0 > ${RESULTS_DIR}/foutcount
 #The need was puzzling and Stack Overflow helped inform us.
 
 ##scaling? x and y are anti-Microsoft pixel/processing coords, originally y-flipped by Phase1a
+firsttime=1
 cat $phase1b_out | while read evt frame extr x y prob
 do
     ((++frame))  #We display the SECOND frame of the difference.  Important?
     #^^^ doesn't affect the loop.  Note yuvSelectMulti --offset 1 to comply with here. 
+
+    frameDigbmp="$(padTo6Digs $frame).bmp"
+    inbmpPaName="thumb${frameDigbmp}"
+    outbmpPaName="pic${frameDigbmp}"
+
+    if [ $firsttime = 1 ]
+    then
+	#Dont waste time, only look at first .bmp to get radius.
+	#Dont rely of an existing var. for the width
+	radpix=$(numquotintnz $(widthOfBmp ${inbmpPaName}) ${BABY_MOVIE_CIRCLE_RAD_DIV})
+        ct=$(numquotintnz $radpix 3) #circle thickness
+	firsttime=0
+    fi
 
     #if (( $frame %5 == 0 ))
     #then
@@ -77,14 +89,10 @@ do
 #    k=$((x+9))
 #    l=$((y+9))
 
-    i=$((x-BABY_MOVIE_CIRCLE_RAD_PIX))  ##scaling?  maybe 9 could remain unscaled
-    j=$((y-BABY_MOVIE_CIRCLE_RAD_PIX))
-    k=$((x+BABY_MOVIE_CIRCLE_RAD_PIX))
-    l=$((y+BABY_MOVIE_CIRCLE_RAD_PIX))
-
-    frameDigbmp="$(padTo6Digs $frame).bmp"
-    inbmpPaName="thumb${frameDigbmp}"
-    outbmpPaName="pic${frameDigbmp}"
+    i=$((x-radpix))  ##scaling?  maybe 9 could remain unscaled
+    j=$((y-radpix))
+    k=$((x+radpix))
+    l=$((y+radpix))
 
     if [ $y -lt "$sky_limit" ]
     then
