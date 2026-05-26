@@ -8,20 +8,24 @@ cd ${SOFTWARE_DIR}
 
 ###################################
 #
-Phase1a=Phase1aPipeOpt  #compiled from FLIRanalysisPhase1aCamXPipeOpt.cpp, alongside us.
-Phase1b=Phase1bPipeOpt  #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
+phase1a="Phase1aPipeOpt" #compiled from FLIRanalysisPhase1aCamXPipeOpt.cpp, alongside us.
+phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
 #
 #####################
-if ! make ${Phase1a} ${Phase1b}
+if ! make ${phase1a} ${phase1b}
 then
     echo make the C++ progs we need failed.  Check this out.
     exit 1
 fi
 
-if ! mkdir -p $BITMAPS_DIR
+if [ $ARCHITECTURE = "framefile" ]
 then
-    echo "Cant make BITMAPS_DIR $BITMAPS_DIR"
-    exit 1
+    
+    if ! mkdir -p $BITMAPS_DIR
+    then
+	echo "Cant make BITMAPS_DIR $BITMAPS_DIR"
+	exit 1
+    fi
 fi
 
 if ! mkdir -p $RESULTS_DIR

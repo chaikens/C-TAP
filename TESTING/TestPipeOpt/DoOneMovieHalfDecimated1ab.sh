@@ -21,7 +21,7 @@
 
 ffmpeg_pipe_extract()
 {
-    ffmpeg  -hide_banner -y -an   \
+    ffmpeg  -hide_banner -y -an -report  \
 	    -i $1                 \
             -vf                   \
             "scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" \
@@ -35,5 +35,5 @@ ffmpeg_pipe_extract()
      OTHER_OPTIONS="--no-crop --camera-index 1"
      #In Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
      #and also named a camera for it.  
-     
+
 source DoOneMoviePipeCommon.h.sh

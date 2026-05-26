@@ -260,3 +260,26 @@ else
     echo we will reuse bitmaps
 fi
 
+
+echo "Heres how to return values from a subshell say for counting."
+cat > nums <<EOF
+10
+20
+30
+40
+50
+EOF
+
+echo 0 > /tmp/c
+
+cat nums | while read x
+do
+    echo $x
+    t=$(cat /tmp/c); ((t++)); echo $t > /tmp/c
+    cat /tmp/c
+done
+
+echo $(cat /tmp/c)
+rm /tmp/c
+
+		 

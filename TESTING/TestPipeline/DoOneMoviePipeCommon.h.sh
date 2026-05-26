@@ -1,4 +1,3 @@
-
 #/*
 # DoOneMoviePipeCommon.h.sh 
 # MUST NOT BE EXECUTABLE
@@ -72,7 +71,7 @@ echo except for exiting errors.
 echo Running $0 $1 $2 | cat >> $LOG
 
 #no more.V
-#echo This $0 exits after the first try of Phase1bPipe | cat >>$LOG
+#echo This $0 exits after the first try of Phase1bPipe | cat &>>$LOG
 
 function widthOfMovie() {
     ffprobe -v quiet  -show_streams $@ | sed -n 's/^width=\([1-9][0-9]*\)$/\1/p'
@@ -125,12 +124,12 @@ echo $( cat /proc/uptime ) | cat >>$LOG
  
 # should be symbolically linked from top C-TAP dir
 # Soon we'll experiment more with this filter, maybe better config way.
-./YUVToBMPStreamFilter   $width $height < PIPE.yuv > PIPE.bmp 2>>$LOG &
+./YUVToBMPStreamFilter   --verbose $width $height < PIPE.yuv > PIPE.bmp 2>>$LOG &
 # width and height are necessary since yuv frames are raw.
 # so we have to take care if ffmpeg outputs differently sized
 # frames from the movie original.
 echo STARTED YUVToBMPStreamFilter at /proc/uptime= | cat >> $LOG
-echo $(cat /proc/uptime) | cat >>$LOG
+echo $(cat /proc/uptime) | cat &>>$LOG
 
 
 echo $0 STARTED Phase1aPipe /proc/uptime= | cat >> $LOG
@@ -142,7 +141,7 @@ echo $(cat /proc/uptime) "," will block | cat   >> $LOG
 ./Phase1aPipe 0 10000000 < PIPE.bmp >  ${RESULT_OF_1a}
 RET=$?
 echo $0 FINISHED returned $RET, /proc/uptime= | cat >> $LOG
-echo $(cat /proc/uptime) | cat >>$LOG
+echo $(cat /proc/uptime) | cat &>>$LOG
 echo Find Phase1a results in ${RESULT_OF_1a} | cat >> $LOG
 
 #1000000 is a large number so all the number of frame from the
@@ -164,16 +163,16 @@ ndiffs=1000000
 
 #echo "./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b}"
 
-echo "./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b}" | cat >>$LOG
+echo "./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b}" | cat &>>$LOG
 
 
 
 #echo
 #echo DEBUGGING $0
 #echo $0 calling:
-#echo ./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 '>' ${RESULTS_DIR}/${RESULT_OF_1b_FIRST_TRY} '2>>' $LOG
+#echo ./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 '>' ${RESULTS_DIR}/${RESULT_OF_1b_FIRST_TRY} '2&>>' $LOG
 
-./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_FIRST_TRY} 2>> $LOG
+./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.5 > ${RESULTS_DIR}/${RESULT_OF_1b_FIRST_TRY}  2>> $LOG
 RET_1b_FIRST=$?
 if [ $RET_1b_FIRST != 0 ]
 then
@@ -191,7 +190,7 @@ echo Find the $nFIRST Phase1b results in ${RESULT_OF_1b_FIRST_TRY} | cat >>$LOG
 #echo
 #echo $0 Debugging...
 #echo $0 End of debugging for now. We will exit.
-#echo $0 End of debugging for now. We will exit | cat >>$LOG
+#echo $0 End of debugging for now. We will exit | cat &>>$LOG
 #exit 1
     
     
@@ -203,8 +202,8 @@ then
 	echo "We will do Phase1b a second time with level=0.98 instead of 0.5  In $0 we not redo Phase1a" | cat >>$LOG
     else
 	echo "Part deux: electric zittzzeezzz.. First try found $n frames with object, too many" | cat >>$LOG
-	echo $0 "calling (with level=0.98 instead of 0.5):" | cat >>$LOG
-	echo "./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.98 '>' ${RESULTS_DIR}/${RESULT_OF_1b_SECOND_TRY} '2>>' $LOG" | cat >> $LOG
+	echo $0 "calling (with level=0.98 instead of 0.5):" | cat &>>$LOG
+	echo "./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.98 '>' ${RESULTS_DIR}/${RESULT_OF_1b_SECOND_TRY} '2&>>' $LOG" | cat >> $LOG
     fi	
     
     ./Phase1bPipe ${RESULTS_DIR}/${RESULT_OF_1a} $ndiffs 0.98 > ${RESULTS_DIR}/${RESULT_OF_1b_SECOND_TRY} 2>> $LOG
@@ -220,7 +219,7 @@ then
     fi
     nSECOND=`cat ${RESULTS_DIR}/${RESULT_OF_1b_SECOND_TRY} | wc -l`
     echo "Phase 1B: Re-Done reports $nSECOND frames with objects." | cat >> $LOG
-    echo see ${RESULTS_DIR}/${RESULT_OF_1b_SECOND_TRY} | cat >> $LOG
+    echo see ${RESULTS_DIR}/${RESULT_OF_1b_SECOND_TRY} | cat &>> $LOG
 fi
 
 #rare msgs to user

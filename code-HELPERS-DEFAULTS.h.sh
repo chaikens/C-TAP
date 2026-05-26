@@ -1,9 +1,12 @@
 echo SOURCED: code-HELPERS-DEFAULTS.h.sh
 set -u #NOW, expanding undefined shell variables will give an error like in decent languages!
+source code-HELPERS.h.sh
+start_dir=$(pwd)
+
 JOBNAME=$(basename $0 | sed -n 's/C-TAP-\(..*\).sh/\1/p')
 if [ $JOBNAME"" = "" ]
 then
-    echo Your top level script should be named C-TAP-<jobname>.sh
+    echo 'Your top level script should be named C-TAP-<jobname>.sh'
     echo not $0
     echo Sorry you can recode all this though since it is open/free.
     exit 1
@@ -13,16 +16,46 @@ fi
 # defaults
 #
 
-REUSE_BMPS=no
-FAST_FILESYS_DIR_IF_USED=
+ffmpeg_xterm_running="no" #so we don't start more than one!
+
+KEEP_ANY_OLD_XTERMS="" #default is do killall xterm near beginning
+#so xterms still running after we fail will be killed.
+#Yes may be user preference, also in case they have  named xterm are used 
+
+KILL_XTERMS_DONT_ASK="no"
+#default: Ask user at shell to kill our xterms, give 20 sec to answer yes.
+
+RUN_EXPLANATION=""
 DEBUG=false
+SOFTWARE_DIR=$(pwd)
+FAST_FILESYS_DIR_IF_USED=
+RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}-$(mydate)"
+
+MAKE_BABY_MOVIE=yes
+BABY_MOVIE_CIRCLE_RAD_PIX=9
+
+#Other and future uses will not use this, it's referred in the Phase1a command.
+PHASE1A_OTHER_OPTIONS=""
+
+
+#
+# for ARCHITECTURE=framefile only
+#
+REUSE_BMPS=no
+
+#for BABY MOVIE always, and also pipeline
 BITMAPS_PARENT_DIR=$(pwd)
 BITMAPS_DIR_NAME="bitmaps"
+
 SLOW_MOVIE_DIR=$(pwd)
 
-SOFTWARE_DIR=$(pwd)
-RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
-#For now, we change (mv) its name to save it.
+#for ARCHITECTURE=pipeline only
+PIPE_DIR=${SOFTWARE_DIR}
+
+#Good only for framefile for now; for pipeline
+#is set to "no" in code-SYSCONFIG.h.sh
+MAKE_BABY_MOVIE="yes"
+
 
 #
 #  Helper shell functions
@@ -102,26 +135,69 @@ function padTo6Digs() {
     echo "${pad}$1"
 }
 
+function kill_our_xterms() {
+    #do it by PID
+    if [ "${xterm_pids}none" != "none" ]
+    then
+       kill ${xterm_pids[*]}
+    fi
+}
+
+
 function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
-
-echo "See the results in the xterms and ${RESULTS_DIR}"
-echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
-if ! read -t 20 yes
+echo "See the results in the xterms."
+cd ${start_dir}
+if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]
 then
-    echo OK. Time for asking done, leaving the xterms.
-    echo Kill them manually or use ./killxterms.sh
-fi
-
-if [ ${yes}"" = "yes" ]
-then
-    if [ ${xterm_pids-none} != "none" ]
+    if [ ${xterm_pids}none} != "none" ]
     then
-	kill ${xterm_pids[*]} 
+	$(kill_our_xterms) 
+    fi
+else
+    echo -n "Type yes to kill the xterms. Or, no, or wait 30sec:"
+    if ! read -t 30 yes
+    then
+	echo OK. Time for asking done, leaving the xterms.
+	echo Kill them manually or use ./killxterms.sh
+    else
+	if [ ${yes}"x" = "yesx" ]
+	then
+	       $(kill_our_xterms)
+	fi
     fi
 fi
-
-echo $0 Done.
+echo $0 Done
+if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
+then
+    echo "cd ${RESULTS_DIR} ; pwd; ffplay ${moviePrefix}.${EXT}" > m
+    echo I created file m which contains
+    cat m
+    echo 'ffplay keys: --DownArrow-- to back up, --s-- to step frame, --space-- to play/pause' 
+    echo 'To see the Baby Movie, type source m (or . <space> m)'
+else
+    echo "See results in"
+    echo ${RESULTS_DIR}
+fi
 exit 0
 }
 
+function uptimenow(){
+    cat /proc/uptime | sed -n 's/\([0-9]*\.[0-9]*\) .*/\1/p'
+    
+}
+function numdif(){
+    echo $(dc -e "$1 $2 - p")
+}
+function mydate() {
+    echo $(date +%b%d-%H-%M%S) #May22-19-2513 MonDay-Hr-MnSc
+}
+# numquotintzn M N echos rounddown(M/N) if this non-zero, 1 if zero.
+# for pixel width of circles.
+function numquotintnz(){
+    echo $(dc -e "1 Sa $1 $2 / d 0 =a p")
+}
+# clumsy reverse polish calculator.
+# Reg-a:=1 so we can put on top of stack if $1/$2 = 0.
+# Push nums, /, if top == 0, push Reg-a's 1, else keep the quot.
+# pop-print the 1 or the quot.

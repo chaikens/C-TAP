@@ -49,16 +49,16 @@ echo $gitcommit | cat >>$LOG
 git remote --verbose | cat >>$LOG #Worldwide readers of the log can get the software!
 ################################################################################
 
-make -C ../.. &>> $LOG #ensure filters are up to date.  -C means do it in specified dir.
-makeRet=$?
-if [ $makeRet != 0 ]
-then
-    echo Make at toplevel returned error code $makeRet. | cat >>$LOG
-    echo Make at toplevel returned error code $makeRet.
-    echo Check this out before continuing.  Here is the log.
-    cat $LOG
-    exit 1
-fi
+#make -C ../.. &>> $LOG #ensure filters are up to date.  -C means do it in specified dir.
+#makeRet=$?
+#if [ $makeRet != 0 ]
+#then
+#    echo Make at toplevel returned error code $makeRet. | cat >>$LOG
+#    echo Make at toplevel returned error code $makeRet.
+#    echo Check this out before continuing.  Here is the log.
+#    cat $LOG
+#    exit 1
+#fi
 
 
 ####################################################################################
@@ -77,28 +77,31 @@ echo "(our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe
 echo " (redirects to/from files) > movie.int > (Phase1bPipe) > file.out " | cat >>$LOG
 echo This is coded by DoOneMovieHalfDecimated1ab.sh | cat >>$LOG 
 
+xterm -geometry 120x80+0+0 -sb -title 'C-TAP LOG' -e tail -f $LOG &
+
+touch $MOVIE_BASE.int
+xterm -geometry 180x30+0+180 -title 'Phase 1a (.int file) output'  -e tail -f $MOVIE_BASE.int &
+
+touch ffmpeg.log
+xterm -geometry 132x30+0+0 -title 'ffmpeg mp4->raw yuv stream' -e tail -f ffmpeg.log &
+
+
 #########   Code what to do here to go in our  time command ########################
 #                                                                                  #
 DO_ONE_MOVIE_SHELL_SCRIPT=./DoOneMovieHalfDecimated1ab.sh                          #
 #                                                                                  #
 ####################################################################################
-/usr/bin/time -o ${MOVIE_BASE}.time \
+/usr/bin/time --verbose -o ${MOVIE_BASE}.time \
      -f 'real    %U\nuser  %E\nsys      %S' \
      ${DO_ONE_MOVIE_SHELL_SCRIPT} \
      $MOVIE_FILE $LOG &
 ####################################################################################
 
-
-
-xterm -geometry 132x30+0+0 -title 'ffmpeg mp4->raw yuv stream' -e tail -f ffmpeg.log &
-xterm -geometry 180x30+0+180 -title 'Phase 1a (.int file) output'  -e tail -f $MOVIE_BASE.int &
-
 wait %/usr/bin/time
 
-kill %2 %3 #the above 2 xterms
+#kill %2 %3 #the above 2 xterms
 
 #These reports come out fast..
-xterm -geometry 120x80+0+0 -sb -title 'C-TAP LOG' -e less -f $LOG &
 xterm -geometry 80x80+0+0 -sb -title 'FIRST Phase1b .out' -e less -f $MOVIE_BASE.out &
 
 #echo "To see progress logs, run"
