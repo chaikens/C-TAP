@@ -13,8 +13,6 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
-KILL_XTERMS_DONT_ASK="yes"
-
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 
 ARCHITECTURE="framefile"
@@ -84,17 +82,17 @@ FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/1
 #     MOVIE_SCALE_OPTION="--movie-scale 2"
 #     PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 #     USER_SCALE_OPTION="--user-scale 1"
-#     OTHER_OPTIONS="--no-crop --camera-index 1"
+#     OTHER_OPTIONS=" --camera-index 1"
 #     #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
 #     #and also named a camera for it.
 
 #for HALF FRAME, (DECIMATED) extraction.
 
-MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
+MOVIE_TO_FRAME_DIV=2 #Should get rid of this.
 MOVIE_SCALE_OPTION="--movie-scale 1"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--no-crop --camera-index 1"
+OTHER_OPTIONS=" --camera-index 1"
 
 #In the Phase1a C++ program, we wrote
 #an exclusion zone function for DroneShort1,

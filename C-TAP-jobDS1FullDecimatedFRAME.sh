@@ -13,8 +13,6 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
-KILL_XTERMS_DONT_ASK="yes"
-
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 
 ARCHITECTURE="framefile"
@@ -22,7 +20,7 @@ ARCHITECTURE="framefile"
 
 if [ $ARCHITECTURE = "framefile" ]
 then		   
-       REUSE_BMPS=yes
+       REUSE_BMPS=no
        BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
        BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
        BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
@@ -75,15 +73,29 @@ FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
 
-#Settings below are used for both the pipeline and frame .bmp architectures
+#For FULL FRAME with DECIMATION extraction by ffmpeg
+#Also, the 2nd filter setpts is set presentation timestamps
+FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 
-#for FULL FRAME, (DECIMATED) RESOLUTION
+#for HALF-RESOLUTION, ditto (simply add the scale filter)
+#FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+
+# THIS DroneShort1.mov ONLY: In the Phase1a C++ program, we wrote an exclusion
+# zone function for DroneShort1, and also named a camera for it.
+#for the DroneShort1.mov only, both pipeline and framebmp arch,
+#(1) --camera-index 1 selects the exclusion zone to hide the data/time display.
+#    We hard coded this and camera name DroneShort1.
+#(2) CROP half-way down, 1080/2 to eliminate the trees. (more than original Camsett)
+
+#for FULL FRAME resolution, DECIMATED/pts extraction: 
 
 MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
 MOVIE_SCALE_OPTION="--movie-scale 2"
-PIXPROC_SCALE_OPTION="--pixproc-scale 1"
+PIXPROC_SCALE_OPTION="--pixproc-scale 2"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--no-crop --camera-index 1"
+OTHER_OPTIONS=" --camera-index 1"
+PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920"
+#PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 960 --CROP_YF 1920"
 #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
 #and also named a camera for it.
 

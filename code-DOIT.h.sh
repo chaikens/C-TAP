@@ -8,11 +8,11 @@ cd ${SOFTWARE_DIR}
 
 ###################################
 #
-Phase1a=Phase1aPipeOpt  #compiled from FLIRanalysisPhase1aCamXPipeOpt.cpp, alongside us.
-Phase1b=Phase1bPipeOpt  #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
+phase1a="Phase1aPipeOpt" #compiled from FLIRanalysisPhase1aCamXPipeOpt.cpp, alongside us.
+phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
 #
 #####################
-if ! make ${Phase1a} ${Phase1b}
+if ! make ${phase1a} ${phase1b}
 then
     echo make the C++ progs we need failed.  Check this out.
     exit 1

@@ -1,13 +1,18 @@
 echo SOURCED: code-ANALYSIS.h.sh
 
+#Phase1ab common options
+opt_scaling="${MOVIE_SCALE_OPTION} ${PIXPROC_SCALE_OPTION} ${USER_SCALE_OPTION}"
+
+phase1a_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS} ${PHASE1A_OTHER_OPTIONS}"
+
 #check if $BITMAPS_DIR is null if we are not reusing bitmaps..I think that's done??
 if [ $ARCHITECTURE = "framefile" ]
 then
-    opt_phase1a_bitmaps="--bitmaps-dir $BITMAPS_DIR"
+    phase1a_options="${phase1a_options} --bitmaps-dir $BITMAPS_DIR"
     #Note Phase1a --pipeline REJECTS --bitmaps-dir option. 
 fi
 
-opt_scaling="${MOVIE_SCALE_OPTION} ${PIXPROC_SCALE_OPTION} ${USER_SCALE_OPTION}"
+phase1b_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS}"
 
 #for pipelined frames: ffmpeg_pipe_extract input-movie-filename pipe-filename-with-yuv
 # It should be a named Unix pipe.

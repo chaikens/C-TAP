@@ -8,25 +8,18 @@
 source code-HELPERS-DEFAULTS.h.sh   #
 echo Running your job $JOBNAME      #
 #####################################
-
-############################
-echo YOUR-SYSCONF-$JOBNAME #
-############################
-
-KILL_XTERMS_DONT_ASK="yes"
+echo YOUR-SYSCONF-$JOBNAME          #
+#####################################
 
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
+#these are used even for pipeline arch, where
+#the BITMAP dir is used for the BABY MOVIE
+BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
+BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
+BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
 ARCHITECTURE="pipeline"
 #"framefile" #vs #pipeline
-
-if [ $ARCHITECTURE = "framefile" ]
-then		   
-       REUSE_BMPS=yes
-       BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
-       BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
-       BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
-fi
 
 ###########END OF YOUR-SYSCONF###
 source code-SYSCONFIG.h.sh      #
@@ -34,14 +27,18 @@ source code-SYSCONFIG.h.sh      #
 echo YOUR-MOVIES-$JOBNAME       #
 #################################
 
-ext=mp4
+#####################################################################
+#           Configure here which movie(s) to process                #
+#####################################################################
 
-#Here is an example of how to configure a directory
-# full of movies for C-TAP's research, not testing.
-#      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
-#
-
+ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
+#### note-we used multiple names for the same movie to separated different experiments.
+
+#####################################################################
+#Here is how to configure a dir full of movies for research, not    #
+# testing: movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"     #
+#####################################################################
 
 #################################
 source code-MOVIES.h.sh         #
@@ -50,10 +47,6 @@ echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
 OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
-
-#Not done yet: when we specify pipelining here, and include the below
-#analysis options, that is what is done.  We'll look at TESTING/TestPipeOpt code
-#to do that.
 
 #The FLIR Algorithm requires the frame sequence to be decimated.
 #So, frame times get lost when extracted!
@@ -65,27 +58,33 @@ OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 #Beware: ffmpeg option names are -single_dash_underscore_sep.
 #Whilst our C++ commands use Unix style --double-dash-dash-sep.
 
+
 #For FULL FRAME with DECIMATION extraction by ffmpeg
 #Also, the 2nd filter setpts is set presentation timestamps
 FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 
+#for HALF-RESOLUTION, ditto (simply add the scale filter)
+#FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+
 #for HALF-RESOLUTION with DECIMATION extraction.
 #FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
-#See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
-# single output options.
+# THIS DroneShort1.mov ONLY: In the Phase1a C++ program, we wrote an exclusion
+# zone function for DroneShort1, and also named a camera for it.
+#for the DroneShort1.mov only, both pipeline and framebmp arch,
+#(1) --camera-index 1 selects the exclusion zone to hide the data/time display.
+#    We hard coded this and camera name DroneShort1.
+#(2) CROP half-way down, 1080/2 to eliminate the trees. (more than original Camsett)
 
-#Settings below are used for both the pipeline and frame .bmp architectures
-
-#for FULL FRAME, (DECIMATED) RESOLUTION
+#for FULL FRAME resolution, DECIMATED/pts extraction: 
 
 MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
 MOVIE_SCALE_OPTION="--movie-scale 2"
-PIXPROC_SCALE_OPTION="--pixproc-scale 1"
+PIXPROC_SCALE_OPTION="--pixproc-scale 2"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--no-crop --camera-index 1"
-#In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
-#and also named a camera for it.
+OTHER_OPTIONS=" --camera-index 1"
+PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920"
+#PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 960 --CROP_YF 1920"
 
 #for HALF FRAME, (DECIMATED) extraction.
 # COMMENTED OUT
@@ -93,13 +92,12 @@ OTHER_OPTIONS="--no-crop --camera-index 1"
 #    MOVIE_SCALE_OPTION="--movie-scale 1"
 #    PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 #    USER_SCALE_OPTION="--user-scale 1"
-#    OTHER_OPTIONS="--no-crop --camera-index 1"
-
-#In the Phase1a C++ program, we wrote
-#an exclusion zone function for DroneShort1,
-#and also named a camera for it.  
+#    OTHER_OPTIONS="--camera-index 1"
+#    PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920"
+##### Explain your run into the log at top and for each movie###
 
 RUN_EXPLANATION="ffmpeg .mp4----> decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out  This is coded by $0"
+
 echo $RUN_EXPLANATION
 
 ####################################

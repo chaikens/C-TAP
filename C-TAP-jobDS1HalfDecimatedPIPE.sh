@@ -8,26 +8,18 @@
 source code-HELPERS-DEFAULTS.h.sh   #
 echo Running your job $JOBNAME      #
 #####################################
-
-############################
-echo YOUR-SYSCONF-$JOBNAME #
-############################
-
-KILL_XTERMS_DONT_ASK="yes"
+echo YOUR-SYSCONF-$JOBNAME          #
+#####################################
 
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
+#these are used even for pipeline arch, where
+#the BITMAP dir is used for the BABY MOVIE
+BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
+BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
+BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
 ARCHITECTURE="pipeline"
 #"framefile" #vs pipeline
-
-if [ $ARCHITECTURE = "framefile" ]
-then		   
-       REUSE_BMPS=yes
-       BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
-       BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
-       BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
-fi
-
 
 ###########END OF YOUR-SYSCONF###
 source code-SYSCONFIG.h.sh      #
@@ -35,14 +27,18 @@ source code-SYSCONFIG.h.sh      #
 echo YOUR-MOVIES-$JOBNAME       #
 #################################
 
-ext=mp4
+#####################################################################
+#           Configure here which movie(s) to process                #
+#####################################################################
 
-#Here is an example of how to configure a directory
-# full of movies for C-TAP's research, not testing.
-#      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
-#
-
+ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
+#### note-we used multiple names for the same movie to separated different experiments.
+
+#####################################################################
+#Here is how to configure a dir full of movies for research, not    #
+# testing: movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"     #
+#####################################################################
 
 #################################
 source code-MOVIES.h.sh         #
@@ -51,10 +47,6 @@ echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
 OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
-
-#Not done yet: when we specify pipelining here, and include the below
-#analysis options, that is what is done.  We'll look at TESTING/TestPipeOpt code
-#to do that.
 
 #The FLIR Algorithm requires the frame sequence to be decimated.
 #So, frame times get lost when extracted!
@@ -77,10 +69,12 @@ FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/1
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
 
-#Settings below are used for both the pipeline and frame .bmp architectures
+# THIS MOVIE ONLY: In the Phase1a C++ program, we wrote an exclusion
+# zone function for DroneShort1, and also named a camera for it.
+
+# These are used for both pipeline and frame .bmp architectures.
 
 #For FULL FRAME, (DECIMATED) RESOLUTION
-# These are used for both pipeline and frame .bmp architectures.
 # COMMENTED OUT
 #     MOVIE_TO_FRAME_DIV=1  #used by pipe arch, but not yet here.
 #     MOVIE_SCALE_OPTION="--movie-scale 2"
@@ -96,17 +90,15 @@ MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
 MOVIE_SCALE_OPTION="--movie-scale 1"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--no-crop --camera-index 1"
+OTHER_OPTIONS="--camera-index 1"
 
-#In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
-#and also named a camera for it.  
+#In the Phase1a C++ program, we wrote an exclusion zone
+# function for DroneShort1, and also named a camera for it.  
      
-#We're refactoring this from TESTING/TestPipelineOPT where
-#we had after defining the above,
-#source DoOneMoviePipeCommon.h.sh
-
 ##### Explain your run into the log at top and for each movie###
+
 RUN_EXPLANATION="ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out  This is coded by $0"
+
 echo $RUN_EXPLANATION
 
 ####################################

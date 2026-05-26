@@ -1,6 +1,5 @@
 echo SOURCED: code-FRAMEFILE-EXTRACT-1A.h.sh
 echo "bitmaps dir="${BITMAPS_DIR}
-echo "will we reuse bitmaps?"${REUSE_BMPS}
 
 pushd $BITMAPS_DIR  > /dev/null #ffmpeg puts bitmaps in its cwd.
     
@@ -13,7 +12,8 @@ pushd $BITMAPS_DIR  > /dev/null #ffmpeg puts bitmaps in its cwd.
 if [ ${REUSE_BMPS}"" != "yes" ]
 then
     echo "STEP:" "Extracting .bmp's" >> $LOG
-        
+    echo "Extracting .bmp's"
+    
     # BITMAPS_DIR is assurred at the beginning, not sep. for each movie
     rm  -f $BITMAPS_DIR/*
     #aside from saving space, we must delete old bitmaps
@@ -23,7 +23,7 @@ then
     # we can then watch it from another
     # shell.  (In unix, a dir/file remade with the same name is different.)
 	
-    #ffmpeg -xerror -threads 0 -hide_banner -an -i ${movie_file}  thumb%06d.bmp  &> ${RESULTS_DIR}/ffmpeg.outputs 
+    #ffmpeg -xerror -threads 0 -hide_banner -an -i ${movie_file}  thumb%06d.bmp  &> ${RESULTS_DIR}/ffmpeg.log 
 
     #we now know decimation is necessary for the FLIR algorithm
     
@@ -37,7 +37,7 @@ then
     #       -vf                                                            \
     #        'scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB'  \
     #       thumb%06d.bmp                                                  \
-    #       &> $RESULTS_DIR/ffmpeg.outputs"
+    #       &> $RESULTS_DIR/ffmpeg.log"
 
     echo "STEP:" Running >> $LOG
     # FFMPEG_EXTRACT_CMD is embedded in ffmpeg_bmp_extract() shell fn from config.
@@ -47,8 +47,10 @@ then
     echo "PGM:" >> $LOG
     (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     echo "FFMPEG_EXTRACT_FILTER=${FFMPEG_EXTRACT_FILTER}" >>${COMMAND_ARCHIVE_PATHNAME}
-    
-    xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.outputs &
+
+    ffmpeg_xterm_running="yes"
+    touch ${RESULTS_DIR}/ffmpeg.log #so we have one.
+    xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
     xterm_pids+=($!) #for killing 'em
 
     extract_start_time=$(uptimenow)
@@ -57,7 +59,7 @@ then
     echo "See progress in the ffmpeg extract bitmaps window. Now's a good coffee break time."
     echo "TIME:" "ffmpeg extraction started at $extract_start_time sec." >> $LOG
 
-    ffmpeg_bmp_extract $movie_file $RESULTS_DIR/ffmpeg.outputs
+    ffmpeg_bmp_extract $movie_file $RESULTS_DIR/ffmpeg.log
     ret=$?
 
     extract_finish_time=$(uptimenow)
@@ -71,7 +73,7 @@ then
 	echo
 	echo ffmpeg error
 	echo opening emacs on ffmpeg output
-	emacs ${RESULTS_DIR}/ffmpeg.outputs &
+	emacs ${RESULTS_DIR}/ffmpeg.log &
 	echo exiting
 	exit 1
     fi
@@ -92,7 +94,6 @@ then
 else
     echo
     echo "We're reusing movie bitmaps for debugging speed."
-    echo
     echo "INFO:" >> $LOG
     echo "INFO:" "We're reusing movie bitmaps for debugging speed." >> $LOG
     echo >> $LOG
@@ -166,100 +167,97 @@ else
     fi
 fi
 
-
-
-
 echo
 echo "Beginning Phase1a"
 echo
 
-if [ true ]
-then
-    # run Phase1a once on all the frames
-    Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a 0 $nframes 0"
-    Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_phase1a_bitmaps} "
-    Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
-    Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
-    Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
-    Phase1a_cmd_args="${Phase1a_cmd_args} ${PHASE1A_OTHER_OPTIONS} "
-    Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
+echo $0 "STARTING Phase1a"
 
-    echo Running
-    echo ${Phase1a_cmd}
-    ( echo ; echo ${Phase1a_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
-    
-    eval ${Phase1a_cmd} 
-    err=$?
-    if [ ${err} != 0 ]
-    then
-	echo "Phase1a run in a single stage returned error code $err"
-	echo "$0 running in cwd=" $(pwd)
-	echo "$0 will exit. Heres the bad command:"
-	echo
-	echo ${Phase1a_cmd}
-	echo
-	exit 1
-    fi
+#if [ true ]
+#then
+
+# run Phase1a once on all the frames
+phase1a_cmd_args="${SOFTWARE_DIR}/${phase1a}"
+phase1a_cmd_args+=" ${phase1a_options} "
+phase1a_cmd="${phase1a_cmd_args} 0 $nframes 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
+  
+echo Running
+echo ${phase1a_cmd}
+( echo ; echo ${phase1a_cmd} )  >>${COMMAND_ARCHIVE_PATHNAME}
+( echo -n "PGM: " ; echo ${phase1a_cmd} )  >>${LOG}
+
+eval ${phase1a_cmd} 
+err=$?
+if [ ${err} != 0 ]
+then
+    echo "Phase1a run in a single stage returned error code $err"
+    echo "$0 running in cwd=" $(pwd)
+    echo "$0 will exit. Heres the bad command:"
+    echo
+    echo ${phase1a_cmd}
+    echo
+    exit 1
+fi
 
     
     #first 0 = first frame number
     #2nd 0 = CC (Cloud Cover) parameter; not used.
-else
+#else
     #
     # orig. code runs Phase1 in stages
     # we must consult Matt Sz. to see if we should get rid of this.
     # One frame pair comparison is lost for each new stage.
     # 
-    u=0; v=0
-    w=30
-    t=$((f/w))
-    echo "Removing any quantum woo; reticulating $t splines..."
+    #u=0; v=0
+    #w=30
+    #t=$((f/w))
+    #echo "Removing any quantum woo; reticulating $t splines..."
     #since the stager appends to the result file..
-    cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
-    while [ $u -lt $nframes ]
-    do
+    #cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+    #while [ $u -lt $nframes ]
+    #do
 	
-	Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
+	#Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a $u $t 0 "
 	#OK diff with brother FullScaling
-	Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_phase1a_bitmaps} "
-	Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
-	Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
+	#Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_phase1a_bitmaps} "
+	#Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
+	#Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
 	
-	Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
-	Phase1a_cmd_args="${Phase1a_cmd_args} ${PHASE1A_OTHER_OPTIONS} "
-	Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
+	#Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
+	#Phase1a_cmd_args="${Phase1a_cmd_args} ${PHASE1A_OTHER_OPTIONS} "
+	#Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 
-	eval ${Phase1a_cmd}  #this does the trick
-	err=$?
-	if [ ${err} != 0 ]
-	then
-	    echo "Phase1a in loop of stages returned error code $err"
-	    echo "$0 running in cwd=" $(pwd)
-	    echo "$0 will exit. Heres the bad command:"
-	    echo
-	    echo ${Phase1a_cmd}
-	fi
+	#eval ${Phase1a_cmd}  #this does the trick
+	#err=$?
+	#if [ ${err} != 0 ]
+	#then
+	    #echo "Phase1a in loop of stages returned error code $err"
+	    #echo "$0 running in cwd=" $(pwd)
+	    #echo "$0 will exit. Heres the bad command:"
+	    #echo
+	    #echo ${Phase1a_cmd}
+	#fi
 	
-	((++v))
-	echo Phase 1A: From $u to $((t+u)) "," Part $v of $w Done
-	if [ $v -gt $w ]
-	then
-	    echo "Don't panic -- there was a remainder from the division!"
-	fi
-	u=$((u+t))
-	if [ $((u+t)) -gt $nframes ]
-	then
-	    t=$((nframes-u))
-	fi
-    done
-fi
+	#((++v))
+	#echo Phase 1A: From $u to $((t+u)) "," Part $v of $w Done
+	#if [ $v -gt $w ]
+	#then
+	 #   echo "Don't panic -- there was a remainder from the division!"
+	#fi
+	#u=$((u+t))
+	#if [ $((u+t)) -gt $nframes ]
+	#then
+	 #   t=$((nframes-u))
+	#fi
+    #done
+#fi
 
 ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
 echo
 echo Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in"
 echo "${RESULTS_DIR}/${RESULT_OF_1a_BASE}"
 
-echo "INFO:" | cat >>$LOG 
+echo "INFO:" >>$LOG 
 echo "INFO:" Phase1a computed $(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l ) difference lines "in" >>$LOG 
 echo "INFO:" "${RESULTS_DIR}/${RESULT_OF_1a_BASE}"  >>$LOG 
 

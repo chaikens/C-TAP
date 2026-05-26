@@ -129,11 +129,12 @@ rm -f ${bmppipe}
 mknod ${bmppipe} p
 
 now=$(uptimenow)
-echo "STEP:" STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at $now seconds. >> $LOG
-echo STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at $now seconds.
+echo "STEP:" 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at $now seconds.' >> $LOG
+echo 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at $now seconds.'
 
 
-$(ffmpeg_pipe_extract ${movie_file} ${bmppipe}) & #MUST BE IN BACKGROUND!!
+$(ffmpeg_pipe_extract ${movie_file}) & #MUST BE IN BACKGROUND!!
+#PIPE.yuv is hardcoded in ffmpeg_pipe_extract.
 
 #Will experiment with more parameters.  The original C-TAP
 # cut back the resolution.
@@ -151,34 +152,28 @@ eval /usr/bin/time --verbose --output=$LOG --append $yuv_filter_cmd &
 
 echo "TIME:" Started YUVToBMPStreamFilter at /proc/uptime=$(uptimenow) seconds. | cat >> $LOG
 
-#begin Phase1a
-
-user_options="${OTHER_OPTIONS} ${MOVIE_SCALE_OPTION} ${PIXPROC_SCALE_OPTION} ${USER_SCALE_OPTION}"
-#Pass to all although they are not fully used.
-
-#Phase1a
+echo
+echo $0 "Begnning Phase1a"
+echo
 
 echo "STEP:" $0 "STARTING Phase1aPipeOpt"  | cat >> $LOG
-echo $0 "STARTING Phase1aPipeOpt"
 phase1a_start_time=$(uptimenow)
 prt=" /proc/uptime=${phase1a_start_time} sec., please wait; See progress in Phasa1a .int window."
 echo $prt
 echo "TIME:" $prt >> $LOG
 
-Phase1a_cmd_args="${SOFTWARE_DIR}/$Phase1a --pipeline "
-Phase1a_cmd_args="${Phase1a_cmd_args} 0 100000000 0"
-Phase1a_cmd_args="${Phase1a_cmd_args} ${OPT_CamSett} "
-Phase1a_cmd_args="${Phase1a_cmd_args} ${opt_scaling} "
-Phase1a_cmd_args="${Phase1a_cmd_args} ${OTHER_OPTIONS} "
-Phase1a_cmd_args="${Phase1a_cmd_args} < ${bmppipe} "
-Phase1a_cmd="${Phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
+phase1a_cmd_args="${SOFTWARE_DIR}/${phase1a} --pipeline "
+phase1a_cmd_args+=" ${phase1a_options} "
+phase1a_cmd_args+=" 0 100000000 0 "
+phase1a_cmd_args+=" < ${bmppipe} "
+phase1a_cmd="${phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 
-(echo "CMD:" ; echo "CMD:" ${Phase1a_cmd}; echo ) >> $LOG
-(echo ; echo ${Phase1a_cmd}; echo ) >> ${COMMAND_ARCHIVE_PATHNAME}
+(echo "CMD:" ; echo "CMD:" ${phase1a_cmd}; echo ) >> $LOG
+(echo ; echo ${phase1a_cmd}; echo ) >> ${COMMAND_ARCHIVE_PATHNAME}
 echo "About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log."
-echo "eval" "/usr/bin/time ${Phase1a_cmd}"
+echo "eval" "/usr/bin/time ${phase1a_cmd}"
 
-eval "/usr/bin/time --verbose ${Phase1a_cmd}"  #FOREGROUND. stderr from cmd and time go to LOG.
+eval "/usr/bin/time --verbose ${phase1a_cmd}"  #FOREGROUND. stderr from cmd and time go to LOG.
 RET=$?
 echo >>$LOG #space after time report
 
@@ -194,7 +189,7 @@ echo "INFO:" "Find Phase1aPipeOpt results in  ${RESULTS_DIR}/${RESULT_OF_1a_BASE
 
 if [ $RET != 0 ]
 then
-    echo $Phase1a_cmd
+    echo $phase1a_cmd
     echo returned status $RET
     echo $0 exiting, bye bye.
     exit $RET

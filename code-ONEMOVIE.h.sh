@@ -41,13 +41,14 @@ echo "TIME:" $start_time_one_movie seconds. >>$LOG
 if [ "${RUN_EXPLANATION}X" != "X" ]
 then
    echo
-   echo > $LOG
+   echo >> $LOG
    echo Your run explanation:
-   echo "INFO:" Your run explanation: > $LOG
+   echo "INFO:" Your run explanation: >> $LOG
    echo
-   echo > $LOG
+   echo >> $LOG
    echo ${RUN_EXPLANATION}
-   echo "INFO:" ${RUN_EXPLANATION} > $LOG
+   echo
+   echo "INFO:" ${RUN_EXPLANATION} >> $LOG
 fi
 
 #It's a good idea to first commit the scripts, programs, settings, etc to be tested.
@@ -117,23 +118,25 @@ xterm_pids+=($!) #for killing 'em
 # level for Phase1b first try is 0.5, here----------------------------------------------V---
 #
 PHASE1B_PARAM=0.5
-Phase1b_cmd="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_PARAM} "
-Phase1b_cmd="${Phase1b_cmd} ${OPT_CamSett} "
-Phase1b_cmd="${Phase1b_cmd} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>>$LOG"
+
+phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+phase1b_cmd="${SOFTWARE_DIR}/$phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_PARAM} "
+phase1b_cmd="${phase1b_cmd} ${OPT_CamSett} "
+phase1b_cmd="${phase1b_cmd} > $phase1b_out 2>>$LOG"
 
 echo Running
-echo ${Phase1b_cmd} 
-( echo ; echo ${Phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
+echo ${phase1b_cmd} 
+( echo ; echo ${phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
-#${Phase1b_cmd} > ${RESULT_DIR}/${RESULT_OF_1b_BASE}
+#${Phase1b_cmd} > $phase1b_out
 
 (echo "CMD:" ; echo "CMD:" "First 1b try command:") | cat >> $LOG 
 
-echo "CMD:" ${Phase1b_cmd} >> $LOG
+echo "CMD:" ${phase1b_cmd} >> $LOG
 echo >> $LOG
 echo "INFO:" Phase1b report: >> $LOG
 echo >> $LOG
-eval ${Phase1b_cmd} 
+eval ${phase1b_cmd} 
 err=$?
 if [ ${err} != 0 ]
 then
@@ -143,10 +146,10 @@ then
     echo "$0 will exit.  See cmd above^^."
     exit 1
 fi
-n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
+n=`cat $phase1b_out | wc -l`
 echo
 echo "First try of Phase1b reported $n frames have objects, see the lines in:"
-echo ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+echo $phase1b_out
 echo
 
 if [ $n -gt 50000 ] || [ $n -eq 0 ]
@@ -184,17 +187,17 @@ then
 	# level for Phase1b redo is 0.98, here-----------------------------------------------------------V---
 	#
 	PHASE1B_REDO_PARAM=0.98
-	Phase1b_redo_cmd="${SOFTWARE_DIR}/$Phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_REDO_PARAM} "
-	Phase1b_redo_cmd="${Phase1b_redo_cmd} ${OPT_CamSett} "
-	Phase1b_redo_cmd="${Phase1b_redo_cmd} > ${RESULTS_DIR}/${RESULT_OF_1b_BASE} 2>>$LOG"
-	( echo  ; echo "${Phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
-	(echo "CMD:" ; echo "CMD:" "${Phase1b_redo_cmd}" ; echo Report ) | cat >> $LOG
-	eval $Phase1b_redo_cmd
+	phase1b_redo_cmd="${SOFTWARE_DIR}/$phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_REDO_PARAM} "
+	phase1b_redo_cmd="${phase1b_redo_cmd} ${OPT_CamSett} "
+	phase1b_redo_cmd="${phase1b_redo_cmd} > $phase1b_out 2>>$LOG"
+	( echo  ; echo "${phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
+	(echo "CMD:" ; echo "CMD:" "${phase1b_redo_cmd}" ; echo Report ) | cat >> $LOG
+	eval $phase1b_redo_cmd
 	err=$?
 	phase1b_finish_time=$(uptimenow)
 	if [ ${err} != 0 ]
 	then
-	    echo "Phase1b redo run returned error code $err"
+	    echo "phase1b redo run returned error code $err"
 	    echo "$0 running in cwd=" $(pwd)
 	    #echo "$0 will continue and do a redo with level=0.98 instead of 0.5"
 	    echo "$0 will exit.  See cmd above^^."
@@ -202,8 +205,8 @@ then
 	fi
 
 	
-	n=`cat ${RESULTS_DIR}/${RESULT_OF_1b_BASE} | wc -l`
-	echo "Phase 1B: Re-Done reports $n frames with objects."
+	n=`cat $phase1b_out | wc -l`
+	echo "phase 1B: Re-Done reports $n frames with objects."
 	echo "INFO:" "Phase 1B: Re-Done reports $n frames with objects." >> $LOG
 	echo "TIME:" "Phase 1B finished at $phase1b_finish_time sec" >> $LOG
 	echo "TIME:" "Took $(numdif $phase1b_finish_time $phase1b_start_time) sec." >> $LOG
@@ -232,7 +235,7 @@ fi
 if [ $MAKE_BABY_MOVIE = "yes" ]
 then
     echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
-    source "${SOFTWARE_DIR}/code-BMP-BABYMOVIE.h.sh"
+    source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
 else
     echo "No baby movie today, someone said no, or our pipeline can't do it yet."
 fi
