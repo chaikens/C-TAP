@@ -201,3 +201,7 @@ function numquotintnz(){
 # Reg-a:=1 so we can put on top of stack if $1/$2 = 0.
 # Push nums, /, if top == 0, push Reg-a's 1, else keep the quot.
 # pop-print the 1 or the quot.
+
+function echofold() {
+    echo $@ | fold --spaces --width=100
+}

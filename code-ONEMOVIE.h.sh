@@ -25,6 +25,9 @@ popd > /dev/null
 ((logn++))
 
 LOG=${RESULTS_DIR}/$moviePrefix.log.$logn
+TIMELOG=${RESULTS_DIR}/$moviePrefix.times.$logn
+time_cmd_prefix="/usr/bin/time --verbose --output=${TIMELOG} --append "
+#We use /usr/bin/time instead of shell's builtin time.
 #Devel: Idea make copies of .int, .cmds, and .out (ffmpeg.output too?) with .ext.$logn
 
 #cat /dev/null > $LOG #start with an empty log.
@@ -43,6 +46,7 @@ then
    echo
    echo >> $LOG
    echo Your run explanation:
+   echo
    echo "INFO:" Your run explanation: >> $LOG
    echo
    echo >> $LOG
@@ -121,19 +125,21 @@ xterm_pids+=($!) #for killing 'em
 PHASE1B_PARAM=0.5
 
 phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
-phase1b_cmd="${SOFTWARE_DIR}/$phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_PARAM} "
-phase1b_cmd="${phase1b_cmd} ${OPT_CamSett} "
-phase1b_cmd="${phase1b_cmd} > $phase1b_out 2>>$LOG"
+phase1b_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
+phase1b_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_PARAM} "
+phase1b_cmd+=" ${OPT_CamSett} "
+phase1b_cmd+=" > $phase1b_out 2>>$LOG"
 
 echo Running
-echo ${phase1b_cmd} 
+echofold ${phase1b_cmd}
 ( echo ; echo ${phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
 #${Phase1b_cmd} > $phase1b_out
 
 (echo "CMD:" ; echo "CMD:" "First 1b try command:") | cat >> $LOG 
 
-echo "CMD:" ${phase1b_cmd} >> $LOG
+echo -n "CMD:"
+echo $(echofold $phase1b_cmd) >> $LOG
 echo >> $LOG
 echo "INFO:" Phase1b report: >> $LOG
 echo >> $LOG
@@ -188,11 +194,14 @@ then
 	# level for Phase1b redo is 0.98, here-----------------------------------------------------------V---
 	#
 	PHASE1B_REDO_PARAM=0.98
-	phase1b_redo_cmd="${SOFTWARE_DIR}/$phase1b ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_REDO_PARAM} "
-	phase1b_redo_cmd="${phase1b_redo_cmd} ${OPT_CamSett} "
-	phase1b_redo_cmd="${phase1b_redo_cmd} > $phase1b_out 2>>$LOG"
+	
+	phase1b_redo_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
+	phase1b_redo_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_REDO_PARAM} "
+	phase1b_redo_cmd+=" ${OPT_CamSett} "
+	phase1b_redo_cmd+="  > $phase1b_out 2>>$LOG"
 	( echo  ; echo "${phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
-	(echo "CMD:" ; echo "CMD:" "${phase1b_redo_cmd}" ; echo Report ) | cat >> $LOG
+	echo "CMD:"
+	$(echofold  "${phase1b_redo_cmd}") >> $LOG
 	eval $phase1b_redo_cmd
 	err=$?
 	phase1b_finish_time=$(uptimenow)
@@ -233,7 +242,7 @@ fi
 # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
 
 
-if [ $MAKE_BABY_MOVIE = "yes" ]
+if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then
     echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
     source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"

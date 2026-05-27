@@ -177,16 +177,17 @@ echo $0 "STARTING Phase1a"
 #then
 
 # run Phase1a once on all the frames
-phase1a_cmd_args="${SOFTWARE_DIR}/${phase1a}"
+phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${phase1a}"
 phase1a_cmd_args+=" ${phase1a_options} "
 phase1a_cmd="${phase1a_cmd_args} 0 $nframes 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
   
 echo Running
-echo ${phase1a_cmd}
+echofold ${phase1a_cmd}
 ( echo ; echo ${phase1a_cmd} )  >>${COMMAND_ARCHIVE_PATHNAME}
-( echo -n "PGM: " ; echo ${phase1a_cmd} )  >>${LOG}
+echo -n "PGM: " >>${LOG}
+echofold ${phase1a_cmd}  >>${LOG}
 
-eval ${phase1a_cmd} 
+eval $time_cmd_prefix ${phase1a_cmd} 
 err=$?
 if [ ${err} != 0 ]
 then

@@ -148,7 +148,7 @@ yuv_filter_cmd="${SOFTWARE_DIR}/YUVToBMPStreamFilter   $width $height < ${yuvpip
 # width and height are necessary since yuv frames are raw.
 # so we have to take care if ffmpeg outputs differently sized
 # frames from the movie original.
-eval /usr/bin/time --verbose --output=$LOG --append $yuv_filter_cmd &
+eval $time_cmd_prefix $yuv_filter_cmd &
 
 echo "TIME:" Started YUVToBMPStreamFilter at /proc/uptime=$(uptimenow) seconds. | cat >> $LOG
 
@@ -162,7 +162,7 @@ prt=" /proc/uptime=${phase1a_start_time} sec., please wait; See progress in Phas
 echo $prt
 echo "TIME:" $prt >> $LOG
 
-phase1a_cmd_args="${SOFTWARE_DIR}/${phase1a} --pipeline "
+phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${phase1a} --pipeline "
 phase1a_cmd_args+=" ${phase1a_options} "
 phase1a_cmd_args+=" 0 100000000 0 "
 phase1a_cmd_args+=" < ${bmppipe} "

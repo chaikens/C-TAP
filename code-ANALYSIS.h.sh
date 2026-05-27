@@ -22,7 +22,7 @@ phase1b_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS}"
 #might become exhaused from all those raw video
 #frames.  (They are 54/2 bytes smaller than half the size of .bmp frames.)
 function ffmpeg_pipe_extract() {
-    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &>${RESULTS_DIR}/ffmpeg.log
+    $time_cmd_prefix ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &>${RESULTS_DIR}/ffmpeg.log
 }
 
 #for .bmp frames: ffmpeg_bmp_extract <movie_file-file-name> <logfile>
@@ -30,5 +30,5 @@ function ffmpeg_pipe_extract() {
 #a big mostly boring herd of hogs to occupy your disk; but keeping
 #them is convenient to make a movie of the interesting ones.
 ffmpeg_bmp_extract() {
-    /usr/bin/time --verbose --output=$LOG --append ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &>$2
+    $time_cmd_prefix ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} thumb%06d.bmp &>$2
 }
