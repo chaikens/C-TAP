@@ -1,0 +1,61 @@
+FIRST LINE OF LOG
+TIME: 31383.40 seconds.
+
+INFO: Your run explanation:
+
+INFO: ffmpeg .mp4----> decimation---->dir of .bmp files -----> (Phase1a dir reading) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1FullDecimatedFRAME.sh
+CMD: ./C-TAP-jobDS1FullDecimatedFRAME.sh
+TIME: Wed May 27 05:35:56 PM EDT 2026
+PGM: commit 035c4d35
+PGM:
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+INFO:
+INFO: We're reusing movie bitmaps for debugging speed.
+
+INFO: 444 frames captured
+INFO:
+INFO: Input Origin Report:
+INFO: We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.
+INFO: bmp_width=3840 bmp_height=2160
+DEVEL: Until a new version is completed,
+DEVEL: clipping is done in Phase1a, maybe other stuff is done in Phase1b,
+DEVEL: based on 1920x1080 bmps, not what you have.
+PGM: /usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.tim
+es.1 --append /data/GIT/C-TAP/Phase1aPipeOpt --movie-scale 2 --pixproc-scale 2 --user-scale 1 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1 --crop-args --CROP_XI 0 --CROP_XF 540 
+--CROP_YI 0 --CROP_YF 1920 --bitmaps-dir /media/seth/CTAP/bitmaps-jobDS1FullDecimatedFRAME 0 444 0 
+>> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 
+2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.log.1
+/data/GIT/C-TAP/Phase1aPipeOpt  called!
+new_bitmaps_dir /media/seth/CTAP/bitmaps-jobDS1FullDecimatedFRAME
+/data/GIT/C-TAP/Phase1aPipeOpt CROP values we be set from args : 
+Top-Bot: CROP_XI=0 CROPXF=540
+Lft-Rht: CROP_YI=0 CROPYF=1920
+Compile Time and CamSett crop constants will be *2 before comparison with a pix coord.
+camera_index setting inExclusionZone is 1
+/data/GIT/C-TAP/Phase1aPipeOpt MinThr=14 SubThr=20
+/data/GIT/C-TAP/Phase1aPipeOpt gets 3840x2160 .bmp files.
+/data/GIT/C-TAP/Phase1aPipeOptCROP param from settings, user (not pix/proc) coords, [[I<=,,<F)) :444Top/Bot  CROP_XI=100 CROP_XF=900
+Lft/Rht  CROP_YI=0 CROP_YF=1919
+CamSett CROPs overruled by crop-args options
+INFO:
+INFO: Phase1a computed 443 difference lines in
+INFO: /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1
+CMD:
+CMD: First 1b try command:
+/usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.tim es.1 --append /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.out.1 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.log.1
+
+INFO: Phase1b report:
+
+/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 116.8 +/- 2.71 (units of 0-255)
+So, setting a minimum threshold of 2.0 SIGMA = 121 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 57.69 +/- 25.40
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 59
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
+INFO: 24 baby movie frames.
+TIME: finish at 31433.73 seconds.
+TIME: net 50.33 seconds.

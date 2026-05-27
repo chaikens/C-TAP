@@ -1,0 +1,53 @@
+FIRST LINE OF LOG
+TIME: 31554.21 seconds.
+
+INFO: Your run explanation:
+
+INFO: ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-jobDS1HalfDecimatedFRAME.sh
+CMD: ./C-TAP-jobDS1HalfDecimatedFRAME.sh
+TIME: Wed May 27 05:38:47 PM EDT 2026
+PGM: commit 035c4d35
+PGM:
+origin	git@github.com:chaikens/C-TAP.git (fetch)
+origin	git@github.com:chaikens/C-TAP.git (push)
+INFO:
+INFO: We're reusing movie bitmaps for debugging speed.
+
+INFO: 444 frames captured
+INFO:
+INFO: Input Origin Report:
+INFO: We are reusing thumb[0-9]^6.bmp-s somehow previously extracted.
+INFO: bmp_width=1920 bmp_height=1080
+PGM: /usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.tim
+es.1 --append /data/GIT/C-TAP/Phase1aPipeOpt --movie-scale 1 --pixproc-scale 1 --user-scale 1 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1 --bitmaps-dir 
+/media/seth/CTAP/bitmaps-jobDS1HalfDecimatedFRAME 0 444 0 >> 
+/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.int.1 
+2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.log.1
+/data/GIT/C-TAP/Phase1aPipeOpt  called!
+new_bitmaps_dir /media/seth/CTAP/bitmaps-jobDS1HalfDecimatedFRAME
+camera_index setting inExclusionZone is 1
+/data/GIT/C-TAP/Phase1aPipeOpt MinThr=14 SubThr=20
+/data/GIT/C-TAP/Phase1aPipeOpt gets 1920x1080 .bmp files.
+/data/GIT/C-TAP/Phase1aPipeOptCROP param from settings, user (not pix/proc) coords, [[I<=,,<F)) :444Top/Bot  CROP_XI=100 CROP_XF=900
+Lft/Rht  CROP_YI=0 CROP_YF=1919
+INFO:
+INFO: Phase1a computed 443 difference lines in
+INFO: /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.int.1
+CMD:
+CMD: First 1b try command:
+/usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.tim es.1 --append /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.int.1 443 /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.int.1 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.out.1 2>>/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.log.1
+
+INFO: Phase1b report:
+
+/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedFRAME-May27-17-3847/DroneShort1HalfDecimated.int.1 .int line reading stopped after reaching maximum param 443
+Grey(8-bit) pixel diff mu and sigma of 80.9 +/- 1.82 (units of 0-255)
+So, setting a minimum threshold of 1.0 SIGMA = 82 (so-called SUB threshold of 20)
+And setting a maximum threshold of 254
+The number of pixels above 20 units is 36.57 +/- 17.01
+Minimum number of pixels allowed to be above the sub-threshold of 20 is 38
+Maximum number of pixels allowed to be above the sub-threshold of 20 is 67
+INFO: 164 baby movie frames.
+TIME: finish at 31570.56 seconds.
+TIME: net 16.35 seconds.

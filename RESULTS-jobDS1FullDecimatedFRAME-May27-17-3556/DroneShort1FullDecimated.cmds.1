@@ -1,0 +1,9 @@
+
+#Reused bitmaps, so no extract commands.
+
+/usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.times.1 --append /data/GIT/C-TAP/Phase1aPipeOpt --movie-scale 2 --pixproc-scale 2 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1 --crop-args --CROP_XI 0 --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920 --bitmaps-dir /media/seth/CTAP/bitmaps-jobDS1FullDecimatedFRAME 0 444 0 >> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.log.1
+
+/usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.times.1 --append /data/GIT/C-TAP/Phase1bPipeOpt /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 443 /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.int.1 0.5 --CamSett-file /data/GIT/C-TAP/CamSett.txt > /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.out.1 2>>/data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.log.1
+
+ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/DroneShort1FullDecimated.MOV &>> /data/GIT/C-TAP/RESULTS-jobDS1FullDecimatedFRAME-May27-17-3556/ffmpeg.log
+
