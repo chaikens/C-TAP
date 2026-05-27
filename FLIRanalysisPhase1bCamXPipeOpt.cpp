@@ -15,11 +15,9 @@ Section 3.2.1 on image analysis for UAP research starting on page 11 of https://
                    NumFrames level \
                    number_of_frames_to_process 
 
-
-  $ Phase1bPipeOpt --pipeline [other options] \
-                    NumFrames level \
-                   number_of_frames_to_process \
-    < (pipe or file .int data output of Phase1a )
+  [--pipeline option reports an error and is ignored.  To pipe input,
+     use say PIPE.int for input_filename and a named pipe made by 
+     mknod PIPE.int p to pipe input data to.]
 
   Other options:
   [--CamSett-file filename] 
@@ -473,6 +471,7 @@ static int get_our_options( int *argc, char **argv[])
 	break;
       case 3: Uscale = atoi(optarg);
 	break;
+      case 4: fprintf(stderr, "%s Ignores Option --pipeline. Use PIPE.int instead.\n", (*argv)[0]);
       case 5: fprintf(stderr, "%s Ignores Option --verbose.\n", (*argv)[0]);
 	break;
       }
