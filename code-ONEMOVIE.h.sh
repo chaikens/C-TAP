@@ -7,7 +7,6 @@ echo "Making Mick West redundant, processing ONI FOIA files..."
 FileName="${moviePrefix}.${ext}"
 echo "FileName=$FileName"
 
-
 #
 # PipeOpt version logging edited to use v1 vars.
 #
@@ -74,7 +73,7 @@ xterm -geometry 150x80+1000+0 -sb -title 'C-TAP LOG' -e less +F -f $LOG &
 xterm_pids+=($!) #for killing 'em
 ################################################################################
 
-RESULT_OF_1a_BASE="${moviePrefix}.int"
+RESULT_OF_1a_BASE="${moviePrefix}.int.${logn}"
 cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 #Phase1a used to be will run multiple times, appending each time,
 # (but the script now only does one run.)
@@ -112,7 +111,7 @@ echo
 echo Beginning Phase1b at $phase1b_start_time sec.
 echo
 
-RESULT_OF_1b_BASE="${moviePrefix}.out"
+RESULT_OF_1b_BASE="${moviePrefix}.out.${logn}"
 cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     
 #so xterm's less doesnt fess. We use less since the result is finished fast.

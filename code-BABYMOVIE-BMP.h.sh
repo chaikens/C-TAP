@@ -47,7 +47,7 @@ fi
 
 #When $ARCHITECTURE=framefile, all the needed frames along with all the others are in $BITMAPS_DIR
 
-cd $BITMAPS_DIR
+pushd $BITMAPS_DIR > /dev/null
 
 rm -f pic*.bmp #only delete images used to make the previous "baby movie"
 #ffmpeg will input from this glob expression.
@@ -119,6 +119,7 @@ do
    fi
 done
 
+
 bmfcount=$(cat ${RESULTS_DIR}/foutcount)
 rm ${RESULTS_DIR}/foutcount
 
@@ -133,10 +134,38 @@ echo '   -----=====ZZZZZZZZ=====------   '  >> ${RESULTS_DIR}/ffmpeg.log
 echo '    ffmpeg now makes a baby movie. '  >> ${RESULTS_DIR}/ffmpeg.log
 echo '   -----=====ZZZZZZZZ=====------   '  >> ${RESULTS_DIR}/ffmpeg.log
 
-make_baby_cmd="ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p ${RESULTS_DIR}/${moviePrefix}.${EXT} &>> $RESULTS_DIR/ffmpeg.log"
+#ffmpeg uses the .MOV suffix to tell the output format.
+
+generic_baby_movie_name="${moviePrefix}.${EXT}"
+baby_movie_logn="${generic_baby_movie_name}.${logn}"
+
+make_baby_cmd="ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p "${RESULTS_DIR}/${generic_baby_movie_name}" &>> ${RESULTS_DIR}/ffmpeg.log"
 (echo ; echo ${make_baby_cmd}; echo ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 
-eval ${make_baby_cmd}
+eval ${time_cmd_prefix} ${make_baby_cmd}
+
+popd > /dev/null #done w/ bitmaps dir
+
+
+#make a logn file name and a convenience symlink
+pushd ${RESULTS_DIR} > /dev/null
+
+#We want to save the baby with a name .$logn
+mv $generic_baby_movie_name $baby_movie_logn  #rename what we save
+
+#But, we want ffplay and other mpeg processors to see the .MOV extension,
+#so we make the symbolic link.  It will link to the most recently made movie.
+ln -s $baby_movie_logn $generic_baby_movie_name
+
+popd 
+
+
+echo 'in' $(pwd) code-BABYMOVIE-BMP.h.sh done 
+#as before, the shared shell parameter holding the symlinks name is
+# ${RESULTS_DIR}/{moviePrefix}.${EXT}
+# We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
+
+
 
 #ffmpeg docs:
 #
