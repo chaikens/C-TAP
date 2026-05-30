@@ -87,7 +87,7 @@ FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/1
 #for HALF FRAME, (DECIMATED) extraction.
 
 MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
-MOVIE_SCALE_OPTION="--movie-scale 1"
+MOVIE_SCALE_OPTION="--movie-scale 2"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
 OTHER_OPTIONS="--camera-index 1"
