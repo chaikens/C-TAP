@@ -94,7 +94,8 @@ MOVIE_SCALE_OPTION="--movie-scale 2"
 PIXPROC_SCALE_OPTION="--pixproc-scale 2"
 USER_SCALE_OPTION="--user-scale 1"
 OTHER_OPTIONS=" --camera-index 1"
-PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920"
+PHASE1A_OTHER_OPTIONS=
+#"--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920"
 #PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 960 --CROP_YF 1920"
 #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
 #and also named a camera for it.

@@ -20,7 +20,7 @@ ARCHITECTURE="framefile"
 
 if [ $ARCHITECTURE = "framefile" ]
 then		   
-       REUSE_BMPS=yes
+       REUSE_BMPS=no
        BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
        BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
        BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
@@ -46,6 +46,12 @@ source code-MOVIES.h.sh         #
 #################################
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
+
+#I think the way, to start, to vary subsequent phases of a job is to
+#override the default from code-HELPERS-DEFAULTS
+#    RESULTS_DIR=${SOFTWARE_DIR}/RESULTS-${JOBNAME}-$(mydate)
+#  but the job is named from the C-TAP....sh file..??
+
 
 OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
