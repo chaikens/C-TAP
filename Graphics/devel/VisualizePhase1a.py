@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[45]:
+# Idea: Use Imagemagick to create images that JUST contain the annotations (text and graphic), so each will be very small.
+# Then, we can use gimp to layer the two relevent thumb..bmp images and the annotation images. 
+# Then we can use gimp to shift from image to image, and calculate the difference and subtraction images.  
+
+# In[1]:
 
 
 import numpy as np
 
 
-# In[46]:
+# In[2]:
 
 
 import wand
@@ -15,19 +19,19 @@ from wand.image import Image
 from wand.drawing import Drawing
 
 
-# In[47]:
+# In[3]:
 
 
 import math
 
 
-# In[48]:
+# In[4]:
 
 
 import matplotlib.pyplot as plt
 
 
-# In[49]:
+# In[5]:
 
 
 dt = np.dtype([('frame', np.int32), 
@@ -43,7 +47,7 @@ dt = np.dtype([('frame', np.int32),
              )
 
 
-# In[50]:
+# In[6]:
 
 
 intdata = np.loadtxt("DroneShort1HalfDecimated.int.1.txt",converters=float,dtype=dt)
@@ -51,7 +55,7 @@ nframes=len(intdata)
 IPath="/media/seth/CTAP/bitmaps-jobDS1HalfDecimatedFRAME"
 
 
-# In[51]:
+# In[7]:
 
 
 def to6( n ):
@@ -61,7 +65,7 @@ def tothumb(n):
 tothumb(1234)
 
 
-# In[52]:
+# In[8]:
 
 
 width=0
@@ -78,14 +82,14 @@ widthTo1920=math.ceil(float(width)/1920.0)
 
 # Setup for drawing the data line.
 
-# In[53]:
+# In[9]:
 
 
 llcapx=int(width/20)
 llcapy=int(height-width/20)
 
 
-# In[54]:
+# In[10]:
 
 
 drdbl=Drawing()
@@ -97,7 +101,7 @@ drdbl.stroke_color="WHITE"
 
 # Setup for drawing markers on Phase1a selected pixels.
 
-# In[55]:
+# In[11]:
 
 
 def M(TH) :
@@ -135,7 +139,7 @@ def unit_up_arrow(s) :
     return -np.concat([arrB(s),arrL(s),arrR(s)])
 
 
-# In[56]:
+# In[12]:
 
 
 def dispdata(row):
@@ -148,7 +152,7 @@ def dispdata(row):
              [ -row['bd'],  150.0, [row['rx'],row['by']], row['bn' ], "blue" ] )             
 
 
-# In[57]:
+# In[13]:
 
 
 colvaldiv = float(128)
@@ -167,7 +171,7 @@ def drdata(dwg, row):
             dwg.line(line[2*i],line[2*i+1])
 
 
-# In[58]:
+# In[14]:
 
 
 img=0
@@ -190,13 +194,14 @@ def vis(fn):
     return img #so jupyter tries to print the result which makes the picture appear!      
 
 
-# In[59]:
+# In[19]:
 
 
-vis(319)
+#comment out so we dont have a huge .ipnb file
+#vis(319)
 
 
-# In[60]:
+# In[17]:
 
 
 def tophonea(n):
@@ -211,7 +216,7 @@ def doAll():
         print(" saved", fn, end="\r")
 
 
-# In[61]:
+# In[18]:
 
 
 doAll()
