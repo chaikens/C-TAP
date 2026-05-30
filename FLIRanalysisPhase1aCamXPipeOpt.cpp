@@ -249,7 +249,7 @@ int pipeline = 0;  //Default is legacy bmp reading version.
                  //Set by --pipeline option.
 
 //might be modified by get_our_options()
-pixCoord Mscale = 1; //original movies
+pixCoord Mscale = 1; //original movies //So far we DO NOT USE THIS!
 pixCoord Pscale = 1; //pixel processing
 pixCoord Uscale = 1; //user specification of clipping and exclusion zones
 
