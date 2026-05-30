@@ -283,3 +283,14 @@ echo $(cat /tmp/c)
 rm /tmp/c
 
 		 
+cat > herefile <<EOF
+Here is data that
+can come from a shell script
+here document that ends in a line with EOF
+EOF
+echo cat herefile
+cat herefile
+
+
+
+
