@@ -173,6 +173,7 @@ class BMclass
 	error(1, errno, "BMclass::write(char *fn) Cant open %s", fns.c_str());
       }
     write(s);
+    fclose(s); //Failed after writing lots of bmps!
   }
 
   /** Access a row or a pixel
