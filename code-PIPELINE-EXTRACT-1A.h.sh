@@ -173,7 +173,7 @@ phase1a_cmd="${phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG"
 echo "About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log."
 echo "eval" "/usr/bin/time ${phase1a_cmd}"
 
-eval "/usr/bin/time --verbose ${phase1a_cmd}"  #FOREGROUND. stderr from cmd and time go to LOG.
+eval " ${phase1a_cmd}"  #FOREGROUND. stderr from cmd and time go to LOG.
 RET=$?
 echo >>$LOG #space after time report
 
