@@ -73,7 +73,8 @@ Explanation of input, saved in (for now) moviename.int file:
     | 4 4 4         | numbers of times a pix diff breaks a threshold   |
     | 5 5 5         | first line positives, 2nd negatives (rgb order)  |
     +------------------------------------------------------------------+
-    | 21            | please look and report, important number         |
+    | 21            | number of (pixel,rgb diff)                       |
+    |               | for which |diff|>=subthreshold                   |
     +------------------------------------------------------------------+
 
 Explanation of output, going into moviename.out file, to
