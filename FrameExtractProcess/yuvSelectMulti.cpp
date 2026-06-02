@@ -46,7 +46,9 @@ optional options:
 #include "bmp.h"
 #include "yuvtobmpT.h"
 #include <cassert>
-#include <unistd.h> //for syscalls like read()
+#include <unistd.h> //for syscalls like read(), fork, exec
+#include <sys/wait.h>
+#include <sys/types.h> //for pid_t ret from wait
 using namespace std;
 
 static const char usage[] = "yuvSelectMulti WidthxHeight framenums-fd yuvinput-fd [one --option required]\n\
@@ -75,6 +77,16 @@ static string bmpnameprefixs = "thumb";
 static string bmpconversions = ""; //no choices yet
 static const char *selinefmt = "%d";  //to parse a file of frame numbers.
 static int offset = 0;
+
+//for compressing .bmp files in their directory (by forked subprocesses)
+static int do_cx  = 0;
+const static char* cx_prog = "gzip";
+static char* cx_default_argv[2] = { 0, 0 }; // 2nd null terminates the arg list passed to execvp 
+static char **  cx_argv =  cx_default_argv; 
+static int cx_nopt = 0; //number of OPTIONS to the compress cmd,
+// NOT including the command AND filename.  This is needed so we know the index at which to
+// put each .bmp pathname. Detecting > 1 token in --compress=.. option is not supported yet.
+static int cx_maxkids = 8;
 
 //FILE POINTERS
 static FILE *fnsFP = 0;    //required, frame numbers wanted
@@ -120,8 +132,18 @@ static void optionprocess() {
       }
     }
   }
+  
+  if( do_cx && !do_bmp_dir_out ) {
+    cerr << "yuvSelectMulti: --compress supported ONLY for --bmp-out-dirpath. "
+	 << "Ignored now." << endl;
+  }
+
+  if( do_cx ) {
+    cx_argv = &cx_default_argv[0];
+  }
 }
 
+  
 uint8_t *yuvbuf = 0;
 
 int main(int argc, char *argv[]) {
@@ -139,7 +161,7 @@ int main(int argc, char *argv[]) {
       cerr << usage << endl << "Will crash now...hope I'm compiled for debugging.. wwwwoooo!!VvvvvBANG." << endl;
       assert(0);
      }
-  
+ 
   // 1st required arg: WWWWxHHHH 
   if ( 2 != (ret = sscanf(argv[1],"%ux%u", &width, &height)))
     {
@@ -192,7 +214,8 @@ int main(int argc, char *argv[]) {
          << " do_bmp_dir_out=" << do_bmp_dir_out
          << " do_yuv_stream_out=" << do_yuv_stream_out << endl;
   }
-  //Loop to read the next wanted frame number into------V----- 
+  //Loop to read the next wanted frame number into------V-----
+  int nkidsalive=0; //for compression only
   while ( (didreadframe = fscanf(fnsFP, selinefmt, &fwanted), didreadframe) == 1  ) {
     fwanted = fwanted + offset;
     //Loop to read the next available frames up to and including the latest wanted one.
@@ -244,53 +267,75 @@ int main(int argc, char *argv[]) {
 		const char *s = d.c_str();
 		if(vb) {cerr << "That, in C string form, is " << s << endl;}
 		pBM->write( s );
+		
+		if( do_cx ) {
+		  int kstatus;
+		  if(1) cerr << "fwanted=" << fwanted << " kidsalive=" << nkidsalive << endl;
+		  while (nkidsalive > cx_maxkids) {
+		    if(1) cerr << "Waiting.." << endl;
+		    wait(&kstatus);
+		    nkidsalive--;
+		  }
+		  if(1) cerr << "Big Dad will forked. fwanted=" << fwanted << endl;
+		  pid_t pid =fork();
+		  if( !pid ) {
+		    if(1) cerr << "Hi from kid to compress " << s << endl;
+		    cx_argv[cx_nopt] = (char*) s;
+		    if(1) cerr << cx_prog << " " << cx_argv << "  " << cx_argv[0] << "  " << endl;
+		    execvp(cx_prog, cx_argv);
+		  }
+		  else {
+		    nkidsalive++;
+		  }
+		}
 	      }
 	  }
-	
-	else {
-	  if( do_yuv_stream_out ) {
-	    size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
-	    if ( rret != 1 ) {
-	      cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
-		   << fwanted << " was wanted. ???" << endl;
-	      return 1;  //out of reading wanted frame number loop
-	    }
-	    fcount++; //yup, we read a frame.
-	    if(vb) { cerr << "Did read frame " << fcount << endl; }
-	    if(vb) { cerr << "Try to output frame " << fcount << endl; }
-	    size_t wret = fwrite( yuvbuf, yuvsize, 1, yuvoutFP );
-	    if( wret != 1 ) {
-	      error( 1, errno, "Failure to write frame %ul to output stream.", fwanted);
-	    }
+	  
 	    else {
-	      if(vb) cerr << "Wrote frame " << fcount << endl;
+	      if( do_yuv_stream_out ) {
+		size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
+		if ( rret != 1 ) {
+		  cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+		       << fwanted << " was wanted. ???" << endl;
+		  return 1;  //out of reading wanted frame number loop
+		}
+		fcount++; //yup, we read a frame.
+		if(vb) { cerr << "Did read frame " << fcount << endl; }
+		if(vb) { cerr << "Try to output frame " << fcount << endl; }
+		size_t wret = fwrite( yuvbuf, yuvsize, 1, yuvoutFP );
+		if( wret != 1 ) {
+		  error( 1, errno, "Failure to write frame %ul to output stream.", fwanted);
+		}
+		else {
+		  if(vb) cerr << "Wrote frame " << fcount << endl;
+		}
+		gotcount++;
+	      }
 	    }
-	    gotcount++;
 	  }
+	else { // fwanted > (fcount + 1) Sorry Charlie.
+	  size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
+	  if ( rret != 1 ) {
+	    cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+		 << fwanted << " was wanted. ???" << endl;
+	    return 1;  //out of reading wanted frame number loop
+	  }
+	  fcount++;
+	  if(vb) cerr << cmd << "Skip frame " << fcount << endl;
+	  //We ignore the unwanted boring picture, overpaint its space with next.
 	}
       }
-      else { // fwanted > (fcount + 1) Sorry Charlie.
-	size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
-	if ( rret != 1 ) {
-	  cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
-	       << fwanted << " was wanted. ???" << endl;
-	  return 1;  //out of reading wanted frame number loop
-	}
-	fcount++;
-	if(vb) cerr << cmd << "Skip frame " << fcount << endl;
-	//We ignore the unwanted boring picture, overpaint its space with next.
-      }
+    } //Wanted list loop ends.
+
+
+    if(vb) {
+      cerr << cmd << " Done. "
+	   << fcount << " frames read. "
+	   << gotcount << " frames selected. Bye." << endl;
     }
-  } //Wanted list loop ends.
-  
-  if(vb) {
-    cerr << cmd << " Done. "
-	 << fcount << " frames read. "
-	 << gotcount << " frames selected. Bye." << endl;
-  }
-  fclose(fnsFP);
-  fclose(yuvinFP);
-  return 0;
+    fclose(fnsFP);
+    fclose(yuvinFP);
+    return 0;
 }
 
 static int get_our_options( int *argc, char **argv[])
@@ -316,6 +361,9 @@ static int get_our_options( int *argc, char **argv[])
       {"bmp-prefix", required_argument, 0, 0},                    //5
       {"seline-fmt", required_argument, 0, 0},                    //6
       {"offset", required_argument, 0, 0},                        //7
+      {"compress", optional_argument, &do_cx, 1},                 //8
+      //option must use = sign: --compress="cmd [args]"
+      {"nkids", required_argument, 0, 0},                         //9
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -367,6 +415,16 @@ static int get_our_options( int *argc, char **argv[])
 	    error(1, 0, "Negative --offset %d not supported (yet).", offset);
 	  }
 	break;
+      case 8:
+	if( optarg ) cx_prog = optarg;  //more than one token in this string, for options to
+	//the compression program, is not supported yet.
+	break;
+      case 9:
+	cx_maxkids = atoi(optarg);
+	if( cx_maxkids <= 0 ) {
+	  error(1, 0, "Badly formatted or negative max number %d of compressing children.\n", cx_maxkids);
+	}
+	break;
       }
     }
   }
@@ -377,3 +435,4 @@ static int get_our_options( int *argc, char **argv[])
   (*argv)[0] = cmd;
   return 0;
 }
+
