@@ -1,5 +1,5 @@
 /**
- yuvSelectFilter WidthxHeight framenums-fd yuvinput-fd [at least one option]
+ yuvSelectMulti WidthxHeight framenums-fd yuvinput-fd [at least one option]
 
  Width, Height must be even.  
  fd's are small integers. Don't use 2 since stderr is used for verbose msgs and errors.
@@ -49,7 +49,7 @@ optional options:
 #include <unistd.h> //for syscalls like read()
 using namespace std;
 
-static const char usage[] = "yuvSelectMult WidthxHeight framenums-fd yuvinput-fd [one --option required]\n\
+static const char usage[] = "yuvSelectMulti WidthxHeight framenums-fd yuvinput-fd [one --option required]\n\
 -fd's are small integers.\n";
 
 //common data from command line arguments, since raw files don't have metadata
