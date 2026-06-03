@@ -22,6 +22,7 @@ echo $startalltime
 echo
 
 (/usr/bin/time --verbose ./yuvSelectMulti --seline-fmt '%*d %d %*d %*d %*d %*f' --bmp-out-dirpath . \
+	       --compress --verbose \
 		  "${w}x${h}" 3 4 \
 		  3<${fwantfile} 4<PIPE.yuv; \
                    echo; echo yuvSelectMulti stopped; uptimenow;  echo) &
