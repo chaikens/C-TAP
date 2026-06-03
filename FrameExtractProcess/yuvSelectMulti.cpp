@@ -80,9 +80,10 @@ static int offset = 0;
 
 //for compressing .bmp files in their directory (by forked subprocesses)
 static int do_cx  = 0;
-const static char* cx_prog = "zstd";
-static char* cx_default_argv[2] = { 0, 0 }; // 2nd null terminates the arg list passed to execvp 
-static char **  cx_argv =  cx_default_argv; 
+const static char* cx_prog = "gzip";
+//const char *cx_prog_default = "gzip";
+static char* cx_default_argv[3] = { 0,  0, 0}; // 3nd null terminates the arg list passed to execvp 
+static char **  cx_argv = cx_default_argv; 
 static int cx_nopt = 0; //number of OPTIONS to the compress cmd,
 // NOT including the command AND filename.  This is needed so we know the index at which to
 // put each .bmp pathname. Detecting > 1 token in --compress=.. option is not supported yet.
@@ -140,6 +141,7 @@ static void optionprocess() {
 
   if( do_cx ) {
     cx_argv = &cx_default_argv[0];
+    cx_argv[0] = (char *) cx_prog;
   }
 }
 
@@ -209,132 +211,152 @@ int main(int argc, char *argv[]) {
   int gotcount = 0;
   int didreadframe = 0;
   
-  if(vb) {
+  if(vb>1) {
     cerr << "do_bmp_stream_out=" << do_bmp_stream_out
          << " do_bmp_dir_out=" << do_bmp_dir_out
          << " do_yuv_stream_out=" << do_yuv_stream_out << endl;
   }
   //Loop to read the next wanted frame number into------V-----
   int nkidsalive=0; //for compression only
-  while ( (didreadframe = fscanf(fnsFP, selinefmt, &fwanted), didreadframe) == 1  ) {
-    fwanted = fwanted + offset;
-    //Loop to read the next available frames up to and including the latest wanted one.
-    while ( fwanted >= (fcount+1) ) {
-      bool fwasread = false;
-      int g = fgetc(yuvinFP);
-      if(vb) cerr << cmd << " fgetc got " << g << endl;
-      if( g == EOF ) {
-	cerr << cmd << "end of input stream when frame "
-	     << fwanted << "was wanted and "
-	     << fcount << " frames were read" << endl;
-	fclose( yuvinFP );
-	return 1;
-      }
-      int ung = ungetc(g, yuvinFP);
-      if(vb) cerr << cmd << " did ungetc got " << ung << endl;
-      if( fwanted == (fcount+1) ) {
-	//We will love you! But let yuvtobmpT read from the stream if we want a bmp.
-	if( do_bmp_stream_out || do_bmp_dir_out )
-	  {
-	    //Yes, we have a handy BMclass <- pBM ready to write bgr data into
-	    //We'll just fill it and then write it all.  One might write pixel by
-	    //pixel, my guess is that's not worth it for performance.
-	    
-	    if (yuvtobmpT( yuvinFP, pBM ) )  //gets w/h from *pBM,
-	      //no erronous return inplemented yet.
-	      {
-		cerr << "yuvtobmpT returned error." << endl;
-		error(1, 0, "%s yuvtobmpT returned error.", cmd);
-	      }
-	    fcount++;
-	    if(vb) cerr << "Did read and made bmp of frame " << fcount << endl;
-	    gotcount++;
-	    
-	    if( do_bmp_stream_out )
-	      {
-		if(vb) {
-		  cerr << "doing do_bmp_stream_out to pBM->write to a FP." << endl;}
-		pBM->write(bmpoutFP);
-	      }
-	    
-	    if( do_bmp_dir_out )
-	      {
-		string d = bmpdirpaths
-		  + string("/")
-		  + bmpnameprefixs
-		  + string (padnumto6(fcount))
-		  + string (".bmp");
-		if(vb) {cerr << "Trying to write " << d << endl;}
-		const char *s = d.c_str();
-		if(vb) {cerr << "That, in C string form, is " << s << endl;}
-		pBM->write( s );
-		
-		if( do_cx ) {
-		  int kstatus;
-		  if(1) cerr << "fwanted=" << fwanted << " kidsalive=" << nkidsalive << endl;
-		  while (nkidsalive > cx_maxkids) {
-		    if(1) cerr << "Waiting.." << endl;
-		    wait(&kstatus);
-		    nkidsalive--;
-		  }
-		  if(1) cerr << "Big Dad will forked. fwanted=" << fwanted << endl;
-		  pid_t pid =fork();
-		  if( !pid ) {
-		    if(1) cerr << "Hi from kid %d to compress " << s << endl;
-		    cx_argv[cx_nopt] = (char*) s;
-		    execvp(cx_prog, cx_argv);
-		  }
-		  else {
-		    nkidsalive++;
-		  }
-		}
-	      }
+  
+  while ( (didreadframe = fscanf(fnsFP, selinefmt, &fwanted), didreadframe) == 1  )
+    { 
+      fwanted = fwanted + offset;
+      while ( fwanted >= (fcount+1) )
+	{
+	  bool fwasread = false; //Don't know.
 	  
-	    else {
-	      if( do_yuv_stream_out ) {
-		size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
-		if ( rret != 1 ) {
-		  cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
-		       << fwanted << " was wanted. ???" << endl;
-		  return 1;  //out of reading wanted frame number loop
+	  //We have to check for EOF on the input stream by TRYING TO READ!
+	  int g = fgetc(yuvinFP);
+	  if(vb>1) cerr << cmd << " fgetc got " << g << endl;
+	  if( g == EOF ) {
+	    cerr << cmd << "end of input stream when frame "
+		 << fwanted << "was wanted and "
+		 << fcount << " frames were read" << endl;
+	    fclose( yuvinFP );
+	    //
+	    // Do we have to wait for compressing children?
+	    return 1;  //Kind of error since the stream ended before a wanted frame.
+	  }      
+	  int ung = ungetc(g, yuvinFP);//Not at EOF, but 1 char was read; put it back
+      
+	  if(vb>1) cerr << cmd << " did ungetc got " << ung << endl;
+      
+	  if( fwanted == (fcount+1) )
+	    {
+	      //We will love you! But let yuvtobmpT read from the stream if we want a bmp.
+	      if( do_bmp_stream_out || do_bmp_dir_out )
+		{
+		  //Next, read one yuv to convert, then write to stream or a file.
+		  //Yes, we have a handy BMclass <- pBM ready to write bgr data into
+		  //We'll just fill it and then write it all.  One might write pixel by
+		  //pixel, my guess is that's not worth it for performance.
+		  
+		  if (yuvtobmpT( yuvinFP, pBM ) )  //gets w/h from *pBM,
+		    //no erronous return inplemented yet.
+		    {
+		      cerr << "yuvtobmpT returned error." << endl;
+		      error(1, 0, "%s yuvtobmpT returned error.", cmd);
+		    }
+		  fcount++; gotcount++;  //consumed a yuv and got a bit map we want. 
+		  if(vb) cerr << "Did read and made bmp of frame " << fcount << endl;
+		  
+		  if( do_bmp_stream_out )
+		    {
+		      if(vb) {
+			cerr << "doing do_bmp_stream_out to pBM->write to a FP." << endl;}
+		      pBM->write(bmpoutFP);
+		    }
+		  
+		  if( do_bmp_dir_out )
+		    {
+		      string d = bmpdirpaths
+			+ string("/")
+			+ bmpnameprefixs
+			+ string (padnumto6(fcount))
+			+ string (".bmp");
+		      if(vb) {cerr << "Trying to write " << d << endl;}
+		      const char *s = d.c_str();
+		      if(vb) {cerr << "That, in C string form, is " << s << endl;}
+		      pBM->write( s );
+		      
+		      if( do_cx )
+			{ //fork off compressor who will write its verion to the dir.
+			  int kstatus;
+			  if(vb) cerr << "We must compress. Frame is " << fcount << endl;
+			  if(vb) cerr << "fwanted=" << fwanted << " kidsalive=" << nkidsalive << endl;
+			  while (nkidsalive > cx_maxkids)
+			    {
+			      if(vb) cerr << "Waiting.." << endl;
+			      pid_t pidret = wait(&kstatus);
+			      nkidsalive--;
+			      if(vb>1) {
+	  cerr << fflush<< nkidsalive << " kids left, Waitret pid " << pidret << " status " << kstatus << endl << fflush;}
+			    }
+			  if(vb) cerr << "Big Dad will fork. fwanted=" << fwanted << endl;
+			  pid_t pid =fork();
+			  if( !pid )
+			    {
+			      if(vb) cerr << "Hi from kid " << getpid() << " of " << getppid() <<
+				       " to compress " << s << endl;
+			      //cx_argv[0]=cx_prog;
+			      cx_argv[cx_nopt+1] = (char*) s;
+			      execvp(cx_prog, cx_argv);
+			    }
+			  else
+			    {
+			      nkidsalive++;
+			    }
+			}
+		    }
+	    
+		      if( do_yuv_stream_out )
+		    {
+		      size_t rret = fread( yuvbuf, yuvsize, 1, yuvinFP );
+		      if ( rret != 1 ) {
+			cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+			     << fwanted << " was wanted. ???" << endl;
+			return 1;  //out of reading wanted frame number loop
+		      }
+		      fcount++; //yup, we read a frame.
+		      if(vb) { cerr << "Did read frame " << fcount << endl; }
+		      if(vb) { cerr << "Try to output frame " << fcount << endl; }
+		      size_t wret = fwrite( yuvbuf, yuvsize, 1, yuvoutFP );
+		      if( wret != 1 )
+			{
+			  error( 1, errno, "Failure to write frame %ul to output stream.", fwanted);
+			}
+		      else
+			{
+			  if(vb) cerr << "Wrote frame " << fcount << endl;
+			}
+		      gotcount++;
+		    }
 		}
-		fcount++; //yup, we read a frame.
-		if(vb) { cerr << "Did read frame " << fcount << endl; }
-		if(vb) { cerr << "Try to output frame " << fcount << endl; }
-		size_t wret = fwrite( yuvbuf, yuvsize, 1, yuvoutFP );
-		if( wret != 1 ) {
-		  error( 1, errno, "Failure to write frame %ul to output stream.", fwanted);
-		}
-		else {
-		  if(vb) cerr << "Wrote frame " << fcount << endl;
-		}
-		gotcount++;
-	      }
 	    }
-	  }
-	else { // fwanted > (fcount + 1) Sorry Charlie.
-	  size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
-	  if ( rret != 1 ) {
-	    cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
-		 << fwanted << " was wanted. ???" << endl;
-	    return 1;  //out of reading wanted frame number loop
-	  }
-	  fcount++;
-	  if(vb) cerr << cmd << "Skip frame " << fcount << endl;
-	  //We ignore the unwanted boring picture, overpaint its space with next.
-	}
-      }
-    } //Wanted list loop ends.
+	  else
+	    { // fwanted > (fcount + 1) Sorry Charlie.
+	      size_t rret =  fread( yuvbuf, yuvsize, 1, yuvinFP );
+	      if ( rret != 1 ) {
+		cerr << argv[0] << " stops. yuv stream ran only "<< fcount << " frames when frame "
+		     << fwanted << " was wanted. ???" << endl;
+		return 1;  //out of reading wanted frame number loop
+	      }
+	      fcount++;
+	      if(vb) cerr << cmd << "Skip frame " << fcount << endl;
+	      //We ignore the unwanted boring picture, overpaint its space with next.
+	    }
+	}  //Wanted list loop ends.
+    }  
+  if(vb) {
+    cerr << cmd << " Done. "
+	 << fcount << " frames read. "
+	 << gotcount << " frames selected. Bye." << endl;
   }
-    if(vb) {
-      cerr << cmd << " Done. "
-	   << fcount << " frames read. "
-	   << gotcount << " frames selected. Bye." << endl;
-    }
-    fclose(fnsFP);
-    fclose(yuvinFP);
-    return 0;
-}
+  fclose(fnsFP);
+  fclose(yuvinFP);
+  return 0;
+}  
 
 static int get_our_options( int *argc, char **argv[])
 {
@@ -351,7 +373,7 @@ static int get_our_options( int *argc, char **argv[])
     int this_option_optind = optind ? optind : 1;
     int option_index = 0;
     static struct option long_options[] = {
-      {"verbose", no_argument, &vb, 1},  //0
+      {"verbose", optional_argument, &vb, 1},                           //0
       {"yuv-out-fd", required_argument, &do_yuv_stream_out, 1},   //1
       {"bmp-out-fd", required_argument, &do_bmp_stream_out, 1},   //2
       {"bmp-out-dirpath", required_argument, &do_bmp_dir_out, 1}, //3
@@ -381,7 +403,7 @@ static int get_our_options( int *argc, char **argv[])
 	    error(1, 0, "--yuv-fd %s BAD, arg should be a fd int",
 		  optarg);
 	  }
-      break;
+	break;
       case 2:
 	ret = sscanf(optarg, "%d", &bmpoutfd);
 	if (ret != 1)
@@ -433,4 +455,5 @@ static int get_our_options( int *argc, char **argv[])
   (*argv)[0] = cmd;
   return 0;
 }
+
 
