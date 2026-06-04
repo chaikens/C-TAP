@@ -49,6 +49,8 @@ optional options:
 #include <unistd.h> //for syscalls like read(), fork, exec
 #include <sys/wait.h>
 #include <sys/types.h> //for pid_t ret from wait
+#include <string.h> //for str_tok_r, old war horse.
+#include <vector>
 using namespace std;
 
 static const char usage[] = "yuvSelectMulti WidthxHeight framenums-fd yuvinput-fd [one --option required]\n\
@@ -81,13 +83,38 @@ static int offset = 0;
 //for compressing .bmp files in their directory (by forked subprocesses)
 static int do_cx  = 0;
 const static char* cx_prog = "gzip";
-//const char *cx_prog_default = "gzip";
-static char* cx_default_argv[3] = { 0,  0, 0}; // 3nd null terminates the arg list passed to execvp 
-static char **  cx_argv = cx_default_argv; 
-static int cx_nopt = 0; //number of OPTIONS to the compress cmd,
-// NOT including the command AND filename.  This is needed so we know the index at which to
-// put each .bmp pathname. Detecting > 1 token in --compress=.. option is not supported yet.
-static int cx_maxkids = 8;
+
+//Default uses no options.
+//[0]=progname [1]=filename (fill in)
+//[2]=0 to terminate argv for execvl.
+vector<char*> cx_argv = {(char*)cx_prog, 0, 0};
+vector<char*> mk_cx_argv(char *s)
+{
+  cx_argv.clear();
+  char *saveptr;
+  char *nxt = strtok_r(s, " ", &saveptr);
+  while( nxt ) {
+    //Put in program name and then any options
+    cx_argv.push_back( nxt );
+    nxt = strtok_r(0," ",&saveptr);
+  }
+  //Make the entry to fit in one char* filename
+  cx_argv.push_back( 0 );
+  //Finally, make the entry containing 0 to
+  //terminate the argv passed as execvl 2nd arg.
+  //Note it has the pgm name in [0], while
+  //we also pass the executable file name. 
+  cx_argv.push_back( 0 );
+  return cx_argv;
+  //To change the file name:
+  // cx_argv.data( )[cx_argv.size()-2] = (char *) "Nextfile.bmp"
+  //
+  //Note:  This code can be easily used to generate a command
+  //for compressing the many files listed by separated arguments
+  //after the compression program and its options.  
+}
+
+static int cx_maxkids = 8;  //to run concurrent compressions.
 
 //FILE POINTERS
 static FILE *fnsFP = 0;    //required, frame numbers wanted
@@ -139,10 +166,9 @@ static void optionprocess() {
 	 << "Ignored now." << endl;
   }
 
-  if( do_cx ) {
-    cx_argv = &cx_default_argv[0];
-    cx_argv[0] = (char *) cx_prog;
-  }
+  //  if( do_cx ) {
+
+  // }
 }
 
   
@@ -281,7 +307,7 @@ int main(int argc, char *argv[]) {
 		      pBM->write( s );
 		      
 		      if( do_cx )
-			{ //fork off compressor who will write its verion to the dir.
+			{ //fork off compressor who will write its result to the dir.
 			  int kstatus;
 			  if(vb) cerr << "We must compress. Frame is " << fcount << endl;
 			  if(vb) cerr << "fwanted=" << fwanted << " kidsalive=" << nkidsalive << endl;
@@ -299,9 +325,8 @@ int main(int argc, char *argv[]) {
 			    {
 			      if(vb) cerr << "Hi from kid " << getpid() << " of " << getppid() <<
 				       " to compress " << s << endl;
-			      //cx_argv[0]=cx_prog;
-			      cx_argv[cx_nopt+1] = (char*) s;
-			      execvp(cx_prog, cx_argv);
+			      cx_argv[cx_argv.size()-2] = (char*) s;
+			      execvp(cx_argv[0], cx_argv.data());
 			    }
 			  else
 			    {
@@ -436,8 +461,9 @@ static int get_our_options( int *argc, char **argv[])
 	  }
 	break;
       case 8:
-	if( optarg ) cx_prog = optarg;  //more than one token in this string, for options to
-	//the compression program, is not supported yet.
+	if( optarg ) {
+	  (void) mk_cx_argv( optarg );
+	}
 	break;
       case 9:
 	cx_maxkids = atoi(optarg);
