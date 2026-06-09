@@ -1,13 +1,15 @@
 #!/usr/bin/bash
 #              (hmm---no comment can follow bash above)#
-#FOR STANDARD USAGE, EDIT ONLY      #
-#THE FILE-NAME OF THIS SCRIPT       #
-#AND CODE OUTSIDE BOXES LIKE THIS.  #
-#THE FILE-NAME SHOULD HAVE THE FORM #
-#  C-TAP-<jobname>.sh               #
-source code-HELPERS-DEFAULTS.h.sh   #
-echo Running your job $JOBNAME      #
-#####################################
+#FOR STANDARD USAGE, EDIT ONLY          #
+#THE FILE-NAME OF THIS SCRIPT           #
+#AND CODE OUTSIDE BOXES LIKE THIS.      #
+#THE FILE-NAME SHOULD HAVE THE FORM     #
+#  C-TAP-<jobname>.sh                   #
+source code-HELPERS-DEFAULTS.h.sh       #
+echo Running your job $JOBNAME          #
+echo Results will be in $RESULTS_DIR    #
+# You can modify RESULTS_DIR            #
+#########################################
 
 ############################
 echo YOUR-SYSCONF-$JOBNAME #
