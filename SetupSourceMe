@@ -39,13 +39,7 @@ then
 	PS1="($GITBRANCH) \[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
 
 	ulimit -c unlimited
-	echo If you can we use sudo to configure crash cores to go into CWD.
-	if sudo src/ezcores.sh 
-	then
-	    echo Unlimited dumps go in cwd core file
-	else
-	    echo Dont worry
-	fi
-
+	#If you can we use sudo to configure crash cores to go into CWD.
+	src/ezcores.sh
 	emacs -title "C-TAP DEVELOPMENT AND TESTING" -g 100x50 $(pwd) &
 fi
