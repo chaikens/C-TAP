@@ -52,7 +52,33 @@ echo YOUR-ANALYSIS-$JOBNAME     #
 
 PHASE_1a_RESULT_OLD_N_OR_NONE=1
 
-OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+
+############ Vary CamSett.txt settings here! #########
+cat > tempCamSett.txt <<EOF
+smallestThr= 0
+biggestThr= 254
+smallestPix= 0
+biggestPix= 67
+SkewGaussAmpl= 0.633
+SkewGaussXi= 1.97
+SkewGaussOmega= 1.89
+SkewGaussAlpha= 2.5
+NumPixAbvThrSumMin= 0
+NumPixAbvThrSumMax= 3
+SubThr= 20
+RewFram= 0
+ForFram= -2
+FramBefNew= 1
+FracYes= 1.0
+CROP_XI= 0
+CROP_XF= 500
+CROP_YI= 0
+CROP_YF= 1919
+mainThreshold= 14
+EOF
+
+
+OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
 #Not done yet: when we specify pipelining here, and include the below
 #analysis options, that is what is done.  We'll look at TESTING/TestPipeOpt code

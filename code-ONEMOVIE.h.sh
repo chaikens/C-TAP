@@ -114,7 +114,8 @@ then
 	exit 1;
     fi
     #Someday there might be comment or other extra stuff in files like this.
-    ndiffs=$(wc -l ${RESULTS_DIR}/${RESULT_OF_1a_BASE})
+    #stupid old unix:  wc -l <filename> prints count<space>filename HA so we must cat here
+    ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
 else
 
     if [[ $PHASE_1a_RESULT_OLD_N_OR_NONE =~ ^[0-9]+$ ]]
@@ -124,7 +125,7 @@ else
 	pushd ${RESULTS_DIR}
 	ln -s ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.int.${logn}
         popd
-	ndiffs=$(wc -l ${RESULTS_DIR}/${RESULT_OF_1a_BASE})
+	ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
     else
 	if [ ${PHASE_1a_RESULT_OLD_N_OR_NONE}Y = NONEY ]
 	then
@@ -157,7 +158,7 @@ xterm_pids+=($!) #for killing 'em
 #
 # level for Phase1b first try is 0.5, here----------------------------------------------V---
 #
-PHASE1B_PARAM=0.50 
+PHASE1B_PARAM=0.001
 
 phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
 phase1b_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
