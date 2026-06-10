@@ -222,6 +222,64 @@ int main ( int argc, char** argv ) {
     else level = 0.99999999999; // 11 9's
   }
   
+  vector<double> SkewGauss(4); // "classic" values for the next line: ampl .633, mu 1.97, sig 1.89, skew 2.5
+  if ( camera == "Custom" ) {
+    SkewGauss[0] = CamSett[4];
+    SkewGauss[1] = CamSett[5];
+    SkewGauss[2] = CamSett[6];
+    SkewGauss[3] = CamSett[7];
+  }
+  else {
+    SkewGauss[0] = 0.673;
+    SkewGauss[1] = 2.;
+    SkewGauss[2] = 2.;
+    SkewGauss[3] = 2.0;
+  }
+
+/***********************************************
+  From original CamSett.txt
+Line0 Value=0(ignored Key =smallestThr=)
+Line1 Value=254(ignored Key =biggestThr=)
+Line2 Value=0(ignored Key =smallestPix=)
+Line3 Value=67(ignored Key =biggestPix=)
+Line4 Value=0.633(ignored Key =SkewGaussAmpl=)
+Line5 Value=1.97(ignored Key =SkewGaussXi=)
+Line6 Value=1.89(ignored Key =SkewGaussOmega=)
+Line7 Value=2.5(ignored Key =SkewGaussAlpha=)
+Line8 Value=0(ignored Key =NumPixAbvThrSumMin=)
+Line9 Value=3(ignored Key =NumPixAbvThrSumMax=)
+Line10 Value=20(ignored Key =SubThr=)
+Line11 Value=0(ignored Key =RewFram=)
+Line12 Value=-2(ignored Key =ForFram=)
+Line13 Value=1(ignored Key =FramBefNew=)
+Line14 Value=1(ignored Key =FracYes=)
+Line15 Value=100(ignored Key =CROP_XI=)
+Line16 Value=900(ignored Key =CROP_XF=)
+Line17 Value=0(ignored Key =CROP_YI=)
+Line18 Value=1919(ignored Key =CROP_YF=)
+Line19 Value=14(ignored Key =mainThreshold=)
+  **************************************************/
+
+  cerr << endl << endl << "INFO: Actual parameters used by " << mycmdname << endl;
+  cerr << "SubThr=" << SubThr << endl;
+  cerr << "RewFram=" << RewFram << endl;
+  cerr << "ForFram=" << ForFram << endl;
+  cerr << "FramBefNew=" << FramBefNew << endl;
+  cerr << "FracYes=" << FracYes << endl;
+  cerr << endl;
+  cerr << "smallestThr=" << smallestThr << endl;
+  cerr << "biggestThr=" << biggestThr << endl;
+  cerr << "smallestPix=" << smallestPix << endl;
+  cerr << "biggestPix=" << biggestPix << endl;
+  cerr << endl;
+  cerr << "Skew Gaussian Params:" << endl;
+  cerr << "SkewGaussAmpl=SkewGauss[0]" << SkewGauss[0] << endl;
+  cerr << "SkewGaussXi=SkewGauss[1]=" << SkewGauss[1] << endl;
+  cerr << "SkewGaussOmega=SkewGauss[2]=" << SkewGauss[2] << endl;
+  cerr << "SkewGaussAlpha=SkewGauss[3]=" << SkewGauss[3] << endl;
+  cerr << endl;
+  cerr << "level=Command argument[3]=" << level << endl << endl;
+
   long NumFrames = 0;
   
   for ( i = 0; i < MaxNumFrames; ++i ) {
@@ -300,7 +358,7 @@ int main ( int argc, char** argv ) {
   }
   fprintf(stderr,"Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
   fprintf(stderr,"Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
-
+  fprintf(stderr,"\n");
   //
   //The first big loop here sets arrays double prob and bool SignalTruth for each frame diff.
   //
@@ -348,20 +406,6 @@ int main ( int argc, char** argv ) {
       ( maxr - AbsAvg ) * ( maxr - AbsAvg ) + ( maxg - AbsAvg ) * ( maxg - AbsAvg ) + ( maxb - AbsAvg ) * ( maxb - AbsAvg );
     AbsStdDev = sqrt ( AbsStdDev / 5. );
     
-    vector<double> SkewGauss(4); // "classic" values for the next line: ampl .633, mu 1.97, sig 1.89, skew 2.5
-    if ( camera == "Custom" ) {
-      SkewGauss[0] = CamSett[4];
-      SkewGauss[1] = CamSett[5];
-      SkewGauss[2] = CamSett[6];
-      SkewGauss[3] = CamSett[7];
-    }
-    else {
-      SkewGauss[0] = 0.673;
-      SkewGauss[1] = 2.;
-      SkewGauss[2] = 2.;
-      SkewGauss[3] = 2.0;
-    }
-
     //prob = 1 - OurSkewGaussian(AbsStdDev)
     
     prob[i] = 1. -
