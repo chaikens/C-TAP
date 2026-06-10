@@ -42,6 +42,15 @@ echo FIRST LINE OF LOG > $LOG
 COMMAND_ARCHIVE_PATHNAME=${RESULTS_DIR}/${moviePrefix}.cmds.$logn
 cat /dev/null > ${COMMAND_ARCHIVE_PATHNAME}    #So we can just append anytime
 
+if [ -n "${OPT_CamSett}" ]
+then
+    echo "INFO: Our CamSett file contents:" >> $LOG
+    echo >> $LOG
+    #Hack OPT_CamSett if non-null is "--CamSett-file <pathname>"
+    cat ${OPT_CamSett/* /""} >> $LOG
+    echo >> $LOG
+fi
+
 start_time_one_movie=$(uptimenow)
 echo Uptime we started on $movie_file is
 echo $start_time_one_movie seconds.
@@ -158,11 +167,13 @@ xterm_pids+=($!) #for killing 'em
 #
 # level for Phase1b first try is 0.5, here----------------------------------------------V---
 #
-PHASE1B_PARAM=0.001
 
 phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
 phase1b_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
-phase1b_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_PARAM} "
+#
+# level for Phase1b was 0.5 here, now this is set by our DEFAULTS and C-TAP scripts
+#                                                                --V---
+phase1b_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE_1b_LEVEL} "
 phase1b_cmd+=" ${OPT_CamSett} "
 phase1b_cmd+=" > $phase1b_out 2>>$LOG"
 
@@ -226,13 +237,11 @@ then
 	#
 
 
-	#
-	# level for Phase1b redo is 0.98, here-----------------------------------------------------------V---
-	#
-	PHASE1B_REDO_PARAM=0.98
-	
 	phase1b_redo_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
-	phase1b_redo_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE1B_REDO_PARAM} "
+	#
+	# level for Phase1b redo was 0.98 here, now this is set by our DEFAULTS and C-TAP scripts
+	#                                                                           --V---
+	phase1b_redo_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE_1b_LEVEL_REDO} "
 	phase1b_redo_cmd+=" ${OPT_CamSett} "
 	phase1b_redo_cmd+="  > $phase1b_out 2>>$LOG"
 	( echo  ; echo "${phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	

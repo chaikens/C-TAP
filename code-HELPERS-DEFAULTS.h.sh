@@ -66,6 +66,9 @@ PIPE_DIR=${SOFTWARE_DIR}
 #is set to "no" in code-SYSCONFIG.h.sh
 MAKE_BABY_MOVIE="yes"
 
+#Analysis parameters
+PHASE_1b_LEVEL=0.5
+PHASE_1b_LEVEL_REDO=0.98
 
 #
 #  Helper shell functions

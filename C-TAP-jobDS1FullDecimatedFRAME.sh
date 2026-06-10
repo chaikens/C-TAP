@@ -77,6 +77,8 @@ CROP_YF= 1919
 mainThreshold= 14
 EOF
 
+PHASE_1b_LEVEL=0.5
+PHASE_1b_LEVEL_REDO=0.98
 
 OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
