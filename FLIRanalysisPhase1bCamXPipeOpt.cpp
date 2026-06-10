@@ -125,6 +125,7 @@ static char camera_cstring[] = "Custom";
 //See ..Phase1a..cpp for more comments about issues, etc.
 
 //scaling?  typedef unsigned short pixCoord; not done here
+//The first big loop sets these array elts for each frame diff
 vector<bool> SignalTruth;
 double prob[555000];
 
@@ -141,7 +142,8 @@ int main ( int argc, char** argv ) {
   vector<short> extrema;
   unsigned long i = 0;
   signed short j = 0;
-  float AbsAvg, AbsStdDev, FracYes;
+  float AbsAvg, AbsStdDev;
+  float FracYes;
   double GlobPixMean[7] = {0.,0.,0.,0.,0.,0.,0.};
   
   char line[80];
@@ -150,7 +152,7 @@ int main ( int argc, char** argv ) {
   int RewFram, ForFram, FramBefNew, SubThr;
   FILE *CamSettfp = fopen(CamSett_file,"r");
   for ( j = 0; j < 20; ++j ) {
-    fscanf ( CamSettfp, "%s %lf", line, &temp );
+    int ret = fscanf ( CamSettfp, "%s %lf", line, &temp );
     CamSett.push_back(temp);
   }
 
@@ -198,6 +200,9 @@ int main ( int argc, char** argv ) {
     smallestPix = (int)CamSett[2];
     biggestPix = (int)CamSett[3];
   }
+
+  //SubThr,RewFram,ForFram,FramBefNew,FracYes,smallestThr,biggestThr,smallestPix,biggestPix
+  //are constant below.
   
   ifstream ifp(argv[1]);
   if(!ifp.is_open()) {
@@ -207,6 +212,7 @@ int main ( int argc, char** argv ) {
   }
   long MaxNumFrames = atol(argv[2]); //maybe use as an upper limit for num diffs to process
                                   //when it is used as a filter.
+  
   double level = atof(argv[3]);
   if ( level >= 0.979 && camera != "B1" ) {
     if ( camera == "B2" ) level = 0.999999999999; // the minimum allowed that doesn't make B2 collect too many events (16_21-57-25)
@@ -294,7 +300,10 @@ int main ( int argc, char** argv ) {
   }
   fprintf(stderr,"Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
   fprintf(stderr,"Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
-  
+
+  //
+  //The first big loop here sets arrays double prob and bool SignalTruth for each frame diff.
+  //
   for ( i = 0; i < (NumFrames-1); ++i ) {
     
     unsigned long frameNum = (unsigned long)store[0][i];
@@ -326,20 +335,19 @@ int main ( int argc, char** argv ) {
     unsigned int NumPixAbvThrSum = NumPixAbvThrR + NumPixAbvThrG + NumPixAbvThrB + NumPixAbvThrr + NumPixAbvThrg + NumPixAbvThrb;
     unsigned int NumPixAbvSubThrSum = (unsigned int)store[25][i];
     
-    extrema.clear();
-    extrema.push_back(maxR);
-    extrema.push_back(maxG);
-    extrema.push_back(maxB);
-    extrema.push_back(maxr);
-    extrema.push_back(maxg);
-    extrema.push_back(maxb);
-    std::sort( extrema.begin(), extrema.end() );
-    unsigned short AbsMax =abs(extrema.back());
-    
+    unsigned short AbsMax;
+    { // maxine should be local.  Vector sort had been used as below but is not needed here to just find the max.
+    vector<unsigned short> maxine = {maxR, maxG, maxB, maxr, maxg, maxb}; //all unsigned, see above.
+    AbsMax = *max_element( maxine.begin(), maxine.end() ); 
+    }
+
+
+    //Calc AbsStdDev of our 6 max absolute color changes to score with our Skew Gaussian
     AbsAvg = ( maxR + maxG + maxB + maxr + maxg + maxb ) / 6.;
     AbsStdDev = ( maxR - AbsAvg ) * ( maxR - AbsAvg ) + ( maxG - AbsAvg ) * ( maxG - AbsAvg ) + ( maxB - AbsAvg ) * ( maxB - AbsAvg ) +
       ( maxr - AbsAvg ) * ( maxr - AbsAvg ) + ( maxg - AbsAvg ) * ( maxg - AbsAvg ) + ( maxb - AbsAvg ) * ( maxb - AbsAvg );
     AbsStdDev = sqrt ( AbsStdDev / 5. );
+    
     vector<double> SkewGauss(4); // "classic" values for the next line: ampl .633, mu 1.97, sig 1.89, skew 2.5
     if ( camera == "Custom" ) {
       SkewGauss[0] = CamSett[4];
@@ -353,20 +361,46 @@ int main ( int argc, char** argv ) {
       SkewGauss[2] = 2.;
       SkewGauss[3] = 2.0;
     }
-    prob[i] = 1. - SkewGauss[0]*exp(-0.5*(AbsStdDev-SkewGauss[1])*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*SkewGauss[2]))*(1.+erf(SkewGauss[3]*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*sqrt(2.))));
+
+    //prob = 1 - OurSkewGaussian(AbsStdDev)
     
-    if ( (prob[i] > level && (AbsMax > MinThr && AbsMax < MaxThr) && NumPixAbvSubThrSum > MinPix && NumPixAbvSubThrSum < MaxPix) ||
-	 (NumPixAbvThrSum > 36 && NumPixAbvThrSum < 44 && camera == "B1") || (NumPixAbvThrSum > 100 && (camera == "B3" || camera == "B4")) ||
-	 (camera == "Custom" && NumPixAbvThrSum > CamSett[8] && NumPixAbvThrSum < CamSett[9]) ) {
+    prob[i] = 1. -
+      SkewGauss[0]
+      *exp( -0.5*(AbsStdDev-SkewGauss[1])*(AbsStdDev-SkewGauss[1])
+	            /(SkewGauss[2]*SkewGauss[2])
+	   )
+      *( 1. + erf(SkewGauss[3]*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*sqrt(2.))) );
+
+    //prob is used to make the bool SignalTruth judgement
+    //and 
+
+    
+    //
+    // decision below depends on camera
+    //
+    // level is used only one time, here:
+    //  --------------V--
+    if ( (prob[i] > level && (AbsMax > MinThr && AbsMax < MaxThr) && NumPixAbvSubThrSum > MinPix && NumPixAbvSubThrSum < MaxPix)
+	 || (NumPixAbvThrSum > 36 && NumPixAbvThrSum < 44 && camera == "B1")
+	 || (NumPixAbvThrSum > 100 && (camera == "B3" || camera == "B4"))
+	 || (camera == "Custom" && NumPixAbvThrSum > CamSett[8] && NumPixAbvThrSum < CamSett[9]) )
+      //.............................  NumPixAbvThrSumMin====^=0 ....  NumPixAbvThrSumMax====^=3
+
+      {
       SignalTruth.push_back(true);
     }
     else {
       SignalTruth.push_back(false);
     }
-    
+    //end of big diff frame loop on i
   }
   
-  double previous[4] = {1.,256.,0.,0.}; unsigned short int iEvtN = 0; // the global event number
+  
+  //used for non-Golden event output lines and to store
+  //the extrema from Golden events 
+  double previous[4] = {1.,256.,0.,0.};
+
+  unsigned short int iEvtN = 0; // the global event number
   unsigned short FrameNum[2] = { 0, 0 }; if ( camera != "Custom" ) SignalTruth.erase(SignalTruth.begin());
   
   for ( i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
@@ -381,6 +415,8 @@ int main ( int argc, char** argv ) {
     for ( j = -RewFram; j < ForFram; ++j ) {
       if ( SignalTruth[i+j] ) ++NumBools; //used with "FracYes" below
     }
+    //End of SignalTruth useage.
+
     
     if ( GoldenEvent || float(NumBools) / float(ForFram+RewFram) > FracYes )
       {
