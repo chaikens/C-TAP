@@ -26,10 +26,20 @@ KILL_XTERMS_DONT_ASK="no"
 #default: Ask user at shell to kill our xterms, give 20 sec to answer yes.
 
 RUN_EXPLANATION=""
+
 DEBUG=false
+
 SOFTWARE_DIR=$(pwd)
 FAST_FILESYS_DIR_IF_USED=
 RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
+
+#What to do
+#Keep "" to do it in this run.
+#Set to an old run number to skip and use the result of run N
+# for the next phase
+#Set to NONE to skip that phase, to use old data from the next phase.
+PHASE_1A_RESULT_OLD_N_OR_NONE=
+PHASE_1B_RESULT_N_OR_NONE=
 
 MAKE_BABY_MOVIE=yes
 BABY_MOVIE_CIRCLE_RAD_PIX=9
@@ -205,3 +215,4 @@ function numquotintnz(){
 function echofold() {
     echo $@ | fold --spaces --width=100
 }
+

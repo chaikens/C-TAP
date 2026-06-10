@@ -136,8 +136,14 @@ echo '   -----=====ZZZZZZZZ=====------   '  >> ${RESULTS_DIR}/ffmpeg.log
 
 #ffmpeg uses the .MOV suffix to tell the output format.
 
+#We use a movie name suffixed with .MOV so ffmpeg and ffplay know its type,
+#but we eventually keep the file named .MOV.${logn} and symlink .MOV to it.
+
 generic_baby_movie_name="${moviePrefix}.${EXT}"
 baby_movie_logn="${generic_baby_movie_name}.${logn}"
+
+#this removes nothing or the previously made symlink.
+rm -f $RESULTS_DIR/${generic_baby_movie_name}
 
 make_baby_cmd="ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p "${RESULTS_DIR}/${generic_baby_movie_name}" &>> ${RESULTS_DIR}/ffmpeg.log"
 (echo ; echo ${make_baby_cmd}; echo ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}

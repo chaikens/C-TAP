@@ -22,10 +22,11 @@ ARCHITECTURE="framefile"
 
 if [ $ARCHITECTURE = "framefile" ]
 then		   
-       REUSE_BMPS=yes
-       BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
-       BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
-       BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
+    REUSE_BMPS=yes  #You might as well do this unless extraction has changed,
+    #because if improper or missing first bmp is detected, it will not reuse.
+    BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
+    BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir 
+    BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 fi
 
 ###########END OF YOUR-SYSCONF###
@@ -48,6 +49,8 @@ source code-MOVIES.h.sh         #
 #################################
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
+
+PHASE_1a_RESULT_OLD_N_OR_NONE=1
 
 OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 

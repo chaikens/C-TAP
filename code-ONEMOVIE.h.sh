@@ -18,10 +18,17 @@ touch "${RESULTS_DIR}/$moviePrefix.log.0"
 #that one's a dummy, so the next
 #numbered one can be computed the first time.
 
+#Compute the next run number and keep it as $logn and later the suffix of the .log file.
 pushd ${RESULTS_DIR} > /dev/null
 logn=$( ls $moviePrefix.log.* | sed s/${moviePrefix}.log.// | sort -n | tail -n 1)
 popd > /dev/null
 ((logn++))
+
+#store a copy of the top level script suffixed by run number.
+cp $(which $0) $RESULTS_DIR/$0.$logn
+
+#we don't yet support running the top script except in $SOFTWARE_DIR
+chmod 644 $RESULTS_DIR/$0.$logn
 
 LOG=${RESULTS_DIR}/$moviePrefix.log.$logn
 TIMELOG=${RESULTS_DIR}/$moviePrefix.times.$logn
@@ -74,36 +81,65 @@ xterm_pids+=($!) #for killing 'em
 ################################################################################
 
 RESULT_OF_1a_BASE="${moviePrefix}.int.${logn}"
-cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
-#Phase1a used to be will run multiple times, appending each time,
-# (but the script now only does one run.)
-# If we did staged runs, we must start with nothing.
-# Also, this ensures xterm's tail doesn't fail.
 
-xterm -geometry 150x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
-xterm_pids+=($!) #for killing 'em
+#This string will either name the file to write Phase 1a results in,
+# or be symbolically linked to an old Phase1a results file (or symlink!)
+# or be ignored, depending on the following tests
 
-#That's where the C++ image processors expect us to be
+if [ ${PHASE_1a_RESULT_OLD_N_OR_NONE}xxx = xxx ]
+then
+    #Make a file to hold a result we will compute.
+    cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 
-cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
-#So stage loop can append results.
+    #Phase1a used to be will run multiple times, appending each time,
+    # (but the script now only does one run.)
+    # If we did staged runs, we must start with nothing.
+    # Also, this ensures xterm's tail doesn't fail.
 
+    xterm -geometry 150x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm_pids+=($!) #for killing 'em
+
+    #That's where the C++ image processors expect us to be
+
+    cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
+    #So stage loop can append results.
+    if [ $ARCHITECTURE = "framefile" ]
+    then
+	source "${SOFTWARE_DIR}/code-FRAMEFILE-EXTRACT-1A.h.sh"
+    elif [ $ARCHITECTURE = "pipeline" ]
+    then
+	source "${SOFTWARE_DIR}/code-PIPELINE-EXTRACT-1A.h.sh"
+    else
+	echo Unrecognized ARCHITECTURE $ARCHITECTURE
+	exit 1;
+    fi
+    #Someday there might be comment or other extra stuff in files like this.
+    ndiffs=$(wc -l ${RESULTS_DIR}/${RESULT_OF_1a_BASE})
+else
+
+    if [[ $PHASE_1a_RESULT_OLD_N_OR_NONE =~ ^[0-9]+$ ]]
+    then
+   	#This value is decimal whole number
+	#We do not do Phase 1a but make a symlink for other stages to use an old version
+	pushd ${RESULTS_DIR}
+	ln -s ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.int.${logn}
+        popd
+	ndiffs=$(wc -l ${RESULTS_DIR}/${RESULT_OF_1a_BASE})
+    else
+	if [ ${PHASE_1a_RESULT_OLD_N_OR_NONE}Y = NONEY ]
+	then
+	    echo We are scripted to both no do and not use Phase1a results
+	    echo It is not implemented yet to using old Phase1b results for something new.
+	    echo ERROR
+	    exit 1
+	fi
+    fi
+fi
 echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
 
 #########################################################
-if [ $ARCHITECTURE = "framefile" ]
-then
-    source "${SOFTWARE_DIR}/code-FRAMEFILE-EXTRACT-1A.h.sh"
-elif [ $ARCHITECTURE = "pipeline" ]
-then
-     source "${SOFTWARE_DIR}/code-PIPELINE-EXTRACT-1A.h.sh"
-else
-    echo Unrecognized ARCHITECTURE $ARCHITECTURE
-    exit 1;
-fi
 
-#Someday there might be comment or other extra stuff in files like this.
-ndiffs=$(wc -l ${RESULTS_DIR}/${RESULT_OF_1a_BASE})
+
 
 
 phase1b_start_time=$(uptimenow)
@@ -121,7 +157,7 @@ xterm_pids+=($!) #for killing 'em
 #
 # level for Phase1b first try is 0.5, here----------------------------------------------V---
 #
-PHASE1B_PARAM=0.5
+PHASE1B_PARAM=0.50 
 
 phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
 phase1b_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "

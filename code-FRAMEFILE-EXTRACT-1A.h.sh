@@ -9,7 +9,33 @@ pushd $BITMAPS_DIR  > /dev/null #ffmpeg puts bitmaps in its cwd.
 # EXTRACT or REUSE BMPS
 #
 #
-if [ ${REUSE_BMPS}"" != "yes" ]
+must_extract=yes
+if [ ${REUSE_BMPS}"" = "yes" ]
+then
+    if ! depthOfBmpIs24 thumb000001.bmp
+    then
+	echo 'thumb000001.bmp does not exist (in its proper place)'
+	echo "or its non-24bit depth is not supported by Phase1a"
+	echo "We will NOT reuse bitmaps, sorry"
+	echo 'INFO: thumb000001.bmp does not exist (in its proper place)' >> $LOG
+	echo "INFO: or its non-24bit depth is not supported by Phase1a"   >> $LOG
+	echo "INFO: We will NOT reuse bitmaps, sorry"                     >> $LOG
+    else
+	bmp_width=$(widthOfBmp thumb000001.bmp)
+	bmp_height=$(heightOfBmp thumb000001.bmp)
+	must_extract=no
+	echo
+	echo "We're reusing movie bitmaps for debugging speed."
+	echo "INFO:" >> $LOG
+	echo "INFO:" "We're reusing movie bitmaps for debugging speed." >> $LOG
+	echo >> $LOG
+	(echo ; echo "#Reused bitmaps, so no extract commands."  ) >>${COMMAND_ARCHIVE_PATHNAME}
+	#move to where baby movie is made 
+	#rm -f pic*.bmp #only delete images used to make the previous "baby movie"
+    fi
+fi
+
+if [ ${must_extract} = yes ]
 then
     echo "STEP:" "Extracting .bmp's" >> $LOG
     echo "Extracting .bmp's"
@@ -90,26 +116,8 @@ then
 	bmp_height=$(heightOfBmp thumb000001.bmp)
     fi
     #done with extrating bitmaps.
-
-else
-    echo
-    echo "We're reusing movie bitmaps for debugging speed."
-    echo "INFO:" >> $LOG
-    echo "INFO:" "We're reusing movie bitmaps for debugging speed." >> $LOG
-    echo >> $LOG
-    (echo ; echo "#Reused bitmaps, so no extract commands."  ) >>${COMMAND_ARCHIVE_PATHNAME}
-    #move to where baby movie is made 
-    #rm -f pic*.bmp #only delete images used to make the previous "baby movie"
-    if ! depthOfBmpIs24 thumb000001.bmp
-    then
-	echo 'thumb000001.bmp does not exist (in its proper place)'
-	echo or its non-24bit depth is not supported by Phase1a
-    else
-	bmp_width=$(widthOfBmp thumb000001.bmp)
-	bmp_height=$(heightOfBmp thumb000001.bmp)
-    fi
 fi
-    
+
 #
 # ffmpeg usage explanation for command ABOVE
 #
@@ -168,11 +176,8 @@ else
 fi
 
 echo
-echo "Beginning Phase1a"
-echo
-
 echo $0 "STARTING Phase1a"
-
+echo
 #if [ true ]
 #then
 
