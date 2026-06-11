@@ -101,6 +101,7 @@ be visualized by drawing a circle on a frame  (from Matt's conversation, March 1
 #include <math.h>
 #include <vector>
 #include <cassert>
+#include <error.h>
 using namespace std;
 
 // Command line options.  Set when, early, main calls
@@ -153,6 +154,9 @@ int main ( int argc, char** argv ) {
   FILE *CamSettfp = fopen(CamSett_file,"r");
   for ( j = 0; j < 20; ++j ) {
     int ret = fscanf ( CamSettfp, "%s %lf", line, &temp );
+    if( ret != 2) {
+      error(1, 0, "Failed to read a <string> <number> Camsett pair from %s", CamSett_file);
+    }
     CamSett.push_back(temp);
   }
 
