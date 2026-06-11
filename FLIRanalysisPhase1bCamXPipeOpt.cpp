@@ -339,7 +339,7 @@ Line19 Value=14(ignored Key =mainThreshold=)
                          pow(OverallAverage-GlobPixMean[4],2.)+
                          pow(OverallAverage-GlobPixMean[5],2.);
   OverallStdDev /= 5.; OverallStdDev = sqrt(OverallStdDev);
-  fprintf(stderr,"Grey(8-bit) pixel diff mu and sigma of %.1f +/- %.2f (units of 0-255)\n",OverallAverage,OverallStdDev);
+  fprintf(stderr,"\nGrey(8-bit) pixel diff mu and sigma of %.1f +/- %.2f (units of 0-255)\n",OverallAverage,OverallStdDev);
   int MinThr = std::max(int(floor(OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5)),smallestThr); //33 for over-fit to initial test
   if ( MinThr > 43 && camera == "B1" ) MinThr = 43;
   int MaxThr = biggestThr;

@@ -198,9 +198,7 @@ echofold ${phase1b_cmd}
 
 echo -n "CMD:"
 echo $(echofold $phase1b_cmd) >> $LOG
-echo >> $LOG
-echo "INFO:" Phase1b report: >> $LOG
-echo >> $LOG
+echo -n "INFO:" Phase1b report: >> $LOG
 eval ${phase1b_cmd} 
 err=$?
 if [ ${err} != 0 ]
