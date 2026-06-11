@@ -77,29 +77,6 @@ function padTo6Digs() {
     echo "${pad}$1"
 }
 
-function exit_greeting() {
-echo "True, full consciousness can now be reasserted by you poor human user."
-
-echo "See the results in the xterms and ${RESULTS_DIR}"
-echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
-if ! read -t 20 yes
-then
-    echo OK. Time for asking done, leaving the xterms.
-    echo Kill them manually or use ./killxterms.sh
-fi
-
-if [ ${yes}"" = "yes" ]
-then
-    if [ ${xterm_pids-none} != "none" ]
-    then
-	kill ${xterm_pids[*]} 
-    fi
-fi
-
-echo $0 Done.
-exit 0
-}
-
 function uptimenow(){
     cat /proc/uptime | sed -n 's/\([0-9]*\.[0-9]*\) .*/\1/p'
     
@@ -183,40 +160,6 @@ function padTo6Digs() {
     echo "${pad}$1"
 }
 
-function exit_greeting() {
-echo "True, full consciousness can now be reasserted by you poor human user."
-
-echo "See the results in the xterms and ${RESULTS_DIR}"
-
-if [ ${KILL_XTERMS_DONT_ASK}"x" = yes"x" ]
-then
-    if [ ${xterm_pids-none} != "none" ]
-    then
-	kill ${xterm_pids[*]} 
-    fi
-    echo $0 Done.
-    exit 0
-fi
-
-echo -n "Type yes to kill the xterms. Or, no, or wait 20sec:"
-if ! read -t 20 yes
-then
-    echo OK. Time for asking done, leaving the xterms.
-    echo Kill them manually or use ./killxterms.sh
-fi
-
-if [ ${yes}"" = "yes" ]
-then
-    if [ ${xterm_pids-none} != "none" ]
-    then
-	kill ${xterm_pids[*]} 
-    fi
-fi
-
-echo $0 Done.
-exit 0
-}
-
 function uptimenow(){
     cat /proc/uptime | sed -n 's/\([0-9]*\.[0-9]*\) .*/\1/p'
     
@@ -226,10 +169,16 @@ function numdif(){
     echo $(dc -e "$1 $2 - p")
 }
 
+
+# numquotintzn M N echos rounddown(M/N) if this non-zero, 1 if zero.
+# for pixel width of circles.
 function numquotintnz(){
     echo $(dc -e "1 Sa $1 $2 / d 0 =a p")
 }
-#### clumsy old fashioned reverse polish calc
+# clumsy reverse polish calculator.
+# Reg-a:=1 so we can put on top of stack if $1/$2 = 0.
+# Push nums, /, if top == 0, push Reg-a's 1, else keep the quot.
+# pop-print the 1 or the quot.
 ## used to calc the pixel width for a small circle.
 ### we store in reg-a (Sa) a 1 to return if the / is 0
 ### and duplicate the quotient to return if not!
@@ -239,3 +188,9 @@ function mydate() {
     echo $(date +%b%d-%H-%M%S ) # May22-13-1435 MonthDay-Hr-MinSec
                                 #Shell doesn't like colons
 }
+
+
+function echofold() {
+    echo $@ | fold --spaces --width=100
+}
+

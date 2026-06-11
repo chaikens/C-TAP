@@ -1,5 +1,15 @@
 #!/usr/bin/bash
-#              (hmm---no comment can follow bash above)#
+#####################################################################
+# To eventually support modified redos commanded in the RESULTS dir,#
+# please code your full pathname to the C-TAP dir here.             #
+# DO NOT encode $(pwd) instead because this script will             #
+# be copied to the RESULTS dir.                                     #
+# This feature is not working yet                                   #
+#####################################################################
+LITERAL_CTAP_SW_PATHNAME=/data/GIT/C-TAP
+##############################
+cd $LITERAL_CTAP_SW_PATHNAME #
+#########################################
 #FOR STANDARD USAGE, EDIT ONLY          #
 #THE FILE-NAME OF THIS SCRIPT           #
 #AND CODE OUTSIDE BOXES LIKE THIS.      #
@@ -50,7 +60,7 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-PHASE_1a_RESULT_OLD_N_OR_NONE=1
+PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 
 ############ Vary CamSett.txt settings here! #########

@@ -132,8 +132,19 @@ else
    	#This value is decimal whole number
 	#We do not do Phase 1a but make a symlink for other stages to use an old version
 	pushd ${RESULTS_DIR}
-	ln -s ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.int.${logn}
-        popd
+	if [ -r ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ]
+	then
+	    ln -s ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.int.${logn}
+	    popd
+	else
+   	    echo You are trying to reuse a Phase1a result that doesn\'t exist.
+	    echo In $0
+	    echo You set PHASE_1a_RESULT_OLD_N_OR_NONE to $PHASE_1a_RESULT_OLD_N_OR_NONE
+	    echo but we can\'t read
+	    echo ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE}
+	    kill_our_xterms
+	    exit 1
+	fi
 	ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
     else
 	if [ ${PHASE_1a_RESULT_OLD_N_OR_NONE}Y = NONEY ]
