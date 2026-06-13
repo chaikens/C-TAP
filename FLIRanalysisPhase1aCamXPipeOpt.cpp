@@ -37,6 +37,11 @@
                     Overrides default ./CamSett.txt  See documenatation
                     and reports from Phase1b.   
                     Settings architecture still under development.
+   
+   [--write-mask-file filename] Writes a file of the row-by-row bit string
+                    with 1 for each non-clipped or exclusion zoned pixel.
+                    This is useful for later visualization and statistical
+                    re-analysis of the image. (These are easily handled by numpy.)
 
    [--verbose]   Used for debugging.
 
@@ -196,6 +201,7 @@ int stdinfreads = 0; //for old debugging of pipelined.
 #include <vector>
 #include <getopt.h>
 #include <cstring>
+#include "BitA.h" //for making the image mask file if requested.
 using namespace std;
 
 int vb = 0; //verbose bool
@@ -231,6 +237,7 @@ static const char default_bitmaps_dir[] = "bitmaps";
 static const char default_CamSett_file[] = "CamSett.txt";
 int no_crop = 0; //scaleCD  //Should we keep this?
 
+char * mask_filename = 0;
 
 //scaling? will use this everywhere including width and height
 typedef uint16_t pixCoord; //scaleCD
@@ -1004,6 +1011,12 @@ int main( int argc, char** argv ) {
     int NumPixAbvSubThrSum = 0;
     
     int CloudCover = 100;
+
+    BitA *mask = 0;
+    if( mask_filename ) {
+      mask = new BitA(width,height);
+      cerr << "Allocated a BitA at " << mask << endl;
+    }
     
     //pixel process loop:
     for ( int i = (i_loop_from); i < (i_loop_lt); ++i ) {
@@ -1035,6 +1048,10 @@ int main( int argc, char** argv ) {
 	  /////////////////////////////////////////FLIR PHASE1A Calculation/////////////////////////////
           //////////////////////////////////////////////////////////////////////////////////////////////
 
+
+	  if(mask) {
+	    mask->set(ii,jj);
+	  }
 	  
 	  if ( diffs[0] > maximum[0] ) {
 	    maximum[0] = diffs[0]; maxLoc[0][0] = ii; maxLoc[0][1] = jj;
@@ -1070,7 +1087,16 @@ int main( int argc, char** argv ) {
 	
       } /* end pixel y loop */
     } /* end pixel x loop */
-    
+
+    if( mask )
+      {
+	mask->writefile(mask_filename);
+	//only make a mask when processing the first image pair,
+	//since the crop/exclusions are the same for all.
+	delete mask;
+	mask = 0;
+	mask_filename = 0;
+      }
     //Output Vertical Pixel coodinates are REVERSED compared to input images.
     //The input, being a .bmp (even current in pipelined version), uses
     //Microsoft's bottom-is-zero convention.  
@@ -1151,7 +1177,7 @@ static int get_our_options( int *argc, char **argv[])
       {"CROP_XF", required_argument, 0, 0},           //11 if --crop-args is set.
       {"CROP_YI", required_argument, 0, 0},           //12
       {"CROP_YF", required_argument, 0, 0},           //13
-
+      {"write-mask-file", required_argument, 0, 0},   //14
       {0,         0,                 0,  0 }
     };
     c = getopt_long( *argc, *argv, "",
@@ -1177,7 +1203,7 @@ static int get_our_options( int *argc, char **argv[])
       case 11: cropargs++; argCROP_XF = atoi(optarg); break;
       case 12: cropargs++; argCROP_YI = atoi(optarg); break;
       case 13: cropargs++; argCROP_YF = atoi(optarg); break;
-
+      case 14: mask_filename = optarg;                break;
       }
     }
   }

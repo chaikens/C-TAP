@@ -3,7 +3,7 @@ all : Phase1aPipeOpt Phase1bPipeOpt
 CXXFLAGS = -O3
 #CXXFLAGS = -g
 
-Phase1aPipeOpt : FLIRanalysisPhase1aCamXPipeOpt.cpp Makefile
+Phase1aPipeOpt : FLIRanalysisPhase1aCamXPipeOpt.cpp BitA.h Makefile
 	$(CXX) $(CXXFLAGS)   -Wno-unused-result $< -o $@
 
 Phase1bPipeOpt : FLIRanalysisPhase1bCamXPipeOpt.cpp Makefile

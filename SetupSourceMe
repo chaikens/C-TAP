@@ -40,6 +40,6 @@ then
 
 	ulimit -c unlimited
 	#If you can we use sudo to configure crash cores to go into CWD.
-	src/ezcores.sh
+	sudo src/ezcores.sh
 	emacs -title "C-TAP DEVELOPMENT AND TESTING" -g 100x50 $(pwd) &
 fi

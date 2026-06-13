@@ -4,7 +4,6 @@ echo SOURCED: code-ANALYSIS.h.sh
 opt_scaling="${MOVIE_SCALE_OPTION} ${PIXPROC_SCALE_OPTION} ${USER_SCALE_OPTION}"
 
 phase1a_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS} ${PHASE1A_OTHER_OPTIONS}"
-
 #check if $BITMAPS_DIR is null if we are not reusing bitmaps..I think that's done??
 if [ $ARCHITECTURE = "framefile" ]
 then

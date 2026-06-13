@@ -165,6 +165,7 @@ echo "TIME:" $prt >> $LOG
 phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${phase1a} --pipeline "
 phase1a_cmd_args+=" ${phase1a_options} "
 phase1a_cmd_args+=" 0 100000000 0 "
+phase1a_options+=" --write-mask-file ${RESULTS_DIR}/${IMAGE_MASK_BASE}"
 phase1a_cmd_args+=" < ${bmppipe} "
 phase1a_cmd="${phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
 

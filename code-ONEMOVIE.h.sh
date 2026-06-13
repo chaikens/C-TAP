@@ -90,6 +90,7 @@ xterm_pids+=($!) #for killing 'em
 ################################################################################
 
 RESULT_OF_1a_BASE="${moviePrefix}.int.${logn}"
+IMAGE_MASK_BASE="${moviePrefix}.btmask.${logn}"
 
 #This string will either name the file to write Phase 1a results in,
 # or be symbolically linked to an old Phase1a results file (or symlink!)
@@ -135,6 +136,7 @@ else
 	if [ -r ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ]
 	then
 	    ln -s ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.int.${logn}
+            ln -s ${moviePrefix}.btmask.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.btmask.${logn}
 	    popd
 	else
    	    echo You are trying to reuse a Phase1a result that doesn\'t exist.
