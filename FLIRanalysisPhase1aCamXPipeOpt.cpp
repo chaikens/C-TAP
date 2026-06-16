@@ -1015,7 +1015,6 @@ int main( int argc, char** argv ) {
     BitA *mask = 0;
     if( mask_filename ) {
       mask = new BitA(width,height);
-      cerr << "Allocated a BitA at " << mask << endl;
     }
     
     //pixel process loop:

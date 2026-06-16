@@ -38,11 +38,12 @@ RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
 #Set to an old run number to skip and use the result of run N
 # for the next phase
 #Set to NONE to skip that phase, to use old data from the next phase.
-PHASE_1A_RESULT_OLD_N_OR_NONE=
-PHASE_1B_RESULT_N_OR_NONE=
+PHASE_1a_RESULT_OLD_N_OR_NONE=
+PHASE_1b_RESULT_N_OR_NONE=
 
 MAKE_BABY_MOVIE=yes
 BABY_MOVIE_CIRCLE_RAD_PIX=9
+EXT="MOV" #baby movie extension
 
 #Other and future uses will not use this, it's referred in the Phase1a command.
 PHASE1A_OTHER_OPTIONS=""

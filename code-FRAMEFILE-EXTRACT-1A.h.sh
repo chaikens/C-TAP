@@ -184,6 +184,7 @@ echo
 # run Phase1a once on all the frames
 phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${phase1a}"
 phase1a_cmd_args+=" ${phase1a_options} "
+phase1a_cmd_args+=" --write-mask-file ${RESULTS_DIR}/${IMAGE_MASK_BASE}"
 phase1a_cmd="${phase1a_cmd_args} 0 $nframes 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG" 
   
 echo Running
