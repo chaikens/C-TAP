@@ -25,6 +25,9 @@ echo Results will be in $RESULTS_DIR    #
 echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
+PHASE_1a=F1a.orig.backwards
+PHASE_1a_RESULT_OLD_N_OR_NONE=
+
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 
 ARCHITECTURE="framefile"
@@ -52,16 +55,13 @@ ext=mp4
 #      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 #
 
-movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
+movie_files="$SLOW_MOVIE_DIR/DS.$ext"
 
 #################################
 source code-MOVIES.h.sh         #
 #################################
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
-
-PHASE_1a_RESULT_OLD_N_OR_NONE=
-
 
 ############ Vary CamSett.txt settings here! #########
 cat > tempCamSett.txt <<EOF
@@ -123,9 +123,9 @@ FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 #for HALF-RESOLUTION, ditto (simply add the scale filter)
 #FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
-# THIS DroneShort1.mov ONLY: In the Phase1a C++ program, we wrote an exclusion
-# zone function for DroneShort1, and also named a camera for it.
-#for the DroneShort1.mov only, both pipeline and framebmp arch,
+# THIS DS.mov ONLY: In the Phase1a C++ program, we wrote an exclusion
+# zone function for DS, and also named a camera for it.
+#for the DS.mov only, both pipeline and framebmp arch,
 #(1) --camera-index 1 selects the exclusion zone to hide the data/time display.
 #    We hard coded this and camera name DroneShort1.
 #(2) CROP half-way down, 1080/2 to eliminate the trees. (more than original Camsett)

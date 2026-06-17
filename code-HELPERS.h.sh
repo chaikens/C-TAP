@@ -194,3 +194,12 @@ function echofold() {
     echo $@ | fold --spaces --width=100
 }
 
+function vev() {
+    echo $1=${!1}
+}
+
+function vevs() {
+    for x in ${1}
+    do vev $x
+    done
+}

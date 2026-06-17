@@ -15,7 +15,7 @@ echo YOUR-SYSCONF-$JOBNAME #
 
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 
-PHASE_1a=F1a.orig
+PHASE_1a=F1a.all
 PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 
@@ -57,8 +57,6 @@ echo YOUR-ANALYSIS-$JOBNAME     #
 #  but the job is named from the C-TAP....sh file..??
 
 
-
-
 ############ Vary CamSett.txt settings here! #########
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
@@ -87,8 +85,6 @@ PHASE_1b_LEVEL=0.5
 PHASE_1b_LEVEL_REDO=0.98
 
 OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
-
-
 
 #Not done yet: when we specify pipelining here, and include the below
 #analysis options, that is what is done.  We'll look at TESTING/TestPipeOpt code

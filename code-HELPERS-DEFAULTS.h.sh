@@ -39,6 +39,8 @@ RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
 # for the next phase
 #Set to NONE to skip that phase, to use old data from the next phase.
 PHASE_1a_RESULT_OLD_N_OR_NONE=
+
+PHASE_1a="F1a.orig"
 PHASE_1b_RESULT_N_OR_NONE=
 
 MAKE_BABY_MOVIE=yes
@@ -110,11 +112,13 @@ fi
 echo $0 Done
 if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then
-    echo "cd ${RESULTS_DIR} ; pwd; ffplay ${moviePrefix}.${EXT}" > m
-    echo I created file m which contains
-    cat m
+    echo "cd ${RESULTS_DIR} ; pwd; ffplay -hide_banner -f mov ${baby_movie_logn}" > m
+    #echo I created file m which contains
+    #cat m
+    echo
     echo 'ffplay keys: --DownArrow-- to back up, --s-- to step frame, --space-- to play/pause' 
-    echo 'To see the Baby Movie, type source m (or . <space> m)'
+    echo 'To see the Baby Movie, type source m (or . <space> m), it puts you in RESULTS dir. too'
+    echo
 else
     echo "See results in"
     echo ${RESULTS_DIR}

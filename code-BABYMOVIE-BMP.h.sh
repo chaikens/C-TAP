@@ -161,7 +161,8 @@ mv $generic_baby_movie_name $baby_movie_logn  #rename what we save
 
 #But, we want ffplay and other mpeg processors to see the .MOV extension,
 #so we make the symbolic link.  It will link to the most recently made movie.
-ln -s $baby_movie_logn $generic_baby_movie_name
+#ln -s $baby_movie_logn $generic_baby_movie_name
+#Instead of this, we generate command ffplay -f mov ..
 
 popd 
 

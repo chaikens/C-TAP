@@ -1,10 +1,14 @@
 echo SOURCED: code-ONEMOVIE.h.sh
-
+#
+# (1) Set up or increment, for one movie, job repetition number ($logn below)
+# to be appended to the RESULTS dir files relevent to that movie.
+#
+# 
 echo "We got moviePrefix=$moviePrefix"
-echo "We got movie_file=$movie_file"
+echo "We got movie_file=$movie_file"   #full pathname
 
 echo "Making Mick West redundant, processing ONI FOIA files..."
-FileName="${moviePrefix}.${ext}"
+FileName="${moviePrefix}.${ext}"       #basename (last pathname component)
 echo "FileName=$FileName"
 
 #
@@ -29,6 +33,13 @@ cp $(which $0) $RESULTS_DIR/$0.$logn
 
 #we don't yet support running the top script except in $SOFTWARE_DIR
 chmod 644 $RESULTS_DIR/$0.$logn
+
+#Make symbolic links with $logn suffix to current movies' video and frame files.
+#Good for later visualization operations, to get at the original movie.
+pushd ${RESULTS_DIR} > /dev/null
+ln -s ${movie_file} ${FileName}.${logn}
+ln -s $BITMAPS_DIR ${BITMAPS_DIR_NAME}.${logn}
+popd > /dev/null
 
 LOG=${RESULTS_DIR}/$moviePrefix.log.$logn
 TIMELOG=${RESULTS_DIR}/$moviePrefix.times.$logn
@@ -106,7 +117,7 @@ then
     # If we did staged runs, we must start with nothing.
     # Also, this ensures xterm's tail doesn't fail.
 
-    xterm -geometry 150x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     xterm_pids+=($!) #for killing 'em
 
     #That's where the C++ image processors expect us to be
