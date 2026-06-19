@@ -919,7 +919,7 @@ int main( int argc, char** argv ) {
     CamSett.push_back(temp);
   }
   ret = fscanf ( file, "%s", line ); fclose(file);
-  unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
+  unsigned short MainThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   fprintf(stderr,"%s MainThr=%u SubThr=%u\n", progname, MainThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
@@ -1017,76 +1017,64 @@ int main( int argc, char** argv ) {
       mask = new BitA(width,height);
     }
     
-    //pixel process loop:
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////FLIR PHASE1A Calculation/////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    int npixused = 0;
+    //Pixel process loop 1 
+    //Find the min and max differences and their first found locations.
+    //Also, construct the mask of 1 bits for not cropped or excluded pixels.
     for ( int i = (i_loop_from); i < (i_loop_lt); ++i ) {
       for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
-	
-	int rgbColorNew[3], rgbColorOld[3];
-	
-	rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0]; //Tiny Old*=New*
-	rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1]; //optimization
-	rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2]; //not done for simplicity.
-	
-	rgbColorNew[0] = (int)dataNew[3 * (i * width + j) + 0];
-        rgbColorNew[1] = (int)dataNew[3 * (i * width + j) + 1];
-        rgbColorNew[2] = (int)dataNew[3 * (i * width + j) + 2];
-	
-	diffs[0] = rgbColorNew[0]-rgbColorOld[0];
-	diffs[1] = rgbColorNew[1]-rgbColorOld[1];
-	diffs[2] = rgbColorNew[2]-rgbColorOld[2];
 	int jj = j;
 	int ii = height - 1 - i;//ii is increasing Top to Bottom, non-Microsoft y-axis:vdir order.
-
 	//exclusion zone and cropping coordinates are in the incr. Top to Bottom order.
 	//(For our direct uses of i, j, it doesn't matter.)
-
 	//old code if( k==start ) removed, init k = start+1
-	if ( !(*inExclusionZone)(ii, jj) ) {
+	if ( !(*inExclusionZone)(ii, jj) )
+	  {
+	    //here is the body of the loop
+	    
+	    npixused++;
+	    if(mask) {  //--write-mask-file is only an option
+	      mask->set(ii,jj);
+	    }
 
-          //////////////////////////////////////////////////////////////////////////////////////////////
-	  /////////////////////////////////////////FLIR PHASE1A Calculation/////////////////////////////
-          //////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	  if(mask) {
-	    mask->set(ii,jj);
-	  }
-	  
-	  if ( diffs[0] > maximum[0] ) {
-	    maximum[0] = diffs[0]; maxLoc[0][0] = ii; maxLoc[0][1] = jj;
-	    if ( maximum[0] > MainThr ) ++NumPixAbvThr[0][0];
-	    if ( maximum[0] > SubThr ) ++NumPixAbvSubThrSum;
-	  }
-	  if ( diffs[1] > maximum[1] ) {
-	    maximum[1] = diffs[1]; maxLoc[1][0] = ii; maxLoc[1][1] = jj;
-	    if ( maximum[1] > MainThr ) ++NumPixAbvThr[1][0];
-	    if ( maximum[1] > SubThr ) ++NumPixAbvSubThrSum;
-	  }
-	  if ( diffs[2] > maximum[2] ) {
-	    maximum[2] = diffs[2]; maxLoc[2][0] = ii; maxLoc[2][1] = jj;
-	    if ( maximum[2] > MainThr ) ++NumPixAbvThr[2][0];
-	    if ( maximum[2] > SubThr ) ++NumPixAbvSubThrSum;
-	  }
-	  if ( diffs[0] < minimum[0] ) {
-	    minimum[0] = diffs[0]; minLoc[0][0] = ii; minLoc[0][1] = jj;
-	    if ( minimum[0] < -MainThr ) ++NumPixAbvThr[0][1];
-	    if ( minimum[0] < -SubThr ) ++NumPixAbvSubThrSum;
-	  }
-	  if ( diffs[1] < minimum[1] ) {
-	    minimum[1] = diffs[1]; minLoc[1][0] = ii; minLoc[1][1] = jj;
-	    if ( minimum[1] < -MainThr ) ++NumPixAbvThr[1][1];
-	    if ( minimum[1] <- SubThr ) ++NumPixAbvSubThrSum;
-	  }
-	  if ( diffs[2] < minimum[2] ) {
-	    minimum[2] = diffs[2]; minLoc[2][0] = ii; minLoc[2][1] = jj;
-	    if ( minimum[2] < -MainThr ) ++NumPixAbvThr[2][1];
-	    if ( minimum[2] < -SubThr ) ++NumPixAbvSubThrSum; }
-	  
-	}
+	    //long winded code to compute the color differences at the given pixel.
+	    int rgbColorNew[3], rgbColorOld[3];
 	
-      } /* end pixel y loop */
-    } /* end pixel x loop */
+	    rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0]; //Tiny Old*=New*
+	    rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1]; //optimization
+	    rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2]; //not done for simplicity.
+	
+	    rgbColorNew[0] = (int)dataNew[3 * (i * width + j) + 0];
+	    rgbColorNew[1] = (int)dataNew[3 * (i * width + j) + 1];
+	    rgbColorNew[2] = (int)dataNew[3 * (i * width + j) + 2];
+	  
+	    diffs[0] = rgbColorNew[0]-rgbColorOld[0];
+	    diffs[1] = rgbColorNew[1]-rgbColorOld[1];
+	    diffs[2] = rgbColorNew[2]-rgbColorOld[2];
 
+	    //Find max and min diffs, and the first locations for each
+	    for (int c = 0; c < 3; c++)
+	      {
+		if( diffs[c] > maximum[c] )
+		  {
+		    maximum[c] = diffs[c];
+		    maxLoc[c][0] = ii; maxLoc[c][1] = jj;
+		  }
+		if( diffs[c] < minimum[c] )
+		  {
+		    minimum[c] = diffs[c];
+		    minLoc[c][0] = ii; minLoc[c][1] = jj;
+		  }
+	      }
+	  }
+      }
+    }
+
+    //save the mask if any
     if( mask )
       {
 	mask->writefile(mask_filename);
@@ -1096,6 +1084,65 @@ int main( int argc, char** argv ) {
 	mask = 0;
 	mask_filename = 0;
       }
+    
+    //Pixel process loop 2.  Calculate:
+    //For each of 3 colors and 2 extrema {min,max} how many
+    //pixel color diffs are within MainThr==mainThreshold of the extreme
+    //
+    //Overall, in how many of the 6 cases is the color diff within SubThr of the extreme
+
+    for ( int i = (i_loop_from); i < (i_loop_lt); ++i ) {
+      for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
+	int jj = j;
+	int ii = height - 1 - i;//ii is increasing Top to Bottom, non-Microsoft y-axis:vdir order.
+	//exclusion zone and cropping coordinates are in the incr. Top to Bottom order.
+	//(For our direct uses of i, j, it doesn't matter.)
+	//old code if( k==start ) removed, init k = start+1
+	if ( !(*inExclusionZone)(ii, jj) )
+	  {
+	    //here is the body of the loop
+	    
+
+	
+	    //long winded code to compute the color differences at the given pixel.
+	    int rgbColorNew[3], rgbColorOld[3];
+	
+	    rgbColorOld[0] = (int)dataOld[3 * (i * width + j) + 0]; //Tiny Old*=New*
+	    rgbColorOld[1] = (int)dataOld[3 * (i * width + j) + 1]; //optimization
+	    rgbColorOld[2] = (int)dataOld[3 * (i * width + j) + 2]; //not done for simplicity.
+	
+	    rgbColorNew[0] = (int)dataNew[3 * (i * width + j) + 0];
+	    rgbColorNew[1] = (int)dataNew[3 * (i * width + j) + 1];
+	    rgbColorNew[2] = (int)dataNew[3 * (i * width + j) + 2];
+	    
+	    diffs[0] = rgbColorNew[0]-rgbColorOld[0];
+	    diffs[1] = rgbColorNew[1]-rgbColorOld[1];
+	    diffs[2] = rgbColorNew[2]-rgbColorOld[2];
+
+	    for (int c = 0; c < 3; c++)
+	      {
+		if( diffs[c] > (maximum[c] - MainThr))
+		  {
+		    ++NumPixAbvThr[c][0];
+		  }
+		if( diffs[c] < (MainThr + minimum[c]))
+		{
+		  ++NumPixAbvThr[c][1];
+		}
+		if( diffs[c] > (maximum[c] - SubThr))
+		    {
+		      ++NumPixAbvSubThrSum;
+		    }
+		if( diffs[c] < (SubThr + minimum[c]))
+		  {
+		      ++NumPixAbvSubThrSum;
+		  }
+	      }
+	  }
+      }
+    }//End of 2nd pixel loop.
+  
+    
     //Output Vertical Pixel coodinates are REVERSED compared to input images.
     //The input, being a .bmp (even current in pipelined version), uses
     //Microsoft's bottom-is-zero convention.  

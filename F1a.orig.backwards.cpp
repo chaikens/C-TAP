@@ -919,7 +919,7 @@ int main( int argc, char** argv ) {
     CamSett.push_back(temp);
   }
   ret = fscanf ( file, "%s", line ); fclose(file);
-  unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
+  unsigned short MainThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   fprintf(stderr,"%s MainThr=%u SubThr=%u\n", progname, MainThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
@@ -1018,8 +1018,12 @@ int main( int argc, char** argv ) {
     }
     
     //pixel process loop:
-    for ( int i = (i_loop_from); i < (i_loop_lt); ++i ) {
-      for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
+    //BOTH DIRECTIONS REVERSED
+    for ( int i = (i_loop_lt)-1;  i >= (i_loop_from); --i ) {
+      for ( int j = (j_loop_lt-1); j >= (j_loop_from); --j ) {
+
+    //for ( int i = (i_loop_from); i < (i_loop_lt); ++i ) {
+    //  for ( int j = (j_loop_from); j < (j_loop_lt); ++j ) {
 	
 	int rgbColorNew[3], rgbColorOld[3];
 	
