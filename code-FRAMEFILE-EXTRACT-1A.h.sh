@@ -77,6 +77,7 @@ then
     ffmpeg_xterm_running="yes"
     touch ${RESULTS_DIR}/ffmpeg.log #so we have one.
     xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
+    #xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
     xterm_pids+=($!) #for killing 'em
 
     extract_start_time=$(uptimenow)

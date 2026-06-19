@@ -117,7 +117,8 @@ then
     # If we did staged runs, we must start with nothing.
     # Also, this ensures xterm's tail doesn't fail.
 
-    xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    #xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e less +F -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     xterm_pids+=($!) #for killing 'em
 
     #That's where the C++ image processors expect us to be
@@ -185,7 +186,7 @@ RESULT_OF_1b_BASE="${moviePrefix}.out.${logn}"
 cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     
 #so xterm's less doesnt fess. We use less since the result is finished fast.
-xterm -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
+xterm -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f +F ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
 xterm_pids+=($!) #for killing 'em
 
 #

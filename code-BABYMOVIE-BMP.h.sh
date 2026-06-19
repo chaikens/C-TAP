@@ -30,6 +30,7 @@ then
     then
 	touch ${RESULTS_DIR}/ffmpeg.log
 	xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
+	#xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
 	xterm_pids+=($!) #for killing 'em
 	ffmpeg_xterm_running="yes"
     fi
@@ -161,8 +162,8 @@ mv $generic_baby_movie_name $baby_movie_logn  #rename what we save
 
 #But, we want ffplay and other mpeg processors to see the .MOV extension,
 #so we make the symbolic link.  It will link to the most recently made movie.
-#ln -s $baby_movie_logn $generic_baby_movie_name
-#Instead of this, we generate command ffplay -f mov ..
+ln -s $baby_movie_logn $generic_baby_movie_name
+#In addition to this, we generate command ffplay -f mov ..
 
 popd 
 

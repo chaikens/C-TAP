@@ -919,7 +919,7 @@ int main( int argc, char** argv ) {
     CamSett.push_back(temp);
   }
   ret = fscanf ( file, "%s", line ); fclose(file);
-  unsigned short MinThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
+  unsigned short MainThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
   fprintf(stderr,"%s MainThr=%u SubThr=%u\n", progname, MainThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 

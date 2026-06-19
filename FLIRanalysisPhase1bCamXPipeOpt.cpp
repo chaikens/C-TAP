@@ -10,14 +10,16 @@ Section 3.2.1 on image analysis for UAP research starting on page 11 of https://
 
   FLIRanalysisPhase1bCamXPipeOpt.cpp, compiled to Phase1bPipeOpt
 
-  $ Phase1bPipeOpt [other options] \
-                   input_filename(.int)  \
-                   NumFrames level \
-                   number_of_frames_to_process 
+  $ Phase1bPipeOpt [other options]                \
+                   input_filename(.int)           \
+                   max_number_of_lines_to_process \
+		   level			  
+
+  It's OK if the input has fewer lines than max_number_of_lines_to_process.
 
   [--pipeline option reports an error and is ignored.  To pipe input,
      use say PIPE.int for input_filename and a named pipe made by 
-     mknod PIPE.int p to pipe input data to.]
+     mknod PIPE.int p to pipe input data to.] 
 
   Other options:
   [--CamSett-file filename] 
@@ -30,6 +32,10 @@ Section 3.2.1 on image analysis for UAP research starting on page 11 of https://
   our output.
 
   [--verbose] ignored for now, may be used again.
+
+  [--include-1a-lines] The 1a line corresponding to a reported frame pair
+  is included in the output, with # in front and the prob[i] at the end.
+  (For analysis of Phase1b, this restored originally commented out code.)
 
   (We no longer rewrite Camsett.txt)  
 
@@ -59,33 +65,41 @@ Explanation of input, saved in (for now) moviename.int file:
 
   shown grouped and explained::
 
-    +---------------+--------------------------------------------------+
-    | 4             | difference frame number from Frame_i-Frame_(i-1) |
-    +---------------+--------------------------------------------------+
-    | 34 721 676    | max pos differences                              |
-    | 34 721 676    | for each color in rgb order,                     |
-    | 34 721 676    |   (diff value) (x-coord) (y-coord)               |
-    +---------------+--------------------------------------------------+
-    | -34 1851 744  | min neg differences                              |
-    | -34 1851 744  |    ditto                                         |
-    | -34 1851 744  |                                                  |
-    +---------------+--------------------------------------------------+
-    | 4 4 4         | numbers of times a pix diff breaks a threshold   |
-    | 5 5 5         | first line positives, 2nd negatives (rgb order)  |
-    +------------------------------------------------------------------+
-    | 21            | number of (pixel,rgb diff)                       |
-    |               | for which |diff|>=subthreshold                   |
-    +------------------------------------------------------------------+
++-----------------------------------------------------------------------------+
+| data[i] index below used to read in the .int file                           |
+| store[i][MaxNumFrames] store is the array of vectors storing .int in memory.| 
++----------+---------------+--------------------------------------------------+
+| 0        |     4         | difference frame number from Frame_i-Frame_(i-1) |
++----------+---------------+--------------------------------------------------+
+|1 2-3     | 34 721 676    | max pos differences                              |
+|4 5-6     | 34 721 676    | for each color in rgb order,                     |
+|7 8-9     | 34 721 676    |   (diff value) (x-coord) (y-coord) of one place  |
+|          |               |                where this difference occurs      |
+|----------+---------------+--------------------------------------------------+
+|10 11-12  | -34 1851 744  | min neg differences                              |
+|13 14-15  | -34 1851 744  |    ditto                                         |
+|16 17-18  | -34 1851 744  |                                                  |
++----------+---------------+--------------------------------------------------+
+|19 20-21  | 4 4 4         | numbers of times a pix diff is within the        |
+|22 23-24  | 5 5 5         | MainThr of a maximum difference                  |
+|          |               | first line positives, 2nd negatives (rgb order)  |
++----------+------------------------------------------------------------------+
+|   25     | 21            | number of (pixel,rgb diff)                       |
+|          |               | for which |diff|>=SubThr                         |
++----------+---------------+--------------------------------------------------+
 
 Explanation of output, going into moviename.out file, to
 be visualized by drawing a circle on a frame  (from Matt's conversation, March 15, 2026:
 
-  Each line corresponds to a one-frame pair event, as determined by the software.
+The output lines correspond to a subsequence of frame-pairs (corresponding to lines in .int)
+selected by this program.  As noted below, the lines are grouped into clusters.
+
+  Each line corresponds to a one adjacent frame-pair event, as determined by the software.
   
-  -   cluster number  (may be repeated, clusters of events are numbered successively)
-  -   frame number  (of one event)
+  - cluster number  (may be repeated, clusters of events are numbered successively)
+  - number of first frame  (of one event)
   - signed pixel diff with max abs value
-  - x, y coords in the frame of the pixel with diffs max abs value
+  - x, y coords of the pixel with diffs max abs value
   - naive bayisan classifier score range 0 to  1 corresponds to a 
     prediction quality ranging from garbage to a real thing.
 
@@ -106,6 +120,7 @@ using namespace std;
 
 // Command line options.  Set when, early, main calls
 static int get_our_options( int *argc, char **argv[]);
+static int include_1a_lines = 0; //option restore original code's output
 
 //defaults here, changeable by options
 //scaling? will use this everywhere including width and height
@@ -121,8 +136,11 @@ const char *CamSett_file = "CamSett.txt"; //in cwd
 int pipeline = 0;  //option
 
 //Setting of not supported yet.
+//Only the Custom camera is used in this version of Phase1b
+//But now, in Phase1a, we use camera_index to select the exclusion zone 
 static char camera_cstring[] = "Custom"; 
-
+string camera(camera_cstring);
+  
 //See ..Phase1a..cpp for more comments about issues, etc.
 
 //scaling?  typedef unsigned short pixCoord; not done here
@@ -135,35 +153,38 @@ int main ( int argc, char** argv ) {
   mycmdname = argv[0];
   get_our_options(&argc, &argv);
 
-  double data[26]; //for reading Phase1a .int data
-  vector<double> store[26];
+  double data[26]; //for reading Phase1a .int data. Read as doubles but hard coded
+  //casts are done to int types are done below.
+  vector<double> store[26]; //Store ALL Phase1a data. store[i] is the i'th column
+  // when the .int file is printed.  Ditto about casting and use. See doc. above.
   //for storing that data, store[kind of data][which diff frame]
+  //
   //(?Not very important) store[] starts at 0 but diff line numbers at the
   //start of each line begin at 1, for frame1-frame0.
-  vector<short> extrema;
-  unsigned long i = 0;
-  signed short j = 0;
-  float AbsAvg, AbsStdDev;
-  float FracYes;
+
+  //Movie wide means. See below
   double GlobPixMean[7] = {0.,0.,0.,0.,0.,0.,0.};
   
-  char line[80];
-  double temp;
   vector<double> CamSett;
-  int RewFram, ForFram, FramBefNew, SubThr;
+  float FracYes;  //Camsett
+  int RewFram;   //CamSett
+  int ForFram;   //CamSett
+  int FramBefNew;//CamSett
+  int SubThr;    //CamSett, not used in 1a except for cerr messages
+
+  //WARNING..CamSett format still depends on a fixed ordering of the numbers!
   FILE *CamSettfp = fopen(CamSett_file,"r");
-  for ( j = 0; j < 20; ++j ) {
+  for ( int j = 0; j < 20; ++j ) {
+    double temp;
+    char line[80];   
     int ret = fscanf ( CamSettfp, "%s %lf", line, &temp );
     if( ret != 2) {
       error(1, 0, "Failed to read a <string> <number> Camsett pair from %s", CamSett_file);
     }
     CamSett.push_back(temp);
   }
-
   fclose(CamSettfp);
 
-  string camera(camera_cstring);
-  
   if ( camera == "Custom" ) {
     SubThr = (int)CamSett[10];
     RewFram= (int)CamSett[11];
@@ -219,6 +240,7 @@ int main ( int argc, char** argv ) {
   
   double level = atof(argv[3]);
   if ( level >= 0.979 && camera != "B1" ) {
+    //WARNING THIS CODE RUNS NOW
     if ( camera == "B2" ) level = 0.999999999999; // the minimum allowed that doesn't make B2 collect too many events (16_21-57-25)
     else if ( camera == "B3" ) level = 0.9999999999;
     else if ( camera == "A3" ) level = 0.9999999; // 15_19-57-27 8:51:30-53pm (boat?)
@@ -228,10 +250,10 @@ int main ( int argc, char** argv ) {
   
   vector<double> SkewGauss(4); // "classic" values for the next line: ampl .633, mu 1.97, sig 1.89, skew 2.5
   if ( camera == "Custom" ) {
-    SkewGauss[0] = CamSett[4];
-    SkewGauss[1] = CamSett[5];
-    SkewGauss[2] = CamSett[6];
-    SkewGauss[3] = CamSett[7];
+    SkewGauss[0] = CamSett[4]; //Amplitude
+    SkewGauss[1] = CamSett[5]; //Xi, mu
+    SkewGauss[2] = CamSett[6]; //Omega, sig
+    SkewGauss[3] = CamSett[7]; //Alpha, skew
   }
   else {
     SkewGauss[0] = 0.673;
@@ -285,8 +307,11 @@ Line19 Value=14(ignored Key =mainThreshold=)
   cerr << "level=Command argument[3]=" << level << endl << endl;
 
   long NumFrames = 0;
-  
-  for ( i = 0; i < MaxNumFrames; ++i ) {
+
+  //
+  //First Frame-pair Loop
+  //
+  for ( int i = 0; i < MaxNumFrames; ++i ) {
     
     if (ifp >> data[0] >> data[1] >> data[2] >> data[3] >> data[4] >> data[5]
 	>> data[6] >> data[7] >> data[8] >> data[9] >> data[10] >> data[11]
@@ -297,40 +322,47 @@ Line19 Value=14(ignored Key =mainThreshold=)
 
 	NumFrames++;
 	
-	GlobPixMean[0] += data[1];
-	GlobPixMean[1] += data[4];
-	GlobPixMean[2] += data[7];
-	GlobPixMean[3] -= data[10];
-	GlobPixMean[4] -= data[13];
-	GlobPixMean[5] -= data[16];
-	GlobPixMean[6] += data[25];
+	GlobPixMean[0] += data[1];   //----------------------------------
+	GlobPixMean[1] += data[4];   //for movie means of max pos diffs of each color
+	GlobPixMean[2] += data[7];   //----------------------------------
+	GlobPixMean[3] -= data[10];  //----------------------------------
+	GlobPixMean[4] -= data[13];  //for movie means of max neg diffs of each color
+	GlobPixMean[5] -= data[16];  //----------------------------------
+	GlobPixMean[6] += data[25];  //for movie mean of count a diff is within SubThr of a max diff.
     
-	for ( j = 0; j < 26; ++j ) {
-	  store[j].push_back(data[j]);
+	for ( int j = 0; j < 26; ++j ) {
+	  store[j].push_back(data[j]);  //store .int line in memory
 	}
       }
     else
       { //read of next or first line failed.
 	if( i == 0 )
 	  { //can't even read the first line!
-	    cerr << "Failure to read first line from " << argv[1] << endl;
-	    cerr << "Bad filename or wrong numberical format." << endl;
+	    cerr << "ERR: Failure to read first line from " << argv[1] << endl;
+	    cerr << "ERR: Bad filename or wrong numberical format." << endl;
 	    return 1;
 	  }
 	else
 	  {
-	    cerr << argv[1] << " .int line reading reached EOF. We read " << NumFrames << endl;
+	    cerr << argv[1] << "INFO: .int line reading reached EOF, OK for pipeline. We read " << NumFrames << endl;
 	    break; //number of lines exceeds MaxNumFrames
+	    //This is not an error when pipelining is used.
 	  }
       }
   }
+
   if (NumFrames == MaxNumFrames) {
-    cerr << argv[1] << " .int line reading stopped after reaching maximum param " << NumFrames << endl;
+    cerr << argv[1] << "INFO: .int line reading stopped after reaching maximum param " << NumFrames << endl;
+    //Is/will there be a use case when we request less than the max available?
   }
   ifp.close();
     
-  for ( j = 0; j < 7; ++j )
+  //remember, NumFrames is our count.
+  for ( int j = 0; j < 7; ++j )
     { GlobPixMean[j] /= double(NumFrames); }
+
+  //These statistics are over the 6 {r,g,b} X {pos,neg} cases 
+
   double OverallAverage= (GlobPixMean[0]+GlobPixMean[1]+GlobPixMean[2]+GlobPixMean[3]+GlobPixMean[4]+GlobPixMean[5]) / 6.;
   double OverallStdDev = pow(OverallAverage-GlobPixMean[0],2.)+
                          pow(OverallAverage-GlobPixMean[1],2.)+
@@ -339,34 +371,54 @@ Line19 Value=14(ignored Key =mainThreshold=)
                          pow(OverallAverage-GlobPixMean[4],2.)+
                          pow(OverallAverage-GlobPixMean[5],2.);
   OverallStdDev /= 5.; OverallStdDev = sqrt(OverallStdDev);
-  fprintf(stderr,"\nGrey(8-bit) pixel diff mu and sigma of %.1f +/- %.2f (units of 0-255)\n",OverallAverage,OverallStdDev);
-  int MinThr = std::max(int(floor(OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5)),smallestThr); //33 for over-fit to initial test
+  fprintf(stderr,
+	  "\nRESULT: Grey(8-bit) pixel diff mu and sigma of %.1f +/- %.2f (units of 0-255)\n",
+	  OverallAverage,
+	  OverallStdDev);
+
+  int MinThr = std::max(int(floor(OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5)),smallestThr);
+  //33 for over-fit to initial test
   if ( MinThr > 43 && camera == "B1" ) MinThr = 43;
   int MaxThr = biggestThr;
-  fprintf(stderr,"So, setting a minimum threshold of %.1f SIGMA = %i (so-called SUB threshold of %d)\n",floor(OverallStdDev),MinThr,SubThr);
-  fprintf(stderr,"And setting a maximum threshold of %i\n",MaxThr);
+  fprintf(stderr,
+	  "RESULT: So, setting a minimum threshold of %.1f SIGMA = %i (so-called SUB threshold of %d)\n",
+	  floor(OverallStdDev),
+	  MinThr,
+	  SubThr);
+  
+  fprintf(stderr,"RESULT: And setting a maximum threshold of %i\n",
+	  MaxThr);
+  
   double GlobPixSigma = 0.0;
-  for ( i = 0; i < NumFrames; ++i ) {
+  for ( int i = 0; i < NumFrames; ++i ) {
     GlobPixSigma += pow(GlobPixMean[6]-store[25][i],2.);
   }
   GlobPixSigma /= (double(NumFrames)-1.);
   GlobPixSigma = sqrt(GlobPixSigma);
-  fprintf(stderr,"The number of pixels above %d units is %.2f +/- %.2f\n",SubThr,GlobPixMean[6],GlobPixSigma);
+  fprintf(stderr,"RESULT: The number of pixels above %d units is %.2f +/- %.2f\n",
+	  SubThr,
+	  GlobPixMean[6],
+	  GlobPixSigma);
+  
   int MinPix = std::max(smallestPix,int(ceil(GlobPixMean[6]+1.)));
-  int MaxPix = biggestPix;
+  int MaxPix = biggestPix;  //CamSett
+  
   while ( MaxPix <= MinPix ) {
-    if ( camera == "B1" )
-      return 1;
+    if ( camera == "B1" ) {
+      cerr << "ERR: Phase1b exits since initial MaxPix > MinPix for camera B1." << endl;
+      return 1;  //Exit with error when this happens for camera B1?
+    }
     else
       MaxPix += 5;
   }
-  fprintf(stderr,"Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
-  fprintf(stderr,"Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
+  fprintf(stderr,"RESULT: Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
+  fprintf(stderr,"RESULT: Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
   fprintf(stderr,"\n");
+  
   //
-  //The first big loop here sets arrays double prob and bool SignalTruth for each frame diff.
+  //The Second big loop here sets arrays double prob and bool SignalTruth for each frame diff.
   //
-  for ( i = 0; i < (NumFrames-1); ++i ) {
+  for ( int i = 0; i < (NumFrames-1); ++i ) {
     
     unsigned long frameNum = (unsigned long)store[0][i];
     unsigned short maxR = (unsigned short)store[1][i];
@@ -405,8 +457,8 @@ Line19 Value=14(ignored Key =mainThreshold=)
 
 
     //Calc AbsStdDev of our 6 max absolute color changes to score with our Skew Gaussian
-    AbsAvg = ( maxR + maxG + maxB + maxr + maxg + maxb ) / 6.;
-    AbsStdDev = ( maxR - AbsAvg ) * ( maxR - AbsAvg ) + ( maxG - AbsAvg ) * ( maxG - AbsAvg ) + ( maxB - AbsAvg ) * ( maxB - AbsAvg ) +
+    float AbsAvg = ( maxR + maxG + maxB + maxr + maxg + maxb ) / 6.;
+    float AbsStdDev = ( maxR - AbsAvg ) * ( maxR - AbsAvg ) + ( maxG - AbsAvg ) * ( maxG - AbsAvg ) + ( maxB - AbsAvg ) * ( maxB - AbsAvg ) +
       ( maxr - AbsAvg ) * ( maxr - AbsAvg ) + ( maxg - AbsAvg ) * ( maxg - AbsAvg ) + ( maxb - AbsAvg ) * ( maxb - AbsAvg );
     AbsStdDev = sqrt ( AbsStdDev / 5. );
     
@@ -440,18 +492,22 @@ Line19 Value=14(ignored Key =mainThreshold=)
     else {
       SignalTruth.push_back(false);
     }
-    //end of big diff frame loop on i
-  }
+  }  //end Second big diff frame loop on i
   
   
+  //
+  // Get ready for the Third Loop.  For DroneShort1 and other Spring 2026 work,
+  // it too spans the whole movie.  It can be limited by RewFram and ForFram Camsetts
+  //
   //used for non-Golden event output lines and to store
   //the extrema from Golden events 
   double previous[4] = {1.,256.,0.,0.};
 
   unsigned short int iEvtN = 0; // the global event number
   unsigned short FrameNum[2] = { 0, 0 }; if ( camera != "Custom" ) SignalTruth.erase(SignalTruth.begin());
-  
-  for ( i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
+
+  //The Third Loop.
+  for ( int i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
     
     bool GoldenEvent = false; unsigned int NumBools = 0;
     if ( camera == "Custom" ) {
@@ -460,7 +516,7 @@ Line19 Value=14(ignored Key =mainThreshold=)
     else {
       if ( SignalTruth[i-1] ) GoldenEvent = true;
     }
-    for ( j = -RewFram; j < ForFram; ++j ) {
+    for ( int j = -RewFram; j < ForFram; ++j ) {
       if ( SignalTruth[i+j] ) ++NumBools; //used with "FracYes" below
     }
     //End of SignalTruth useage.
@@ -474,9 +530,10 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	unsigned short maxr = (unsigned short)(-store[10][i]);
 	unsigned short maxg = (unsigned short)(-store[13][i]);
 	unsigned short maxb = (unsigned short)(-store[16][i]);
-	extrema.clear();
+	vector<short> extrema;
 	extrema.push_back(maxR); extrema.push_back(maxG); extrema.push_back(maxB); extrema.push_back(maxr); extrema.push_back(maxg); extrema.push_back(maxb);
 	std::sort(extrema.begin(),extrema.end()); unsigned short AbsMax = abs(extrema.back());
+	
 	extrema.clear();
 	if ( AbsMax == maxR ) { extrema.push_back( maxR); extrema.push_back(store[2][i]); extrema.push_back(store[3][i]); }
 	else if ( AbsMax == maxG ) { extrema.push_back( maxG); extrema.push_back(store[5][i]); extrema.push_back(store[6][i]); }
@@ -505,13 +562,14 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	    previous[1] = double(extrema[1]);
 	    previous[2] = double(extrema[2]);
 	  }
-	/*printf("%.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f %.0f %.0f\t%.0f %.0f %.0f\t\t%.0f\t%.12f\n",store[0][i],
+	if(include_1a_lines)
+	   printf("#%.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f %.0f %.0f\t%.0f %.0f %.0f\t\t%.0f\t%.12f\n",store[0][i],
 	  store[1][i],store[2][i],store[3][i],store[4][i],store[5][i],store[6][i],store[7][i],store[8][i],store[9][i],
 	  store[10][i],store[11][i],store[12][i],store[13][i],store[14][i],store[15][i],store[16][i],store[17][i],store[18][i],
 	  store[19][i],store[20][i],store[21][i],
-	  store[22][i],store[23][i],store[24][i],store[25][i],prob[i]);*/
+	  store[22][i],store[23][i],store[24][i],store[25][i],prob[i]);
       } /* if GoldenEvent || ... */
-  } /* RewFram to < NumFrames-ForFram-2 loop */ 
+  } /* Loop RewFram <= i < NumFrames-ForFram-2 */ 
   return 0;
 } /*main*/
 
@@ -537,6 +595,7 @@ static int get_our_options( int *argc, char **argv[])
       {"verbose",    no_argument, 0, 0 },              //5 ignored, for regres. devel.
       {"no-crop",    no_argument, 0, 0 },              //6 ignored, compat w Phase1a
       {"camera-index",    required_argument, 0, 0 },         //7 ignored, compat w Phase1a
+      {"include-1a-lines", no_argument, &include_1a_lines, 1 },  //8
       {0,         0,                 0,  0 }
       //but we won't accept a --bitmaps-dir, at least yet..
     };
