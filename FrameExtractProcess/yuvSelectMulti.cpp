@@ -19,6 +19,13 @@ There are 3 use cases specified by mutually exclusive options and their suboptio
          [--bmp-prefix myname  Written files are named mynamedddddd.bmp, not FRAMEdddddd.bmp]
 
 optional options:
+
+--compress[="cmd [options]]"] Only for --bmp-out-dirpath.   
+         Writes the gzip compressed version of each .bmp.
+         Any compression command possibly with options can be given as an option; must use
+         ="..." option format. The file name of the .bmp to be compressed will be the last 
+         argument to the compression cmd.
+
 --verbose
 --seline-fmt '..%d..' sscanf format for extracting one int from one frame selection data line,
    It must have a conversion specification for EVERY field in each line, so fscanf will scan over
