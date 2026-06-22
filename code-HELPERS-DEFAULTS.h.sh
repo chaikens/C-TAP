@@ -18,9 +18,10 @@ fi
 
 ffmpeg_xterm_running="no" #so we don't start more than one!
 
-KEEP_ANY_OLD_XTERMS="" #default is do killall xterm near beginning
+KILLALL_XTERMS_AT_START="yes" #default is do killall xterm near beginning
 #so xterms still running after we fail will be killed.
-#Yes may be user preference, also in case they have  named xterm are used 
+#Yes may be user preference, also in case they have  named xterm are used
+#no is a good choice when running concurrent jobs!
 
 KILL_XTERMS_DONT_ASK="no"
 #default: Ask user at shell to kill our xterms, give 20 sec to answer yes.
@@ -46,6 +47,8 @@ PHASE_1b_RESULT_N_OR_NONE=
 MAKE_BABY_MOVIE=yes
 BABY_MOVIE_CIRCLE_RAD_PIX=9
 EXT="MOV" #baby movie extension
+KEEP_BABY_MAKING_FILES=no
+KEEP_BABY_BMPS=no
 
 #Other and future uses will not use this, it's referred in the Phase1a command.
 PHASE1A_OTHER_OPTIONS=""

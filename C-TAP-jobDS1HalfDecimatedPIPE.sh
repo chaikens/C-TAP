@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-#              (hmm---no comment can follow bash above)#
 #FOR STANDARD USAGE, EDIT ONLY      #
 #THE FILE-NAME OF THIS SCRIPT       #
 #AND CODE OUTSIDE BOXES LIKE THIS.  #
@@ -18,8 +17,19 @@ BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir
 BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
+PHASE_1a=F1a.orig
+PHASE_1a_RESULT_OLD_N_OR_NONE=
+
 ARCHITECTURE="pipeline"
 #"framefile" #vs pipeline
+
+
+
+
+
+
+
+
 
 ###########END OF YOUR-SYSCONF###
 source code-SYSCONFIG.h.sh      #

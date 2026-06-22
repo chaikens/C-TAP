@@ -51,7 +51,7 @@ result_file_1a=${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 # Required programs:
 # ffmpeg
 # ./YUVToBMPStreamFilter
-# ./Phase1aPipeOpt
+# ./Phase1a (or other name for variations)
 # ./Phase1bPipeOpt
 #*/
 
@@ -92,7 +92,7 @@ result_file_1a=${RESULTS_DIR}/${RESULT_OF_1a_BASE}
 # Required programs:
 # ffmpeg
 # ./YUVToBMPStreamFilter
-# ./Phase1aPipeOpt
+# ./Phase1aPipeOpt (or other name for variations)
 # ./Phase1bPipeOpt
 #*/
 
@@ -162,7 +162,7 @@ prt=" /proc/uptime=${phase1a_start_time} sec., please wait; See progress in Phas
 echo $prt
 echo "TIME:" $prt >> $LOG
 
-phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${phase1a} --pipeline "
+phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${PHASE_1a} --pipeline "
 phase1a_cmd_args+=" ${phase1a_options} "
 phase1a_cmd_args+=" 0 100000000 0 "
 phase1a_options+=" --write-mask-file ${RESULTS_DIR}/${IMAGE_MASK_BASE}"

@@ -1,0 +1,776 @@
+(base) seth@turtle:/data/GIT/C-TAP$ ./C-TAP-BEN120.sh 
+SOURCED: code-HELPERS-DEFAULTS.h.sh
+SOURCED: code-HELPERS.h.sh
+Running your job BEN120
+YOUR-SYSCONF-BEN120
+SOURCED: code-SYSCONFIG.h.sh
+YOUR-MOVIES-BEN120
+SOURCED: code-MOVIES.h.sh
+YOUR-ANALYSIS-BEN120
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+SOURCED: code-ANALYSIS.h.sh
+SOURCED: c-TAP-DOIT.h.sh
+make: 'F1a.orig' is up to date.
+make: 'Phase1bPipeOpt' is up to date.
+We will process this (these) 12 movie file(s).
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120000000_20250120010000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120010000_20250120020000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120020000_20250120030000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120030000_20250120040000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120040000_20250120050000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120164559_20250120180000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120180000_20250120190000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120190000_20250120200000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120200000_20250120210000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120210000_20250120220000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120220000_20250120230000.mp4
+/media/seth/BENCAM-COPY/2025-01-20/N884A6_ch1_main_20250120230000_20250121000000.mp4
+
+Begin processing 1 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120000000_20250120010000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120000000_20250120010000.mp4
+  2,831,123,208 100%   21.64MB/s    0:02:04 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120000000_20250120010000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120000000_20250120010000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120000000_20250120010000.mp4
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120000000_20250120010000.mp4 is
+67740.41 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  67740.69 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=67740.70 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.times.3 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1   0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.int.3 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.log.3
+Finished: 71115.97
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3375.27 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 71115.98 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.times.3 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.int.3 69071 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.out.3 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.log.3
+CMD:
+First try of Phase1b reported 11530 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.out.3
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame11530isOrigFrame69052
+Breaking Lue's NDA...make a movie of them 11530 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120000000_20250120010000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 1 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120000000_20250120010000.mp4 at
+uptime 74771.95 seconds.
+that took 7031.54 wall clock seconds.
+Begin processing 2 of 12 movie file(s)
+Checking if we already have the copy
+They are the same
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120010000_20250120020000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120010000_20250120020000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120010000_20250120020000.mp4
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120010000_20250120020000.mp4 is
+74800.82 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  74801.22 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=74801.24 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.times.2 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.int.2 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.log.2
+Finished: 78272.16
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3470.92 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 78272.18 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.times.2 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.int.2 68890 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.out.2 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.log.2
+CMD:
+First try of Phase1b reported 12002 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.out.2
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12002isOrigFrame68889
+Breaking Lue's NDA...make a movie of them 12002 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120010000_20250120020000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 2 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120010000_20250120020000.mp4 at
+uptime 82133.81 seconds.
+that took 7332.99 wall clock seconds.
+Begin processing 3 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120020000_20250120030000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120020000_20250120030000.mp4
+  2,826,168,443 100%   85.18MB/s    0:00:31 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120020000_20250120030000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120020000_20250120030000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120020000_20250120030000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120020000_20250120030000.mp4 is
+82165.86 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  82166.25 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=82166.29 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.log.1
+Finished: 85728.53
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3562.24 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 85728.55 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.int.1 68966 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.log.1
+CMD:
+First try of Phase1b reported 12487 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12487isOrigFrame68963
+Breaking Lue's NDA...make a movie of them 12487 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120020000_20250120030000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 3 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120020000_20250120030000.mp4 at
+uptime 89470.73 seconds.
+that took 7304.87 wall clock seconds.
+Begin processing 4 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120030000_20250120040000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120030000_20250120040000.mp4
+  2,830,087,300 100%   84.85MB/s    0:00:31 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120030000_20250120040000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120030000_20250120040000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120030000_20250120040000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120030000_20250120040000.mp4 is
+89502.94 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  89503.37 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=89503.41 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.log.1
+Finished: 93104.16
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3600.75 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 93104.18 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.int.1 69058 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.log.1
+CMD:
+First try of Phase1b reported 12766 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12766isOrigFrame69052
+Breaking Lue's NDA...make a movie of them 12766 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120030000_20250120040000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 4 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120030000_20250120040000.mp4 at
+uptime 96834.64 seconds.
+that took 7331.70 wall clock seconds.
+Begin processing 5 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120040000_20250120050000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120040000_20250120050000.mp4
+  2,823,940,887 100%   87.44MB/s    0:00:30 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120040000_20250120050000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120040000_20250120050000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120040000_20250120050000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120040000_20250120050000.mp4 is
+96865.82 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  96866.10 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=96866.11 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.log.1
+Finished: 100150.88
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3284.77 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 100150.89 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.int.1 68903 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.log.1
+CMD:
+First try of Phase1b reported 12454 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12454isOrigFrame68892
+Breaking Lue's NDA...make a movie of them 12454 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120040000_20250120050000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 5 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120040000_20250120050000.mp4 at
+uptime 103705.66 seconds.
+that took 6839.84 wall clock seconds.
+Begin processing 6 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120164559_20250120180000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120164559_20250120180000.mp4
+  3,478,953,029 100%   94.73MB/s    0:00:35 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120164559_20250120180000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120164559_20250120180000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120164559_20250120180000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120164559_20250120180000.mp4 is
+103741.05 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  103741.34 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=103741.35 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.log.1
+Finished: 107969.70
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 4228.35 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 107969.73 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.int.1 84893 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.log.1
+CMD:
+First try of Phase1b reported 22334 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame22334isOrigFrame84893
+Breaking Lue's NDA...make a movie of them 22334 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120164559_20250120180000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 6 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120164559_20250120180000.mp4 at
+uptime 113038.75 seconds.
+that took 9297.70 wall clock seconds.
+Begin processing 7 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120180000_20250120190000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120180000_20250120190000.mp4
+  2,830,745,813 100%   88.45MB/s    0:00:30 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120180000_20250120190000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120180000_20250120190000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120180000_20250120190000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120180000_20250120190000.mp4 is
+113069.64 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  113069.95 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=113069.96 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.log.1
+Finished: 116520.84
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3450.88 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 116520.85 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.int.1 69075 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.log.1
+CMD:
+First try of Phase1b reported 12680 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12680isOrigFrame69073
+Breaking Lue's NDA...make a movie of them 12680 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120180000_20250120190000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 7 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120180000_20250120190000.mp4 at
+uptime 119867.22 seconds.
+that took 6797.58 wall clock seconds.
+Begin processing 8 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120190000_20250120200000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120190000_20250120200000.mp4
+  2,825,304,288 100%   86.92MB/s    0:00:30 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120190000_20250120200000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120190000_20250120200000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120190000_20250120200000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120190000_20250120200000.mp4 is
+119898.59 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  119898.87 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=119898.89 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.log.1
+Finished: 123362.93
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3464.04 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 123362.94 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.int.1 68937 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.log.1
+CMD:
+First try of Phase1b reported 11779 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame11779isOrigFrame68935
+Breaking Lue's NDA...make a movie of them 11779 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120190000_20250120200000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 8 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120190000_20250120200000.mp4 at
+uptime 126594.85 seconds.
+that took 6696.26 wall clock seconds.
+Begin processing 9 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120200000_20250120210000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120200000_20250120210000.mp4
+  2,824,290,781 100%   87.75MB/s    0:00:30 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120200000_20250120210000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120200000_20250120210000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120200000_20250120210000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120200000_20250120210000.mp4 is
+126625.93 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  126626.24 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=126626.25 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.log.1
+Finished: 130108.94
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3482.69 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 130108.96 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.int.1 68914 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.log.1
+CMD:
+First try of Phase1b reported 12274 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12274isOrigFrame68912
+Breaking Lue's NDA...make a movie of them 12274 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120200000_20250120210000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 9 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120200000_20250120210000.mp4 at
+uptime 133416.87 seconds.
+that took 6790.94 wall clock seconds.
+Begin processing 10 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120210000_20250120220000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120210000_20250120220000.mp4
+  2,829,350,765 100%   93.33MB/s    0:00:28 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120210000_20250120220000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120210000_20250120220000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120210000_20250120220000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120210000_20250120220000.mp4 is
+133446.15 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  133446.46 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=133446.48 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.log.1
+Finished: 137025.46
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3578.98 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 137025.48 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.int.1 69044 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.log.1
+CMD:
+First try of Phase1b reported 11866 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame11866isOrigFrame69029
+Breaking Lue's NDA...make a movie of them 11866 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120210000_20250120220000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 10 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120210000_20250120220000.mp4 at
+uptime 140361.47 seconds.
+that took 6915.32 wall clock seconds.
+Begin processing 11 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120220000_20250120230000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120220000_20250120230000.mp4
+  2,819,766,292 100%  104.85MB/s    0:00:25 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120220000_20250120230000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120220000_20250120230000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120220000_20250120230000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120220000_20250120230000.mp4 is
+140387.51 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  140387.84 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=140387.86 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.log.1
+Finished: 144001.80
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3613.94 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 144001.83 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.int.1 68791 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.log.1
+CMD:
+First try of Phase1b reported 12583 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame12583isOrigFrame68790
+Breaking Lue's NDA...make a movie of them 12583 frames. Watch in ffmpeg's xterm.
+INFO: After:
+/data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP /data/GIT/C-TAP
+in /data/GIT/C-TAP code-BABYMOVIE-BMP.h.sh done
+about to delete input movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120220000_20250120230000.mp4
+Cosmic consciousness has been achieved!!
+from yet another movie 11 of 12.
+Finished movie /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120220000_20250120230000.mp4 at
+uptime 147518.82 seconds.
+that took 7131.31 wall clock seconds.
+Begin processing 12 of 12 movie file(s)
+Checking if we already have the copy
+diff: /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120230000_20250121000000.mp4: No such file or directory
+Copying (rsync) one movie from slow to fast filesystem.
+N884A6_ch1_main_20250120230000_20250121000000.mp4
+  2,825,980,436 100%  118.06MB/s    0:00:22 (xfr#1, to-chk=0/1)
+SOURCED: code-ONEMOVIE.h.sh
+We got moviePrefix=N884A6_ch1_main_20250120230000_20250121000000
+We got movie_file=/data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120230000_20250121000000.mp4
+Making Mick West redundant, processing ONI FOIA files...
+FileName=N884A6_ch1_main_20250120230000_20250121000000.mp4
+ln: failed to create symbolic link 'bitmaps-BEN120.1/bitmaps-BEN120': File exists
+Uptime we started on /data/GIT/C-TAP/TMPMOVIEDIR/N884A6_ch1_main_20250120230000_20250121000000.mp4 is
+147542.02 seconds.
+
+Your run explanation:
+
+
+ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out This is coded by ./C-TAP-BEN120.sh
+
+SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at  147542.35 seconds.
+
+./C-TAP-BEN120.sh Begnning Phase1a
+
+/proc/uptime=147542.37 sec., please wait; See progress in Phasa1a .int window.
+About to call Phase1a from within /usr/bin/time --verbose ...Report is in Log.
+eval /usr/bin/time /usr/bin/time --verbose --output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.times.1 --append  /data/GIT/C-TAP/F1a.orig --pipeline  --movie-scale 2 --pixproc-scale 1 --user-scale 1 --CamSett-file /data/GIT/C-TAP/CamSett.txt --camera-index 1  --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120000000_20250120010000.btmask.3 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120010000_20250120020000.btmask.2 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120020000_20250120030000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120030000_20250120040000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120040000_20250120050000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120164559_20250120180000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120180000_20250120190000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120190000_20250120200000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120200000_20250120210000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120210000_20250120220000.btmask.1 --write-mask-file /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120220000_20250120230000.btmask.1  0 100000000 0  < /data/GIT/C-TAP/PIPE.bmp  >> /data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.int.1 2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.log.1
+Finished: 151169.58
+./C-TAP-BEN120.sh FINISHED returned 0, took wallclock time 3627.21 sec.
+Repaying TTSA investors, straightening Uri Gellar's spoons...
+
+Beginning Phase1b at 151169.60 sec.
+
+Running
+/usr/bin/time --verbose 
+--output=/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.times.1 
+--append /data/GIT/C-TAP/Phase1bPipeOpt 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.int.1 68957 0.5 
+--CamSett-file /data/GIT/C-TAP/CamSett.txt > 
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.out.1 
+2>>/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.log.1
+CMD:
+First try of Phase1b reported 12300 frames have objects, see the lines in:
+/data/GIT/C-TAP/RESULTS-BEN120/N884A6_ch1_main_20250120230000_20250121000000.out.1
+
+Logging range, deploying Little Green Men..circling 'em in picnn.bmps
+SOURCED: code-BABYMOVIE-BMP.h.sh
+rm: cannot remove '/data/GIT/C-TAP/PIPE.yuv': No such file or directory
+PIPE_YUV /data/GIT/C-TAP/PIPE.yuv
+Starting MOV making yuv extraction background task.
+yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm.
+yuvSelectMulti done.  Begin making frames with circles in'em.
+BabyFrame11178isOrigFrame62749

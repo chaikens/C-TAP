@@ -16,7 +16,8 @@ There are 3 use cases specified by mutually exclusive options and their suboptio
          [--bmp-conversion kind(TBD)]
 
 --bmp-out-dirpath <writable dir name for .bmp files> [--bmp-conversion kind(TBD)]
-         [--bmp-prefix myname  Written files are named mynamedddddd.bmp, not FRAMEdddddd.bmp]
+         [--bmp-prefix myname  Written files are named mynamedddddd.bmp, 
+                               not FRAMEdddddd.bmp]
 
 optional options:
 

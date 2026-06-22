@@ -52,6 +52,8 @@ pushd $BITMAPS_DIR > /dev/null
 
 rm -f pic*.bmp #only delete images used to make the previous "baby movie"
 #ffmpeg will input from this glob expression.
+#We must delete these even if KEEP_BABY_BMPS==yes because any old pic* frames will be
+#included in the baby movie made when ffmpeg inputs pic*.bmp
 
 echo 0 > ${RESULTS_DIR}/foutcount
 #The while loop runs in (another) subshell (process, since it's in a pipeline) so vars set there
@@ -104,16 +106,27 @@ do
 
    if [ -r $inbmpPaName ] #check because offsets might point us to non-existant frames! 
    then
+
+       	if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
+	then
+	    mv  ${inbmpPaName} ${outbmpPaName}
+	    inbmpPaName=${outbmpPaName}
+	fi
+	
+       
 	BITMAP_EDIT_CMD="convert ${inbmpPaName} "
+	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha remove "
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -fill none -stroke ${color} -strokewidth ${ct}"
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -draw 'circle $i,$j $k,$l' "
-	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} ${outbmpPaName}"
+	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha off ${outbmpPaName}"
 
 	eval $BITMAP_EDIT_CMD
 
 	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
 	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
 
+
+	
    else
     	echo "Warning BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}"
     	echo "WARN: BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}" >> $LOG
@@ -150,6 +163,17 @@ make_baby_cmd="ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type g
 (echo ; echo ${make_baby_cmd}; echo ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 
 eval ${time_cmd_prefix} ${make_baby_cmd}
+
+if [ ${KEEP_BABY_BMPS}poo != yespoo ]
+then
+    echo "INFO: bitmap dir " $(pwd) " df before clearing:" >> $LOG
+    df . >> $LOG
+    rm *.bmp
+    echo "INFO: After:"
+    df . >> $LOG
+fi
+
+
 
 popd > /dev/null #done w/ bitmaps dir
 

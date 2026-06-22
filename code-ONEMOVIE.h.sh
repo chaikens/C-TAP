@@ -90,7 +90,7 @@ echo "TIME:" $( date )  >>$LOG
 echo "PGM:" $gitcommit  >>$LOG
 ( echo "PGM:"; git remote --verbose )  >>$LOG #Worldwide readers of the log can get the software!
 
-if [ $KEEP_ANY_OLD_XTERMS"x" == "x" ]
+if [ ${KILLALL_XTERMS_AT_START}"x" != "yesx" ]
 then
     killall -q xterm 
 fi
