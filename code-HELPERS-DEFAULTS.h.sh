@@ -18,10 +18,13 @@ fi
 
 ffmpeg_xterm_running="no" #so we don't start more than one!
 
-KILLALL_XTERMS_AT_START="yes" #default is do killall xterm near beginning
+KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
 #so xterms still running after we fail will be killed.
 #Yes may be user preference, also in case they have  named xterm are used
 #no is a good choice when running concurrent jobs!
+
+KILL_OUR_XTERMS_ONE_DONE="yes"
+#no is a good choice when analyzing single movies
 
 KILL_XTERMS_DONT_ASK="no"
 #default: Ask user at shell to kill our xterms, give 20 sec to answer yes.
@@ -31,6 +34,8 @@ RUN_EXPLANATION=""
 DEBUG=false
 
 SOFTWARE_DIR=$(pwd)
+
+FAST_MOVIE_DIR=$(pwd)/TMPMOVIEDIR
 FAST_FILESYS_DIR_IF_USED=
 RESULTS_DIR="${SOFTWARE_DIR}/RESULTS-${JOBNAME}"
 

@@ -63,6 +63,7 @@ then
 fi
 
 start_time_one_movie=$(uptimenow)
+echo $(date)
 echo Uptime we started on $movie_file is
 echo $start_time_one_movie seconds.
 echo "TIME:" $start_time_one_movie seconds. >>$LOG
@@ -90,7 +91,7 @@ echo "TIME:" $( date )  >>$LOG
 echo "PGM:" $gitcommit  >>$LOG
 ( echo "PGM:"; git remote --verbose )  >>$LOG #Worldwide readers of the log can get the software!
 
-if [ ${KILLALL_XTERMS_AT_START}"x" != "yesx" ]
+if [ $KILLALL_XTERMS_AT_START"x" == "yesx" ]
 then
     killall -q xterm 
 fi

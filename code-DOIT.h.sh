@@ -47,7 +47,6 @@ then
     COPYMOVIES=
 else
     COPYMOVIES=true
-    FAST_MOVIE_DIR="$(pwd)/TMPMOVIEDIR"
     mkdir -p $FAST_MOVIE_DIR
 fi
 
@@ -63,6 +62,7 @@ o=0
 for movie_file in $movie_files
 do
     ((++o))
+    echo $(date)
     echo "Begin processing $o of $numMovieFiles movie file(s)"
     
     if [ $COPYMOVIES ]
@@ -91,6 +91,11 @@ do
     source ${SOFTWARE_DIR}/code-ONEMOVIE.h.sh
     ###########################################################################
 
+    if [ ${KILL_OUR_XTERMS_ONE_DONE}X = yesX ]
+    then
+	kill_our_xterms #our shell fn
+    fi
+    
 done
 
 exit_greeting

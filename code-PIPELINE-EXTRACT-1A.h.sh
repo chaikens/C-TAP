@@ -180,11 +180,11 @@ echo >>$LOG #space after time report
 
 phase1a_finish_time=$(uptimenow)
 echo Finished: $phase1a_finish_time
-echo "TIME:" Finishted: $phase1a_finish_time >> $LOG
+echo "TIME:" Finished: $phase1a_finish_time >> $LOG
 phase1a_net_time=$(numdif $phase1a_finish_time $phase1a_start_time)
 
-echo "TIME:" "$0 FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec." >> $LOG
-echo "$0 FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec." 
+echo "TIME:" "${PHASE_1a} FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec." >> $LOG
+echo "${PHASE_1a} FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec." 
 
 echo "INFO:" "Find Phase1aPipeOpt results in  ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" >> $LOG
 
