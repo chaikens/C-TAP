@@ -15,7 +15,7 @@ then
     unset PIPE_DIR  #Maybe we'll use pipes for something else in the future.
 fi
 
-if [ ${KILLALL_XTERMS_AT_START}"xx" = "noxx" ]
+if [ ${KILLALL_XTERMS_AT_START}"xx" = "yesxx" ]
 then
     killall -q xterm
 fi
