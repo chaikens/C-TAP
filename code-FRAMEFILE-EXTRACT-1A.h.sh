@@ -74,7 +74,7 @@ then
     (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     echo "FFMPEG_EXTRACT_FILTER=${FFMPEG_EXTRACT_FILTER}" >>${COMMAND_ARCHIVE_PATHNAME}
 
-    if [ -z ${xterm_ffmpeg_pid} ]
+    if [ ${xterm_ffmpeg_pid}x = "x" ]
     then
 	touch ${RESULTS_DIR}/ffmpeg.log
 	xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
