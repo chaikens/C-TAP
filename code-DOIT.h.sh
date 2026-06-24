@@ -87,14 +87,15 @@ do
 	moviePrefix=`basename ${movie_file%.$ext}`
     fi
 
+    if [ "${KILL_OUR_XTERMS_ONE_DONE}"X = "yesX" ]
+    then
+	kill_our_xterms #our shell fn OK to call with no xterms to kill
+    fi
+
     ###########################################################################
     source ${SOFTWARE_DIR}/code-ONEMOVIE.h.sh
     ###########################################################################
 
-    if [ ${KILL_OUR_XTERMS_ONE_DONE}X = yesX ]
-    then
-	kill_our_xterms #our shell fn
-    fi
     
 done
 

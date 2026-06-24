@@ -16,7 +16,7 @@ fi
 # defaults
 #
 
-ffmpeg_xterm_running="no" #so we don't start more than one!
+xterm_ffmpeg_pid=  #empty, store single pid so we can test and eventually kill
 
 KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
 #so xterms still running after we fail will be killed.
@@ -85,11 +85,16 @@ PHASE_1b_LEVEL_REDO=0.98
 #  shell functions specific to us
 #
 
+xterm_pids=
+
 function kill_our_xterms() {
     #do it by PID
+    echo DEBUG kill_our_xterms called here is xterm_pids
+    echo DEBUG "${xterm_pids}"
     if [ "${xterm_pids}none" != "none" ]
     then
-       kill ${xterm_pids[*]}
+	kill ${xterm_pids[*]}
+	xterm_pids=
     fi
 }
 
@@ -100,7 +105,7 @@ echo "See the results in the xterms."
 cd ${start_dir}
 if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]
 then
-    if [ ${xterm_pids}none} != "none" ]
+    if [ "${xterm_pids}"none != "none" ]
     then
 	$(kill_our_xterms) 
     fi
@@ -113,7 +118,11 @@ else
     else
 	if [ ${yes}"x" = "yesx" ]
 	then
-	       $(kill_our_xterms)
+	    kill_our_xterms
+	    if [ ${xterm_ffmpeg_pid}x != "x" ]
+	    then
+	       kill ${xterm_ffmpeg_pid}
+	    fi
 	fi
     fi
 fi

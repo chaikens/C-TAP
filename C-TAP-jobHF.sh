@@ -48,6 +48,8 @@ ext=mp4 #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 #
 
 movie_files="$SLOW_MOVIE_DIR/DS.$ext"
+movie_files+=" $SLOW_MOVIE_DIR/DSa.${ext}"
+
 
 
 

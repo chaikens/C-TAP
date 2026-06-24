@@ -74,11 +74,13 @@ then
     (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     echo "FFMPEG_EXTRACT_FILTER=${FFMPEG_EXTRACT_FILTER}" >>${COMMAND_ARCHIVE_PATHNAME}
 
-    ffmpeg_xterm_running="yes"
-    touch ${RESULTS_DIR}/ffmpeg.log #so we have one.
-    xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
-    #xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
-    xterm_pids+=($!) #for killing 'em
+    if [ -z ${xterm_ffmpeg_pid} ]
+    then
+	touch ${RESULTS_DIR}/ffmpeg.log
+	xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
+	#xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
+	xterm_ffmpeg_pid=$!  #to ensure just one xterm for ffmpeg; may kill at end.
+    fi
 
     extract_start_time=$(uptimenow)
     echo "ffmpeg is extracting frames into many many .bmp files"
