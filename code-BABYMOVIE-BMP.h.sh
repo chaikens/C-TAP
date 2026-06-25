@@ -91,10 +91,10 @@ do
 #    k=$((x+9))
 #    l=$((y+9))
 
-    i=$((x-radpix))  ##scaling?  maybe 9 could remain unscaled
-    j=$((y-radpix))
+    i=$x  ##scaling?  maybe 9 could remain unscaled
+    j=$y
     k=$((x+radpix))
-    l=$((y+radpix))
+    l=$y
 
     if [ $y -lt "$sky_limit" ]
     then
