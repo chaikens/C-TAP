@@ -29,6 +29,8 @@ KILL_OUR_XTERMS_BEFORE_EACH_MOVIE="yes"
 KILL_XTERMS_DONT_ASK="no"
 #default: Ask user at shell to kill our xterms, give 20 sec to answer yes.
 
+XTERM_PARAM=" -fn 7x13bold "
+
 RUN_EXPLANATION=""
 
 DEBUG=false

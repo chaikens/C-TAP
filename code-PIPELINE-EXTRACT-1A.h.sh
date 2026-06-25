@@ -135,7 +135,7 @@ echo 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at ' $now "seconds."
 if [ ${xterm_ffmpeg_pid}x = "x" ]
 then
     touch ${RESULTS_DIR}/ffmpeg.log
-    xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
+    xterm ${XTERM_PARAM} -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
     #xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
     xterm_ffmpeg_pid=$!  #to ensure just one xterm for ffmpeg; may kill at end.
 fi

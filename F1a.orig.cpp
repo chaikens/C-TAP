@@ -946,11 +946,10 @@ int main( int argc, char** argv ) {
   unsigned char* dataOld = BMP_B; //variables used for
   unsigned char* dataNew = BMP_A; //double buffering
 
-  cerr << progname <<
-    "INFO: CROP param from settings, user (not pix/proc) coords, (x,y) in iff " <<
-    "INFO: CROP_xORyI <= xORy <= CROP_xORyF" << end;
-  cerr <<  "INFO: Top/Bot  CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << endl;
-  cerr <<  "INFO: Lft/Rht  CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
+  cerr << "INFO: CROP param from settings, user (not pix/proc) coords, (x,y) in iff " << endl
+       << "INFO: CROP_xORyI <= xORy <= CROP_xORyF" << endl;
+  cerr << "INFO: Top/Bot  CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << endl;
+  cerr << "INFO: Lft/Rht  CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
 
   //Cropping merely reduces the main inner loop ranges.
   //The inner loop is the most costly step after frame extraction when you

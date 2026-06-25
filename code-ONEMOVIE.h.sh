@@ -98,7 +98,7 @@ fi
 
 echo DEBUG starting C-TAP LOG xterm xterm_pids=
 echo $xterm_pids
-xterm -geometry 150x80+1000+0 -sb -title 'C-TAP LOG' -e less +F -f $LOG &
+xterm ${XTERM_PARAM} -geometry 150x80+1000+0 -sb -title 'C-TAP LOG' -e less +F -f $LOG &
 #option +F acts like user types F (continue after end of file)
 xterm_pids+=" $!" #for killing 'em
 echo DEBUG after plusequal xterm_pids is
@@ -125,7 +125,7 @@ then
     #xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     echo DEBUG starting Phase1a xterm xterm_pids is
     echo $xterm_pids
-    xterm -geometry 200x30+0+542 -title 'Phase 1a (.int file) output'  -e less +F -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm ${XTERM_PARAM} -geometry 200x30+0+542 -title 'Phase 1a (.int file) output'  -e less +F -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     xterm_pids+=" $!" #for killing 'em
     echo DEBUG after plusequal xtermpids is
     echo $xterm_pids
@@ -198,7 +198,7 @@ cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
 
 echo DEBUG starting phase1a xterm xterm_pids is
 echo $xterm_pids
-xterm -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f +F ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
+xterm ${XTERM_PARAM} -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f +F ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
 xterm_pids+=" $!" #for killing 'em
 echo DEBUG now xterm_pids is
 echo $xterm_pids
