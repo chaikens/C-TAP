@@ -91,8 +91,10 @@ do
 #    k=$((x+9))
 #    l=$((y+9))
 
+    # i,j Imagemagick draw circle center param.
     i=$x  ##scaling?  maybe 9 could remain unscaled
     j=$y
+    # k,l Imagemagick draw circle some point on circumference param.
     k=$((x+radpix))
     l=$y
 
