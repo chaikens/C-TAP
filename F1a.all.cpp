@@ -920,7 +920,10 @@ int main( int argc, char** argv ) {
   }
   ret = fscanf ( file, "%s", line ); fclose(file);
   unsigned short MainThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
-  fprintf(stderr,"%s MainThr=%u SubThr=%u\n", progname, MainThr, SubThr);
+
+  fprintf(stderr,"INFO: %s non-CROP settings used:\nINFO: "
+	  "mainThreshold(CamSett[19])=%u SubThr(CamSett[10])=%u\n", progname, MainThr, SubThr);
+
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
 #ifdef Custom

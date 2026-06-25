@@ -87,7 +87,7 @@ do
 	moviePrefix=`basename ${movie_file%.$ext}`
     fi
 
-    if [ "${KILL_OUR_XTERMS_ONE_DONE}"X = "yesX" ]
+    if [ "${KILL_OUR_XTERMS_BEFORE_EACH_MOVIE}"X = "yesX" ]
     then
 	kill_our_xterms #our shell fn OK to call with no xterms to kill
     fi

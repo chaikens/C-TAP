@@ -920,7 +920,8 @@ int main( int argc, char** argv ) {
   }
   ret = fscanf ( file, "%s", line ); fclose(file);
   unsigned short MainThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
-  fprintf(stderr,"%s MainThr=%u SubThr=%u\n", progname, MainThr, SubThr);
+  fprintf(stderr,"INFO: %s non-CROP settings used:\nINFO: "
+	  "mainThreshold(CamSett[19])=%u SubThr(CamSett[10])=%u\n", progname, MainThr, SubThr);
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
 #ifdef Custom
@@ -944,9 +945,10 @@ int main( int argc, char** argv ) {
   unsigned char* dataNew = BMP_A; //double buffering
 
   cerr << progname <<
-    "CROP param from settings, user (not pix/proc) coords, [[I<=,,<F)) :" << end;
-  cerr <<  "Top/Bot  CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << endl;
-  cerr <<  "Lft/Rht  CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
+    "INFO: CROP param from settings, user (not pix/proc) coords, (x,y) in iff " <<
+    "INFO: CROP_xORyI <= xORy <= CROP_xORyF" << end;
+  cerr <<  "INFO: Top/Bot  CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << endl;
+  cerr <<  "INFO: Lft/Rht  CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
 
   //Cropping merely reduces the main inner loop ranges.
   //The inner loop is the most costly step after frame extraction when you
