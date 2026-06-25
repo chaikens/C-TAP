@@ -920,8 +920,10 @@ int main( int argc, char** argv ) {
   }
   ret = fscanf ( file, "%s", line ); fclose(file);
   unsigned short MainThr = (unsigned short)CamSett[19], SubThr = (unsigned short)CamSett[10];
+
   fprintf(stderr,"INFO: %s non-CROP settings used:\nINFO: "
 	  "mainThreshold(CamSett[19])=%u SubThr(CamSett[10])=%u\n", progname, MainThr, SubThr);
+
   //We don't write cameraName= ...  at the end of CamSett.txt anymore.
 
 #ifdef Custom
@@ -1089,6 +1091,7 @@ int main( int argc, char** argv ) {
       } /* end pixel y loop */
     } /* end pixel x loop */
 
+    //save the mask if any
     if( mask )
       {
 	mask->writefile(mask_filename);
