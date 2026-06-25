@@ -23,7 +23,7 @@ KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
 #Yes may be user preference, also in case they have  named xterm are used
 #no is a good choice when running concurrent jobs!
 
-KILL_OUR_XTERMS_ONE_DONE="yes"
+KILL_OUR_XTERMS_BEFORE_EACH_MOVIE="yes"
 #no is a good choice when analyzing single movies
 
 KILL_XTERMS_DONT_ASK="no"

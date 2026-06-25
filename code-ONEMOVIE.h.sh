@@ -125,7 +125,7 @@ then
     #xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     echo DEBUG starting Phase1a xterm xterm_pids is
     echo $xterm_pids
-    xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e less +F -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm -geometry 200x30+0+542 -title 'Phase 1a (.int file) output'  -e less +F -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
     xterm_pids+=" $!" #for killing 'em
     echo DEBUG after plusequal xtermpids is
     echo $xterm_pids

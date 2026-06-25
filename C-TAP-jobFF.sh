@@ -25,7 +25,7 @@ echo Results will be in $RESULTS_DIR    #
 echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
-PHASE_1a=F1a.orig.backwards
+PHASE_1a=F1a.orig
 PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
@@ -35,7 +35,7 @@ ARCHITECTURE="framefile"
 
 if [ $ARCHITECTURE = "framefile" ]
 then		   
-    REUSE_BMPS=yes  #You might as well do this unless extraction has changed,
+    REUSE_BMPS=no  #You might as well do this unless extraction has changed,
     #because if improper or missing first bmp is detected, it will not reuse.
     BITMAPS_DIR_NAME="bitmaps-${JOBNAME}" 
     BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir 
@@ -108,20 +108,13 @@ OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
 #For FULL FRAME with DECIMATION extraction by ffmpeg
 #Also, the 2nd filter setpts is set presentation timestamps
-FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
+FFMPEG_EXTRACT_FILTER="  -vsync vfr -vf decimate=mixed=true,setpts=N/100/TB " #-fps_mode vfr"
 
 #for HALF-RESOLUTION with DECIMATION extraction.
 #FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
-
-#For FULL FRAME with DECIMATION extraction by ffmpeg
-#Also, the 2nd filter setpts is set presentation timestamps
-FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
-
-#for HALF-RESOLUTION, ditto (simply add the scale filter)
-#FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 # THIS DS.mov ONLY: In the Phase1a C++ program, we wrote an exclusion
 # zone function for DS, and also named a camera for it.
