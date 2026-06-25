@@ -110,7 +110,10 @@ do
 
        	if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
 	then
+	    #This renames frameNNNNNN.bmp to picNNNNNN.bmp
 	    mv  ${inbmpPaName} ${outbmpPaName}
+	    #And this directs Imagemagick to input picNNNNN.bmp
+	    #so when drawing circles, it replaces the contents.
 	    inbmpPaName=${outbmpPaName}
 	fi
 	
