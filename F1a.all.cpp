@@ -947,7 +947,7 @@ int main( int argc, char** argv ) {
   unsigned char* dataNew = BMP_A; //double buffering
 
   cerr << "INFO: CROP param from settings, user (not pix/proc) coords, (x,y) in iff " << endl
-       << "INFO: CROP_xORyI <= xORy <= CROP_xORyF" << endl;
+       << "INFO: CROP_xORyI <= yORx <= CROP_xORyF" << endl;
   cerr << "INFO: Top/Bot  CROP_XI=" << CROP_XI << " CROP_XF=" << CROP_XF << endl;
   cerr << "INFO: Lft/Rht  CROP_YI=" << CROP_YI << " CROP_YF=" << CROP_YF << endl;
 
