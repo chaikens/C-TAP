@@ -50,8 +50,9 @@ ext=mp4 #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 #      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 #
 
+SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY
 movie_files="$SLOW_MOVIE_DIR/DS.$ext"
-movie_files+=" $SLOW_MOVIE_DIR/DSa.${ext}"
+#movie_files+=" $SLOW_MOVIE_DIR/DSa.${ext}"
 
 #####################################################################
 #Here is how to configure a dir full of movies for research, not    #

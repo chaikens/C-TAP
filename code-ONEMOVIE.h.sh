@@ -37,7 +37,7 @@ chmod 644 $RESULTS_DIR/$0.$logn
 #Make symbolic links with $logn suffix to current movies' video and frame files.
 #Good for later visualization operations, to get at the original movie.
 pushd ${RESULTS_DIR} > /dev/null
-ln -s ${movie_file} ${FileName}.${logn}
+ln -s ${precopy_movie_file} ${FileName}.${logn}
 ln -s $BITMAPS_DIR ${BITMAPS_DIR_NAME}.${logn}
 popd > /dev/null
 

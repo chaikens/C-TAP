@@ -64,6 +64,8 @@ do
     ((++o))
     echo $(date)
     echo "Begin processing $o of $numMovieFiles movie file(s)"
+
+    precopy_movie_file=$movie_file
     
     if [ $COPYMOVIES ]
     then
