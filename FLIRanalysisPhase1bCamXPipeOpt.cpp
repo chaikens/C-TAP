@@ -352,7 +352,7 @@ Line19 Value=14(ignored Key =mainThreshold=)
   }
 
   if (NumFrames == MaxNumFrames) {
-    cerr << argv[1] << "INFO: .int line reading stopped after reaching maximum param " << NumFrames << endl;
+    cerr << "INFO: F1a .int line reading stopped after reaching maximum param " << NumFrames << endl;
     //Is/will there be a use case when we request less than the max available?
   }
   ifp.close();
