@@ -232,7 +232,7 @@ int main ( int argc, char** argv ) {
   ifstream ifp(argv[1]);
   if(!ifp.is_open()) {
     //bad ugly C++ this failed to detect bad file. I hacked reading when loop index i==0
-    cerr << "Phase1b data input file " << argv[1] << "failed" << endl;
+    cerr << "INFO: Phase1b data input file " << argv[1] << "failed" << endl;
     return 1;
   }
   long MaxNumFrames = atol(argv[2]); //maybe use as an upper limit for num diffs to process
@@ -338,13 +338,13 @@ Line19 Value=14(ignored Key =mainThreshold=)
       { //read of next or first line failed.
 	if( i == 0 )
 	  { //can't even read the first line!
-	    cerr << "ERR: Failure to read first line from " << argv[1] << endl;
-	    cerr << "ERR: Bad filename or wrong numberical format." << endl;
+	    cerr << "ERR: Phase1b Failure to read first line from " << argv[1] << endl;
+	    cerr << "ERR: Phase1b Bad filename or wrong numberical format." << endl;
 	    return 1;
 	  }
 	else
 	  {
-	    cerr << argv[1] << "INFO: .int line reading reached EOF, OK for pipeline. We read " << NumFrames << endl;
+	    cerr << "INFO: Phase1b .int line reading reached EOF, OK for pipeline. We read " << NumFrames << endl;
 	    break; //number of lines exceeds MaxNumFrames
 	    //This is not an error when pipelining is used.
 	  }
@@ -352,7 +352,7 @@ Line19 Value=14(ignored Key =mainThreshold=)
   }
 
   if (NumFrames == MaxNumFrames) {
-    cerr << "INFO: F1a .int line reading stopped after reaching maximum param " << NumFrames << endl;
+    cerr << "INFO: Phase1b .int line reading stopped after reaching maximum param " << NumFrames << endl;
     //Is/will there be a use case when we request less than the max available?
   }
   ifp.close();
