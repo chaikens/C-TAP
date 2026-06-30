@@ -91,8 +91,6 @@ xterm_pids=
 
 function kill_our_xterms() {
     #do it by PID
-    echo DEBUG kill_our_xterms called here is xterm_pids
-    echo DEBUG "${xterm_pids}"
     if [ "${xterm_pids}none" != "none" ]
     then
 	kill ${xterm_pids[*]}

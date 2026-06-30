@@ -13,7 +13,7 @@ echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 ##SHOULD BE SCALED!!
 ##circles with center (above)< sky_limit are cyan, below lime (ImageMagick coords.)
 sky_limit=800
-BABY_MOVIE_CIRCLE_RAD_DIV=240;
+BABY_MOVIE_CIRCLE_RAD_DIV=100;
 
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
@@ -77,7 +77,7 @@ do
 	#Dont waste time, only look at first .bmp to get radius.
 	#Dont rely of an existing var. for the width
 	radpix=$(numquotintnz $(widthOfBmp ${inbmpPaName}) ${BABY_MOVIE_CIRCLE_RAD_DIV})
-        ct=$(numquotintnz $radpix 3) #circle thickness
+        ct=$(numquotintnz $radpix 6) #circle thickness
 	firsttime=0
     fi
 
