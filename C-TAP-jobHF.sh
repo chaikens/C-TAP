@@ -25,7 +25,7 @@ BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir
 BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
-KEEP_BABY_BMPS=no
+KEEP_BABY_BMPS=yes
 KILL_OUR_XTERMS_BEFORE_EACH_MOVIE=yes
 
 PHASE_1a=F1a.orig
@@ -51,7 +51,7 @@ ext=mp4 #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 #
 
 movie_files="$SLOW_MOVIE_DIR/DS.$ext"
-movie_files+=" $SLOW_MOVIE_DIR/DSa.${ext}"
+
 
 #####################################################################
 #Here is how to configure a dir full of movies for research, not    #
@@ -147,6 +147,8 @@ OTHER_OPTIONS=" --camera-index 1"
 RUN_EXPLANATION="ffmpeg .mp4----->dir of .bmps ----->(Phase1a (reads .bmp files) > movie.int > (Phase1bPipe file redir) > file.out  This is coded by $0"
 
 echo $RUN_EXPLANATION
+
+REUSE_BMPS=yes
 
 ####################################
 source code-ANALYSIS.h.sh          #
