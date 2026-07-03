@@ -202,6 +202,7 @@ int stdinfreads = 0; //for old debugging of pipelined.
 #include <getopt.h>
 #include <cstring>
 #include "BitA.h" //for making the image mask file if requested.
+#include "EZbtraps.h"
 using namespace std;
 
 int vb = 0; //verbose bool
@@ -357,6 +358,9 @@ pixCoord UtoP( pixCoord c ) { return UtoPmult*c; } //don't bother inlining or
 // more efficient than including that in exclusion zone functions,
 // since cropping can REDUCE THE RANGE OF THE MAIN LOOP
 // by \Theta(length*width).
+float UtoPmultFloat;
+float UtoPFloat(float c) { return UtoPmultFloat*c; }
+
 
 
 //scaleCD
@@ -734,6 +738,64 @@ static bool ezDroneCalib1( pixCoord ii, pixCoord jj ) {
 ////////////////THE RESOLUTION WHEN THESE CAMERA VIDEOS ARE EXTRACTED FOR US///
 ///////////////////////////////////////////////////////////////////////////////
 
+EZbtraps BenCambtraps =
+  { . xL0 = 0, . yL0 = 360 ,
+    . diffs = {
+      {121.33169,187.96547 },
+      {300,65.37608 },
+      {61.33169,245.3021 },
+      {77.31196,2.66338 },
+      {44.11837,-161.47966 },
+      {133.26757,-182.49075 },
+      {25.32676,146.88039 },
+      {6.78175,183.57584 },
+      {25.40074,-11.7386 },
+      {65.91861,-130.55487 },
+      {58.18745,0.66585 },
+      {38.41553,133.50185 },
+      {961.27618,2.9963},
+      {0,0}}
+  };
+
+/* .svg file <path> element d attribute, made with inkscape
+   d="m 0,360 
+121.33169,187.96547 
+300,65.37608 
+61.33169,245.3021 
+77.31196,2.66338 
+44.11837,-161.47966 
+133.26757,-182.49075 
+25.32676,146.88039 
+6.78175,183.57584 
+25.40074,-11.7386 
+65.91861,-130.55487 
+58.18745,0.66585 
+38.41553,133.50185 
+961.27618,2.9963"
+*/
+
+
+static bool ezBenCam( pixCoord ii, pixCoord jj)
+{ return
+    ((ii < UtoP(73) ) && (jj > UtoP(1568) )
+    ||
+    BenCambtraps.ez(jj, ii) );
+}
+
+/*************************   EXCLUSION ZONING ************************************
+ ******  implemented in EZ bottom trapezoid class class EZvtraps in EZbtraps.h ***
+ 
+| xL  yL 1 |   |    xL     yL    1 | = (xL)*(yR-yL)-(yL)*(xR-xL) + (xR-xL)*y - (yR-yL)*x
+| xR  yR 1 | = | xR-xL  yR-yL    0 | = (xL)*(  yD )-(yL)*(  xD ) + (  xD )*y - (  yD )*x
+| x   y  1 |   |    x      y     1 |
+
+ xLi <= x <= xRi
+
+NEXT[ (xRi, yRi),          (xD(i+1),yD(i+1))   ] =
+    ( xR(i+1)=xRi+xD(i+1), yR(i+1)=yRi+yD(i+1) )
+
+*/
+
 //scaleCD--yes, pixCoord==Pcoord are what we should use here,
 //given these are called with loop indices, which are Pcoords.
 static bool ezCamA1( pixCoord ii, pixCoord jj ) {
@@ -813,6 +875,7 @@ struct camera {
 } cameras[] = {
   { "None",  ezNone },
   { "DroneCalib1", ezDroneCalib1 },
+  { "BenCam", ezBenCam }, 
   { "CamA1", ezCamA1 },
   { "CamA2", ezCamA2 },
   { "CamA3", ezCamA3 },
@@ -827,7 +890,7 @@ struct camera {
 };
   
 static bool ((* ezFunArray[])) (pixCoord, pixCoord)  =
-  { ezNone, ezDroneCalib1, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
+{ ezNone, ezDroneCalib1, ezBenCam, ezCamA1, ezCamA2, ezCamA3, ezCamA4,
     ezCamB1, ezCamB2, ezCamB3, ezCamB4 };
 
 int camera_index = 0;
@@ -878,6 +941,7 @@ int main( int argc, char** argv ) {
   // all with --user-scale 1 set by default.
   // (We no longer pretend anything.)
   UtoPmult = Pscale/Uscale;
+  UtoPmultFloat = ((float)Pscale)/((float)Uscale);
   //For now, we don't use or check Uscale, nor do other scaling.
   if( UtoPmult != 1 )
     fprintf(stderr,"Compile Time and CamSett crop constants will be *%u before comparison with a pix coord.\n",

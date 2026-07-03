@@ -63,22 +63,15 @@ then
 fi
 
 start_time_one_movie=$(uptimenow)
+echo Started $movie_file
 echo $(date)
-echo Uptime we started on $movie_file is
-echo $start_time_one_movie seconds.
 echo "TIME:" $start_time_one_movie seconds. >>$LOG
 
 if [ "${RUN_EXPLANATION}X" != "X" ]
 then
-   echo
    echo >> $LOG
-   echo Your run explanation:
-   echo
    echo "INFO:" Your run explanation: >> $LOG
-   echo
    echo >> $LOG
-   echo ${RUN_EXPLANATION}
-   echo
    echo "INFO:" ${RUN_EXPLANATION} >> $LOG
 fi
 
@@ -180,7 +173,8 @@ echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
 
 phase1b_start_time=$(uptimenow)
 echo
-echo Beginning Phase1b at $phase1b_start_time sec.
+echo Beginning Phase1b
+date
 echo
 
 RESULT_OF_1b_BASE="${moviePrefix}.out.${logn}"
@@ -188,14 +182,14 @@ cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1b_BASE}
     
 #so xterm's less doesnt fess. We use less since the result is finished fast.
 
-echo DEBUG starting phase1a xterm xterm_pids is
-echo $xterm_pids
 xterm -bg '#FFFFE0' ${XTERM_PARAM} -geometry 80x80+0+0 -sb -title 'Phase1b .out' -e less -f +F ${RESULTS_DIR}/${RESULT_OF_1b_BASE} &
 xterm_pids+=" $!" #for killing 'em
 
 #
 # level for Phase1b first try is 0.5, here----------------------------------------------V---
 #
+
+phase1b_failed="no"
 
 phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
 phase1b_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
@@ -206,9 +200,9 @@ phase1b_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE_1b_LEVEL} "
 phase1b_cmd+=" ${OPT_CamSett} "
 phase1b_cmd+=" > $phase1b_out 2>>$LOG"
 
-echo Running
-echofold ${phase1b_cmd}
-( echo ; echo ${phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
+echo Running Phase1b first try
+#echofold ${phase1b_cmd}
+( echo ; echo -n "cd "; pwd; echo ${phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
 #${Phase1b_cmd} > $phase1b_out
 
@@ -238,6 +232,7 @@ then
     if [ $n == 0 ]
     then
 	echo "Part deux: electric boogaloo... First try found 0 frames with objects."
+	echo "About to redo Phase1b."
 	echo "INFO:" "Part deux: electric boogaloo... First try found 0 frames with objects." >> $LOG
 	
 	#we don't redo Phase1a since current version ignores cloud cover param."
@@ -271,9 +266,9 @@ then
 	phase1b_redo_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE_1b_LEVEL_REDO} "
 	phase1b_redo_cmd+=" ${OPT_CamSett} "
 	phase1b_redo_cmd+="  > $phase1b_out 2>>$LOG"
-	( echo  ; echo "${phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
-	echo "CMD:"
-	$(echofold  "${phase1b_redo_cmd}") >> $LOG
+	( echo  ; echo -n "cd "; pwd; echo "${phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
+	#echo "CMD:"
+	#$(echofold  "${phase1b_redo_cmd}") >> $LOG
 	eval $phase1b_redo_cmd
 	err=$?
 	phase1b_finish_time=$(uptimenow)
@@ -303,23 +298,28 @@ then
     (echo "INFO:" "Either too many or too few objects..." ; echo "On to the next movie, if any" ) >> $LOG
 
     finish_time_one_movie=$(uptimenow)
-    echo Finished movie $movie_file at
-    echo uptime $finish_time_one_movie seconds.
+    echo Finished movie $movie_file
+    date
     echo "TIME:" finish at $finish_time_one_movie seconds. >> $LOG
     et=$(numdif $finish_time_one_movie $start_time_one_movie)
     echo that took $et wall clock seconds.
     echo "TIME:" net $et seconds. >> $LOG
+    phase1b_failed=yes
     continue #top level movie loop
 fi
 # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
 
 
+
 if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then
-    echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
-    source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
+    if [ $phase1b_failed"wawa" = "nowawa" ]
+    then
+	echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
+	source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
+    fi
 else
-    echo "No baby movie today, someone said no, or our pipeline can't do it yet."
+    echo "No baby movie today, someone said no."
 fi
 
 # We're done with I/O thru the bitmaps dir
@@ -349,8 +349,8 @@ echo "Cosmic consciousness has been achieved!!"
 echo "from yet another movie $o of $numMovieFiles."
 
 finish_time_one_movie=$(uptimenow)
-echo Finished movie $movie_file at
-echo uptime $finish_time_one_movie seconds.
+echo Finished movie $movie_file
+date
 echo "TIME:" finish at $finish_time_one_movie seconds. >> $LOG
 et=$(numdif $finish_time_one_movie $start_time_one_movie)
 echo that took $et wall clock seconds.

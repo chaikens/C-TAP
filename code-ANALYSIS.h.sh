@@ -15,13 +15,14 @@ phase1b_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS}"
 
 #for pipelined frames: ffmpeg_pipe_extract input-movie-filename pipe-filename-with-yuv
 # It should be a named Unix pipe.
-#Writes to PIPE.yuv, the .yuv extension specifies raw format to ffmpeg
+#Writes to ${JOBNAME}PIPE.yuv, the .yuv extension specifies raw format to ffmpeg
 #This should run in a shell background (i.e., separate process).
 #If not, concurrency will not occur and, what's worse, kernal VM
 #might become exhaused from all those raw video
 #frames.  (They are 54/2 bytes smaller than half the size of .bmp frames.)
 function ffmpeg_pipe_extract() {
-    $time_cmd_prefix ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/PIPE.yuv &>${RESULTS_DIR}/ffmpeg.log
+    (echo ; echo -n; pwd; echo ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/${JOBNAME}PIPE.yuv '&>'${RESULTS_DIR}/ffmpeg.log ) >> ${COMMAND_ARCHIVE_PATHNAME}
+    $time_cmd_prefix ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/${JOBNAME}PIPE.yuv &>${RESULTS_DIR}/ffmpeg.log
 }
 
 #for .bmp frames: ffmpeg_bmp_extract <movie_file-file-name> <logfile>

@@ -71,7 +71,7 @@ then
     type ffmpeg_bmp_extract >> $LOG
     echo "PGM:" ffmpeg filter is "${FFMPEG_EXTRACT_FILTER}" >> $LOG
     echo "PGM:" >> $LOG
-    (echo ; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
+    (echo ; echo -n "cd "; pwd; type ffmpeg_bmp_extract; echo ) >>${COMMAND_ARCHIVE_PATHNAME}
     echo "FFMPEG_EXTRACT_FILTER=${FFMPEG_EXTRACT_FILTER}" >>${COMMAND_ARCHIVE_PATHNAME}
 
     if [ ${xterm_ffmpeg_pid}x = "x" ]
@@ -192,7 +192,7 @@ phase1a_cmd="${phase1a_cmd_args} 0 $nframes 0 >> ${RESULTS_DIR}/${RESULT_OF_1a_B
   
 echo Running
 echofold ${phase1a_cmd}
-( echo ; echo ${phase1a_cmd} )  >>${COMMAND_ARCHIVE_PATHNAME}
+( echo ; echo -n "cd "; pwd; echo ${phase1a_cmd} )  >>${COMMAND_ARCHIVE_PATHNAME}
 echo -n "PGM: " >>${LOG}
 echofold ${phase1a_cmd}  >>${LOG}
 

@@ -18,7 +18,7 @@ fi
 
 xterm_ffmpeg_pid=  #empty, store single pid so we can test and eventually kill
 
-KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
+KILLALL_XTERMS_AT_START="yes" #default is do killall xterm near beginning
 #so xterms still running after we fail will be killed.
 #Yes may be user preference, also in case they have  named xterm are used
 #no is a good choice when running concurrent jobs!
@@ -128,19 +128,32 @@ fi
 echo $0 Done
 if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then
-    echo "cd ${RESULTS_DIR} ; pwd; ffplay -hide_banner -f mov ${baby_movie_logn}" > m
-    #echo I created file m which contains
-    #cat m
-    echo
-    echo 'ffplay keys: --DownArrow-- to back up, --s-- to step frame, --space-- to play/pause' 
-    echo 'To see the Baby Movie, type source m (or . <space> m), it puts you in RESULTS dir. too'
-    echo
+    if [ ${phase1b_failed}"wawa" = "nowawa" ]
+    then
+	echo "cd ${RESULTS_DIR} ; pwd; ffplay -hide_banner -f mov ${baby_movie_logn}" > m
+	#echo I created file m which contains
+	#cat m
+	echo
+	echo 'ffplay keys: --DownArrow-- to back up, --s-- to step frame, --space-- to play/pause' 
+	echo 'To see the Baby Movie, type source m (or . <space> m), it puts you in RESULTS dir. too'
+	echo
+    else
+	echo
+	echo "cd ${RESULTS_DIR}; pwd " > m
+	echo 'Phase1b failed (no events), no baby movie, sorry.'
+	echo 'To cwd to RESULTS dir, type source m (or . <space> m)'
+	echo
+    fi
 else
-    echo "See results in"
-    echo ${RESULTS_DIR}
+        echo
+	echo No baby movie requested.
+	echo "cd ${RESULTS_DIR}; pwd " > m
+	echo To cwd to RESULTS dir ${RESULTS_DIR}, type source m '(or . <space> m)'
+	echo
 fi
 exit 0
 }
+
 
 
 

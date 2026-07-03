@@ -18,7 +18,7 @@ BABY_MOVIE_CIRCLE_RAD_DIV=100;
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
     #what to use for PIPE.yuv?
-    pipe_yuv="${PIPE_DIR}/PIPE.yuv" #should end in .yuv to tell ffmpeg format
+    pipe_yuv="${PIPE_DIR}/${JOBNAME}PIPE.yuv" #should end in .yuv to tell ffmpeg format
     rm ${pipe_yuv}  #Need this??
     mknod ${pipe_yuv} p
     echo PIPE_YUV ${pipe_yuv}
@@ -164,7 +164,7 @@ baby_movie_logn="${generic_baby_movie_name}.${logn}"
 rm -f $RESULTS_DIR/${generic_baby_movie_name}
 
 make_baby_cmd="ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p "${RESULTS_DIR}/${generic_baby_movie_name}" &>> ${RESULTS_DIR}/ffmpeg.log"
-(echo ; echo ${make_baby_cmd}; echo ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
+(echo ; echo -n "cd "; pwd; echo ${make_baby_cmd}; echo ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 
 eval ${time_cmd_prefix} ${make_baby_cmd}
 

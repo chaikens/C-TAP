@@ -28,7 +28,7 @@ BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 KEEP_BABY_BMPS=no
 KILL_OUR_XTERMS_BEFORE_EACH_MOVIE=yes
 
-PHASE_1a=F1a.orig
+PHASE_1a=F1a.all
 PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 ARCHITECTURE="pipeline"
@@ -50,7 +50,7 @@ ext=mp4 #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 #      movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"
 #
 
-SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY
+SLOW_MOVIE_DIR=$(pwd)
 movie_files="$SLOW_MOVIE_DIR/DS.$ext"
 #movie_files+=" $SLOW_MOVIE_DIR/DSa.${ext}"
 
