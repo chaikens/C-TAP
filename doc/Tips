@@ -6,3 +6,7 @@ and exits a non-interactive shell if parameter is unset or null.
 echo ${pa:?}
 bash: pa: parameter null or not set
 
+When building software, resolve missing libraries by installing their -dev package,
+runtime package is not sufficient.
+
+

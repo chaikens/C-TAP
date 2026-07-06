@@ -18,7 +18,7 @@ fi
 
 xterm_ffmpeg_pid=  #empty, store single pid so we can test and eventually kill
 
-KILLALL_XTERMS_AT_START="yes" #default is do killall xterm near beginning
+KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
 #so xterms still running after we fail will be killed.
 #Yes may be user preference, also in case they have  named xterm are used
 #no is a good choice when running concurrent jobs!

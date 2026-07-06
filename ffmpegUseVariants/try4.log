@@ -1,0 +1,32 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'DroneShort1.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:02:00.12, start: 0.000000, bitrate: 8340 kb/s
+  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 3840x2160 [SAR 1:1 DAR 16:9], 8015 kb/s, 23.98 fps, 23.98 tbr, 24k tbn, 47.95 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(und): Audio: mp3 (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 320 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> jpegls (native))
+Press [q] to stop, [?] for help
+Output #0, image2, to 'thumb%06d.jpeg':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Stream #0:0(und): Video: jpegls, rgb24(pc, gbr/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 1 fps, 1 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc58.134.100 jpegls
+frame=    1 fps=0.0 q=0.0 size=N/A time=00:00:00.00 bitrate=N/A speed=   0x    frame=    2 fps=0.0 q=0.0 size=N/A time=00:00:00.00 bitrate=N/A dup=0 drop=29 speed=   0x    frame=    2 fps=1.7 q=0.0 size=N/A time=00:00:00.00 bitrate=N/A dup=0 drop=65 speed=   0x    frame=    3 fps=1.7 q=-0.0 size=N/A time=00:00:01.00 bitrate=N/A dup=0 drop=94 speed=0.58x    frame=    3 fps=1.3 q=-0.0 size=N/A time=00:00:01.00 bitrate=N/A dup=0 drop=125 speed=0.45x    frame=    3 fps=1.1 q=-0.0 size=N/A time=00:00:01.00 bitrate=N/A dup=0 drop=160 speed=0.366x    frame=    4 fps=1.2 q=-0.0 size=N/A time=00:00:02.00 bitrate=N/A dup=0 drop=189 speed=0.619x    frame=    4 fps=1.1 q=-0.0 size=N/A time=00:00:02.00 bitrate=N/A dup=0 drop=223 speed=0.534x    frame=    4 fps=0.9 q=-0.0 size=N/A time=00:00:02.00 bitrate=N/A dup=0 drop=256 speed=0.47x    frame=    5 fps=1.0 q=-0.0 size=N/A time=00:00:03.00 bitrate=N/A dup=0 drop=288 speed=0.63x    frame=    5 fps=0.9 q=-0.0 size=N/A time=00:00:03.00 bitrate=N/A dup=0 drop=322 speed=0.569x    frame=    5 fps=0.9 q=-0.0 size=N/A time=00:00:03.00 bitrate=N/A dup=0 drop=358 speed=0.52x    frame=    6 fps=1.0 q=-0.0 size=N/A time=00:00:04.00 bitrate=N/A dup=0 drop=390 speed=0.636x    frame=    6 fps=0.9 q=-0.0 size=N/A time=00:00:04.00 bitrate=N/A dup=0 drop=425 speed=0.589x    frame=    6 fps=0.8 q=-0.0 size=N/A time=00:00:04.00 bitrate=N/A dup=0 drop=462 speed=0.548x    frame=    7 fps=0.9 q=-0.0 size=N/A time=00:00:05.00 bitrate=N/A dup=0 drop=494 speed=0.64x    frame=    7 fps=0.9 q=-0.0 Lsize=N/A time=00:00:07.00 bitrate=N/A dup=0 drop=497 speed=0.889x    
+video:11529kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+Exiting normally, received signal 2.
