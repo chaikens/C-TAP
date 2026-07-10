@@ -15,6 +15,12 @@ echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 sky_limit=800
 BABY_MOVIE_CIRCLE_RAD_DIV=100;
 
+rm -f pic*.bmp #only delete images used to make the previous "baby movie"
+#ffmpeg will input from this glob expression.
+#We must delete these even if KEEP_BABY_BMPS==yes because any old pic* frames will be
+#included in the baby movie made when ffmpeg inputs pic*.bmp
+
+
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
     #what to use for PIPE.yuv?
@@ -34,7 +40,11 @@ then
 	xterm_ffmpeg_pid=$!  #to ensure just one xterm for ffmpeg; may kill at end.
     fi
 
+    sttime=$(uptimenow)
+    echo "TIME: pipe extract select for MOV began " $sttime " sec." >> ${LOG}
     $(ffmpeg_pipe_extract ${movie_file}) &
+
+    
 
     echo "yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm."
     ${SOFTWARE_DIR}/yuvSelectMulti ${width}x${height} 3 4 3<${phase1b_out} 4<${pipe_yuv} \
@@ -43,16 +53,14 @@ then
 	       --offset 1
     rm ${pipe_yuv}
     echo "yuvSelectMulti done.  Begin making frames with circles in'em."
+
+    echo "TIME: pipe extract select done after " $(numdif $(uptimenow) $sttime) "sec." >> ${LOG}
 fi
 
 #When $ARCHITECTURE=framefile, all the needed frames along with all the others are in $BITMAPS_DIR
 
 pushd $BITMAPS_DIR > /dev/null
 
-rm -f pic*.bmp #only delete images used to make the previous "baby movie"
-#ffmpeg will input from this glob expression.
-#We must delete these even if KEEP_BABY_BMPS==yes because any old pic* frames will be
-#included in the baby movie made when ffmpeg inputs pic*.bmp
 
 echo 0 > ${RESULTS_DIR}/foutcount
 #The while loop runs in (another) subshell (process, since it's in a pipeline) so vars set there
@@ -63,6 +71,8 @@ echo 0 > ${RESULTS_DIR}/foutcount
 
 ##scaling? x and y are anti-Microsoft pixel/processing coords, originally y-flipped by Phase1a
 firsttime=1
+sttime=$(uptimenow)
+
 cat $phase1b_out | while read evt frame extr x y prob
 do
     ((++frame))  #We display the SECOND frame of the difference.  Important?
@@ -136,7 +146,7 @@ do
     	echo "WARN: BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}" >> $LOG
    fi
 done
-
+echo "TIME: To draw circles into .bmps w/Imagemagick took " $(numdif $(uptimenow) $sttime) " sec." >> ${LOG}
 
 bmfcount=$(cat ${RESULTS_DIR}/foutcount)
 rm ${RESULTS_DIR}/foutcount

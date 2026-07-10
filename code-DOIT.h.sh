@@ -98,7 +98,12 @@ do
     source ${SOFTWARE_DIR}/code-ONEMOVIE.h.sh
     ###########################################################################
 
-    
+    if [ -e Please_Stop ]
+    then
+	rm Please_Stop
+	break
+    fi
+	
 done
 
 exit_greeting

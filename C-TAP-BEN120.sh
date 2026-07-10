@@ -11,9 +11,10 @@ echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
 KEEP_BABY_BMPS=no
-KILL_OUR_XTERMS_ONE_DONE=no
+KILL_OUR_XTERMS_ONE_DONE=yes
 
-FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
+FAST_MOVIE_DIR=/dev/shm/TMPMOVIES
+FAST_FILESYS_DIR_IF_USED="/media/seth/TerabyteSandisk/CTAP"
 #these are used even for pipeline arch, where
 #the BITMAP dir is used for the BABY MOVIE
 BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir 
@@ -50,7 +51,7 @@ ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 
 
 
-SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY/2025-01-20
+SLOW_MOVIE_DIR=/media/seth/TerabyteSandisk/2025-01-20
 #movie_files=$(echo ${SLOW_MOVIE_DIR}/*main_20250117{18,19,20,21,22,23}*.mp4)
 movie_files=$(echo ${SLOW_MOVIE_DIR}/*.mp4)
 
@@ -68,8 +69,31 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
+cat > tempCamSett.txt <<EOF
+smallestThr= 0
+biggestThr= 254
+smallestPix= 0
+biggestPix= 67
+SkewGaussAmpl= 0.633
+SkewGaussXi= 1.97
+SkewGaussOmega= 1.89
+SkewGaussAlpha= 2.5
+NumPixAbvThrSumMin= 0
+NumPixAbvThrSumMax= 3
+SubThr= 20
+RewFram= 0
+ForFram= -2
+FramBefNew= 1
+FracYes= 1.0
+CROP_XI= 0
+CROP_XF= 858
+CROP_YI= 0
+CROP_YF= 1919
+mainThreshold= 14
+EOF
+
+OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
 
 
@@ -118,7 +142,7 @@ OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 #for HALF-RESOLUTION with DECIMATION extraction.
 #Also, the 2nd filter setpts is set presentation timestamps
-FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB,drawtext=fontfile=arial.ttf:text=%{n}:x=(w-tw)-70:y=(2*lh)-30:fontcolor=white:box=1:boxcolor=0x00000099:fontsize=30" 
 
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
@@ -144,7 +168,7 @@ MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
 MOVIE_SCALE_OPTION="--movie-scale 2"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--camera-index 1"
+OTHER_OPTIONS="--camera-index 2"
 
 #In the Phase1a C++ program, we wrote
 #an exclusion zone function for DroneShort1,
