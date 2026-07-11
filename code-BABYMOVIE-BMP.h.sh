@@ -15,6 +15,8 @@ echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 sky_limit=800
 BABY_MOVIE_CIRCLE_RAD_DIV=100;
 
+
+pushd $BITMAPS_DIR > /dev/null
 rm -f pic*.bmp #only delete images used to make the previous "baby movie"
 #ffmpeg will input from this glob expression.
 #We must delete these even if KEEP_BABY_BMPS==yes because any old pic* frames will be
@@ -42,12 +44,13 @@ then
 
     sttime=$(uptimenow)
     echo "TIME: pipe extract select for MOV began " $sttime " sec." >> ${LOG}
+    #ffmpeg_pipe_extract shell function already has $time_cmd_prefix
     $(ffmpeg_pipe_extract ${movie_file}) &
 
     
 
     echo "yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm."
-    ${SOFTWARE_DIR}/yuvSelectMulti ${width}x${height} 3 4 3<${phase1b_out} 4<${pipe_yuv} \
+    ${time_cmd_prefix} ${SOFTWARE_DIR}/yuvSelectMulti ${width}x${height} 3 4 3<${phase1b_out} 4<${pipe_yuv} \
 	       --bmp-out-dirpath $BITMAPS_DIR        \
 	       --seline-fmt '%*d %d %*d %*d %*d %*f' \
 	       --offset 1
@@ -58,9 +61,6 @@ then
 fi
 
 #When $ARCHITECTURE=framefile, all the needed frames along with all the others are in $BITMAPS_DIR
-
-pushd $BITMAPS_DIR > /dev/null
-
 
 echo 0 > ${RESULTS_DIR}/foutcount
 #The while loop runs in (another) subshell (process, since it's in a pipeline) so vars set there
@@ -88,7 +88,7 @@ do
 	#Dont rely of an existing var. for the width
 	radpix=$(numquotintnz $(widthOfBmp ${inbmpPaName}) ${BABY_MOVIE_CIRCLE_RAD_DIV})
         ct=$(numquotintnz $radpix 6) #circle thickness
-	firsttime=0
+	#firsttime=0 #will use firsttime again to time convert
     fi
 
     #if (( $frame %5 == 0 ))
@@ -134,7 +134,17 @@ do
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -draw 'circle $i,$j $k,$l' "
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha off ${outbmpPaName}"
 
-	eval $BITMAP_EDIT_CMD
+	#second use of firsttime, let's time convert but just once
+	#so we don't clutter .times.n files with a report for every frame!
+	if [ $firsttime = 1 ]
+	then
+	    #We must use eval or else Imagemagick gets circle, $i, etc as separate params.
+	    eval $time_cmd_prefix $BITMAP_EDIT_CMD
+	    firsttime=0
+	else
+	    eval $BITMAP_EDIT_CMD
+	fi
+	
 
 	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
 	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.

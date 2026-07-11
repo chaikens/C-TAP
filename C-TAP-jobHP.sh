@@ -28,7 +28,7 @@ BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 KEEP_BABY_BMPS=no
 KILL_OUR_XTERMS_BEFORE_EACH_MOVIE=yes
 
-PHASE_1a=F1a.all
+PHASE_1a=F1a.orig
 PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 ARCHITECTURE="pipeline"
@@ -94,7 +94,8 @@ OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 PHASE_1b_LEVEL=0.5
 PHASE_1b_LEVEL_REDO=0.98
 
-FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+#frame numbering added..the constants good for half-resolution, 1920x1080, were found by trial/error
+FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB,drawtext=fontfile=arial.ttf:text=%{n}:x=(w-tw)-70:y=(2*lh)-30:fontcolor=white:box=1:boxcolor=0x00000099:fontsize=30" 
 
 MOVIE_TO_FRAME_DIV=2 #Should get rid of this.
 MOVIE_SCALE_OPTION="--movie-scale 2"
