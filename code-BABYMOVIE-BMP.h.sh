@@ -62,7 +62,7 @@ fi
 
 #When $ARCHITECTURE=framefile, all the needed frames along with all the others are in $BITMAPS_DIR
 
-echo 0 > ${RESULTS_DIR}/foutcount
+#echo 0 > ${RESULTS_DIR}/foutcount
 #The while loop runs in (another) subshell (process, since it's in a pipeline) so vars set there
 #are not those of the current shell. It seems the current shell creates the subshell to include
 #its params and their values, but the subshell's variable values are not copied back.
@@ -146,8 +146,8 @@ do
 	fi
 	
 
-	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
-	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
+#	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
+#	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
 
 
 	
@@ -158,12 +158,13 @@ do
 done
 echo "TIME: To draw circles into .bmps w/Imagemagick took " $(numdif $(uptimenow) $sttime) " sec." >> ${LOG}
 
-bmfcount=$(cat ${RESULTS_DIR}/foutcount)
-rm ${RESULTS_DIR}/foutcount
+#bmfcount=$(cat ${RESULTS_DIR}/foutcount)
+#rm ${RESULTS_DIR}/foutcount
 
 echo  
-echo "Breaking Lue's NDA...make a movie of them ${bmfcount} frames. Watch in ffmpeg's xterm."
-echo "INFO: ${bmfcount} baby movie frames." >> $LOG
+#echo "Breaking Lue's NDA...make a movie of them ${bmfcount} frames. Watch in ffmpeg's xterm."
+#echo "INFO: ${bmfcount} baby movie frames." >> $LOG
+echo "Breaking Lue's NDA...make a movie of them. Watch in ffmpeg's xterm."
 # cwd is ${BITMAPS_DIR}
 #We just had added the pic*.bmp frames for the 'baby movie'
 EXT="MOV" #NOT same as ext above!
