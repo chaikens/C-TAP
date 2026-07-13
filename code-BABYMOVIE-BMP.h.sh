@@ -27,7 +27,7 @@ if [ ${ARCHITECTURE} = "pipeline" ]
 then
     #what to use for PIPE.yuv?
     pipe_yuv="${PIPE_DIR}/${JOBNAME}PIPE.yuv" #should end in .yuv to tell ffmpeg format
-    rm ${pipe_yuv}  #Need this??
+    rm -f ${pipe_yuv}  #Need this??
     mknod ${pipe_yuv} p
     echo PIPE_YUV ${pipe_yuv}
     #Use the same ffmpeg_pipe_extract() as before, should be defined.
