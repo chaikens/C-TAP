@@ -27,7 +27,7 @@ if [ ${ARCHITECTURE} = "pipeline" ]
 then
     #what to use for PIPE.yuv?
     pipe_yuv="${PIPE_DIR}/${JOBNAME}PIPE.yuv" #should end in .yuv to tell ffmpeg format
-    rm ${pipe_yuv}  #Need this??
+    rm -f ${pipe_yuv}  #Need this??
     mknod ${pipe_yuv} p
     echo PIPE_YUV ${pipe_yuv}
     #Use the same ffmpeg_pipe_extract() as before, should be defined.
@@ -88,12 +88,12 @@ do
 	#Dont rely of an existing var. for the width
 	radpix=$(numquotintnz $(widthOfBmp ${inbmpPaName}) ${BABY_MOVIE_CIRCLE_RAD_DIV})
         ct=$(numquotintnz $radpix 6) #circle thickness
-	#firsttime=0 #will use firsttime again to time convert
+	firsttime=0 #will use firsttime again to time convert
     fi
 
     #if (( $frame %5 == 0 ))
     #then
-    #echo "processing frame number" $frame
+    #	echo "processing frame number" $frame
     #fi
 
 #    i=$((x-9))  ##scaling?  maybe 9 could remain unscaled
@@ -134,23 +134,23 @@ do
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -draw 'circle $i,$j $k,$l' "
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha off ${outbmpPaName}"
 
-	#second use of firsttime, let's time convert but just once
-	#so we don't clutter .times.n files with a report for every frame!
-	if [ $firsttime = 1 ]
+	#Time a few Imagemagic commands, not the first, because
+	#each costs a NEW PROCESS.  (An Imagemagic server would be cool, and
+	#running this loop in a modern interpeter having an imagemagic api
+	#would be best.  Perhaps we can do this all with the ffmpeg draw filter,
+	#if we can get it to read params from a file, one read for each frame.
+        if (( $frame %1500 == 0 ))
 	then
+	    echo "We are timing Imagemagick on frame"$frame
 	    #We must use eval or else Imagemagick gets circle, $i, etc as separate params.
 	    eval $time_cmd_prefix $BITMAP_EDIT_CMD
-	    firsttime=0
 	else
 	    eval $BITMAP_EDIT_CMD
-	fi
-	
+	fi	
 
 #	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
 #	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
 
-
-	
    else
     	echo "Warning BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}"
     	echo "WARN: BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}" >> $LOG

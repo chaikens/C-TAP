@@ -198,6 +198,9 @@ date
 
 echo "INFO:" "Find Phase1aPipeOpt results in  ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" >> $LOG
 
+rm -f ${bmppipe}
+rm -f ${yuvpipe}
+
 if [ $RET != 0 ]
 then
     echo $phase1a_cmd
