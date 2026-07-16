@@ -15,13 +15,18 @@ echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 sky_limit=800
 BABY_MOVIE_CIRCLE_RAD_DIV=100;
 
+#if KEEP_BABY_BMPS=yes, new a picDDDDDD.bmp file is made
+#by putting a circle into the corresponding thumbDDDDDD.bmp file.
+#if no, thumbDDDDDD.bmp is renamed picDDDDDD.bmp and imagemagic
+#is commanded use that same filename for input and output.
+#So, when KEEP_BABY_BMPS=no (for production), the filenames
+# thumbDDDDDD.bmp are in sequence replaced by picDDDDDD.bmp
+#So, when this is disrupted, some (later) thumbDDDDDD.bmps
+# are retained and there appear other picDDDDDD.bmps from earlier.
+
 
 pushd $BITMAPS_DIR > /dev/null
-rm -f pic*.bmp #only delete images used to make the previous "baby movie"
-#ffmpeg will input from this glob expression.
-#We must delete these even if KEEP_BABY_BMPS==yes because any old pic* frames will be
-#included in the baby movie made when ffmpeg inputs pic*.bmp
-
+rm -f pic*.bmp #before we only delete images used to make the previous "baby movie"
 
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
