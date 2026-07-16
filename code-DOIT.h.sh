@@ -41,14 +41,18 @@ if ! SLOW_FILESYS_REPORT=$(df $SLOW_MOVIE_DIR 2>&1 )
        exit
 fi
 
-if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
+
+COPYMOVIES=
+if [ -n $FAST_MOVIE_DIR ]
 then
-    echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
-    COPYMOVIES=
-else
-    COPYMOVIES=true
-    mkdir -p $FAST_MOVIE_DIR
-fi
+    if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
+    then
+	echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
+	COPYMOVIES=
+    else
+	COPYMOVIES=true
+	mkdir -p $FAST_MOVIE_DIR
+    fi
 
 numMovieFiles=`ls $movie_files | wc -l`
 

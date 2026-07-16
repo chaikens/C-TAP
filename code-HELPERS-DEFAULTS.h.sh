@@ -71,6 +71,13 @@ BITMAPS_DIR_NAME="bitmaps"
 
 SLOW_MOVIE_DIR=$(pwd)
 
+FAST_MOVIE_DIR=
+#Set this so that when the next movie is to be done,
+#it is copied to a faster dir, used from there, and
+#the copy is deleted when done.
+
+#In no case do we delete the original copy.
+
 #for ARCHITECTURE=pipeline only
 PIPE_DIR=${SOFTWARE_DIR}
 
