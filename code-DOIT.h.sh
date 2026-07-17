@@ -44,7 +44,7 @@ fi
 
 COPYMOVIES=
 
-if [ -n $FAST_MOVIE_DIR ]
+if [ -n $FAST_MOVIE_DIR"" ]
 then
     if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
     then
