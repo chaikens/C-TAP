@@ -1,7 +1,10 @@
-all : F1a.orig F1a.all F1a.orig.backwards Phase1bPipeOpt
+all : F1a.orig F1a.all F1a.orig.backwards Phase1bPipeOpt semaphores
 
 CXXFLAGS = -O3
 #CXXFLAGS = -g
+
+semaphores:
+	$(MAKE) -C src/semaphores
 
 F1a.orig : F1a.orig.cpp BitA.h EZbtraps.h Makefile
 	$(CXX) $(CXXFLAGS)   -Wno-unused-result $< -o $@
