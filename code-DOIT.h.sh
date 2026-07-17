@@ -12,7 +12,7 @@ cd ${SOFTWARE_DIR}
 phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
 #
 #####################
-if ! make ${PHASE_1a} ${phase1b}
+if ! make ${PHASE_1a} ${phase1b} semaphores
 then
     echo make the C++ progs we need failed.  Check this out.
     exit 1
@@ -43,6 +43,7 @@ fi
 
 
 COPYMOVIES=
+
 if [ -n $FAST_MOVIE_DIR ]
 then
     if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
@@ -53,6 +54,7 @@ then
 	COPYMOVIES=true
 	mkdir -p $FAST_MOVIE_DIR
     fi
+fi
 
 numMovieFiles=`ls $movie_files | wc -l`
 
