@@ -25,9 +25,11 @@ BABY_MOVIE_CIRCLE_RAD_DIV=100;
 # are retained and there appear other picDDDDDD.bmps from earlier.
 
 ${SOFTWARE_DIR}/semopen BABYMAKER 1
-(echo -n Will do semdown BABYMAKER; date) | cat >> ${LOG} 
+(echo -n Will do semdown BABYMAKER; date) | cat >> ${LOG}
+(echo -n Will do semdown BABYMAKER; date)
 ${SOFTWARE_DIR}/semdown BABYMAKER
 (echo -n Return from semdown BABYMAKER; date) | cat >> ${LOG}
+(echo -n Return from semdown BABYMAKER; date) 
 
 pushd $BITMAPS_DIR > /dev/null
 rm -f pic*.bmp #before we only delete images used to make the previous "baby movie"
@@ -230,6 +232,7 @@ echo 'in' $(pwd) code-BABYMOVIE-BMP.h.sh done
 
 ${SOFTWARE_DIR}/semup BABYMAKER
 (echo -n semup BABYMAKER; date) | cat >> ${LOG}
+(echo -n semup BABYMAKER; date)
 #as before, the shared shell parameter holding the symlinks name is
 # ${RESULTS_DIR}/{moviePrefix}.${EXT}
 # We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
