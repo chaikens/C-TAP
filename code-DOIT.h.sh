@@ -63,7 +63,13 @@ echo "We will process this (these) $numMovieFiles movie file(s)."
 
 #echo $movie_files
 ls $movie_files
-echo
+if [ $? != 0 ]
+then
+   echo Trying to find the movies you requested.
+   echo Some error when commanding ls these arguments:
+   echo $movie_files
+fi
+
 o=0
 for movie_file in $movie_files
 do
