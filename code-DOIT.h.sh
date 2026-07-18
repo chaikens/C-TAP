@@ -14,7 +14,13 @@ phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alon
 #####################
 if ! make ${PHASE_1a} ${phase1b} semaphores
 then
-    echo make the C++ progs we need failed.  Check this out.
+    echo make the C++ progs in C-TAP we need failed.  Check this out.
+    exit 1
+fi
+
+if ! make -C ${SOFTWARE_DIR}/FrameExtractProcess
+then
+    echo make the C++ progs in C-TAP/FrameExtractProcess we need failed.  Check this out.
     exit 1
 fi
 
@@ -110,6 +116,12 @@ do
     source ${SOFTWARE_DIR}/code-ONEMOVIE.h.sh
     ###########################################################################
 
+    if [ -e Please_Stop_${JOBNAME} ]
+    then
+	rm Please_Stop_${JOBNAME}
+	break
+    fi
+    
     if [ -e Please_Stop ]
     then
 	rm Please_Stop
