@@ -84,6 +84,9 @@ fi
 firsttime=1
 sttime=$(uptimenow)
 
+time_convert_after=0
+time_convert_after_incr=1
+
 cat $phase1b_out | while read evt frame extr x y prob
 do
     ((++frame))  #We display the SECOND frame of the difference.  Important?
@@ -129,14 +132,17 @@ do
    if [ -r $inbmpPaName ] #check because offsets might point us to non-existant frames! 
    then
 
-       	if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
-	then
+       #Try, instead of renaming so convert uses the same filename for in and out,
+       #input from thumb.., output to pic..., and deleted thumb after convert call
+       #We'll see if there is less thrashing
+       	#if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
+	#then
 	    #This renames frameNNNNNN.bmp to picNNNNNN.bmp
-	    mv  ${inbmpPaName} ${outbmpPaName}
-	    #And this directs Imagemagick to input picNNNNN.bmp
-	    #so when drawing circles, it replaces the contents.
-	    inbmpPaName=${outbmpPaName}
-	fi
+	 #   mv  ${inbmpPaName} ${outbmpPaName}
+	 #   #And this directs Imagemagick to input picNNNNN.bmp
+	 #   #so when drawing circles, it replaces the contents.
+	 #   inbmpPaName=${outbmpPaName}
+	#fi
 	
        
 	BITMAP_EDIT_CMD="convert ${inbmpPaName} "
@@ -150,15 +156,24 @@ do
 	#running this loop in a modern interpeter having an imagemagic api
 	#would be best.  Perhaps we can do this all with the ffmpeg draw filter,
 	#if we can get it to read params from a file, one read for each frame.
-        if (( $frame %1500 == 0 ))
+
+	#if (( $frame %1500 == 0 ))
+	if (( frame > time_convert_after ))
 	then
-	    echo "We are timing Imagemagick on frame"$frame
+	    time_convert_after=$((time_convert_after + time_convert_after_incr))
+	    time_convert_after_incr=$((time_convert_after_incr + 1 + time_convert_after_incr / 2))
+	    echo $time_convert_after '(next) + ' $time_convert_after_incr
+	    echo "We are timing Imagemagick on frame "$frame
 	    #We must use eval or else Imagemagick gets circle, $i, etc as separate params.
 	    eval $time_cmd_prefix $BITMAP_EDIT_CMD
 	else
 	    eval $BITMAP_EDIT_CMD
-	fi	
+	fi
 
+	#Don't bother saving nohow since it differs little from outbmpPaName img
+	rm ${inbmpPaName}
+
+	
 #	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
 #	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
 
