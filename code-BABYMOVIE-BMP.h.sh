@@ -24,13 +24,23 @@ BABY_MOVIE_CIRCLE_RAD_DIV=100;
 #So, when this is disrupted, some (later) thumbDDDDDD.bmps
 # are retained and there appear other picDDDDDD.bmps from earlier.
 
-${SOFTWARE_DIR}/semopen BABYMAKER 1
-(echo -n Will do semdown BABYMAKER; date) | cat >> ${LOG}
-(echo -n Will do semdown BABYMAKER; date)
-${SOFTWARE_DIR}/semdown BABYMAKER
-(echo -n Return from semdown BABYMAKER; date) | cat >> ${LOG}
-(echo -n Return from semdown BABYMAKER; date) 
+if [ ${ALLOW_THRASHING_BABIES}wawa != yeswawa ]
+then
+    ${SOFTWARE_DIR}/semopen BABYMAKER 1
+    (echo -n TIME: Will do semdown BABYMAKER; date) | cat >> ${LOG}
+    (echo -n Will do semdown BABYMAKER; date)
+    ${SOFTWARE_DIR}/semdown BABYMAKER
+    (echo -n TIME: Return from semdown BABYMAKER; date) | cat >> ${LOG}
+    (echo -n Return from semdown BABYMAKER; date) 
+else
+    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER STARTED 
+    date
+    echo -n TIME: A COMPETITIVE BABY MAKER STARTED '  ' >> ${LOG}
+    date >> ${LOG}
+fi
 
+    
+    
 pushd $BITMAPS_DIR > /dev/null
 rm -f pic*.bmp #before we only delete images used to make the previous "baby movie"
 
@@ -135,15 +145,24 @@ do
        #Try, instead of renaming so convert uses the same filename for in and out,
        #input from thumb.., output to pic..., and deleted thumb after convert call
        #We'll see if there is less thrashing
-       	#if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
-	#then
-	    #This renames frameNNNNNN.bmp to picNNNNNN.bmp
-	 #   mv  ${inbmpPaName} ${outbmpPaName}
-	 #   #And this directs Imagemagick to input picNNNNN.bmp
-	 #   #so when drawing circles, it replaces the contents.
-	 #   inbmpPaName=${outbmpPaName}
-	#fi
+       #if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
+       #then
+       #
+       #   see below
+       #
+       #fi
 	
+       if [ ${TRY_CONVERT_picbmp_TO_picbmp}xyz = yesxyz ]
+       then
+	   mv  ${inbmpPaName} ${outbmpPaName}
+	   #This renames frameNNNNNN.bmp to picNNNNNN.bmp
+	   inbmpPaName=${outbmpPaName}
+	   #And this gives Imagemagick/convert picNNNNN.bmp
+	   #for both input and output,
+	   #so when drawing circles, it seems to replace the contents.
+       fi
+
+
        
 	BITMAP_EDIT_CMD="convert ${inbmpPaName} "
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha remove "
@@ -171,8 +190,12 @@ do
 	fi
 
 	#Don't bother saving nohow since it differs little from outbmpPaName img
-	rm ${inbmpPaName}
-
+	if [ ${inbmpPaName} != ${outbmpPaName} ]
+	   #whoops! when we TRY_CONVERT_picbmp_TO_picbmp, cheap direct problem sol'n if code.
+	then
+	    rm ${inbmpPaName}
+	fi
+	
 	
 #	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
 #	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
@@ -245,14 +268,20 @@ popd
 
 echo 'in' $(pwd) code-BABYMOVIE-BMP.h.sh done 
 
-${SOFTWARE_DIR}/semup BABYMAKER
-(echo -n semup BABYMAKER; date) | cat >> ${LOG}
-(echo -n semup BABYMAKER; date)
-#as before, the shared shell parameter holding the symlinks name is
-# ${RESULTS_DIR}/{moviePrefix}.${EXT}
-# We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
-
-
+if [ ${ALLOW_THRASHING_BABIES}wawa != yeswawa ]
+then   
+    ${SOFTWARE_DIR}/semup BABYMAKER
+    (echo -n semup BABYMAKER ' ' ; date) | cat >> ${LOG}
+    (echo -n semup BABYMAKER ' '; date)
+    #as before, the shared shell parameter holding the symlinks name is
+    # ${RESULTS_DIR}/{moviePrefix}.${EXT}
+    # We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
+else
+    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER FINISHED
+    date
+    echo -n TIME: A COMPETITIVE BABY MAKER FINISHED '  ' >> ${LOG}
+    date >> ${LOG}
+fi
 
 #ffmpeg docs:
 #

@@ -1,4 +1,8 @@
+scratch/
 CamSett.txt
+tempCamSett.txt
+TMP*
+shellrun*
 *.bmp
 *.BMP
 *.yuv

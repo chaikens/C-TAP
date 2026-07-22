@@ -16,6 +16,11 @@ fi
 # defaults
 #
 
+# variations for performance improving development
+TRY_CONVERT_picbmp_TO_picbmp="no"  # see code-BABYMOVIE-BMP.h.sh
+ALLOW_THRASHING_BABIES="no"        # yes will disable semaphore mutexing of baby making.
+#IDEA!! Use >1 initialize semaphore to limit HOW MANY baby makers compete!
+
 xterm_ffmpeg_pid=  #empty, store single pid so we can test and eventually kill
 
 KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning

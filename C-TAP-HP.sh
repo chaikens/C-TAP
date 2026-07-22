@@ -10,6 +10,9 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
+TRY_CONVERT_picbmp_TO_picbmp=yes
+ALLOW_THRASHING_BABIES=yes
+
 KEEP_BABY_BMPS=no
 KILL_OUR_XTERMS_ONE_DONE=yes
 
