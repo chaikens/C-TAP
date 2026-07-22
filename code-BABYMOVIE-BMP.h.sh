@@ -33,7 +33,7 @@ then
     (echo -n TIME: Return from semdown BABYMAKER; date) | cat >> ${LOG}
     (echo -n Return from semdown BABYMAKER; date) 
 else
-    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER STARTED 
+    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER STARTED '  '
     date
     echo -n TIME: A COMPETITIVE BABY MAKER STARTED '  ' >> ${LOG}
     date >> ${LOG}

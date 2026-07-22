@@ -10,6 +10,14 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
+function xterm()
+{
+    echo
+    echo INFO: Not starting xterm log monitor. Do manually with:
+    echo xterm $@
+    echo
+}
+
 TRY_CONVERT_picbmp_TO_picbmp=yes
 ALLOW_THRASHING_BABIES=yes
 
