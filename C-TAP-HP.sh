@@ -14,6 +14,7 @@ function xterm()
 {
     echo
     echo INFO: Not starting xterm log monitor. Do manually with:
+    echo '(but you must quote the #colors and (-ied) names)'
     echo xterm $@
     echo
 }
@@ -25,7 +26,7 @@ KEEP_BABY_BMPS=no
 KILL_OUR_XTERMS_ONE_DONE=yes
 
 FAST_MOVIE_DIR=
-FAST_FILESYS_DIR_IF_USED=/SPARE
+FAST_FILESYS_DIR_IF_USED=/data/CTAP/scratch
 #these are used even for pipeline arch, where
 #the BITMAP dir is used for the BABY MOVIE
 BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir

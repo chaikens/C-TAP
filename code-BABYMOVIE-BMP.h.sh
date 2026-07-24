@@ -76,7 +76,8 @@ then
 	       --seline-fmt '%*d %d %*d %*d %*d %*f' \
 	       --offset 1
     rm ${pipe_yuv}
-    echo "yuvSelectMulti done.  Begin making frames with circles in'em."
+    echo "yuvSelectMulti done.  We now making frames with circles in'em."
+    echo "See progress reports here at geometrically increasing intervals, their time info in log:"
 
     echo "TIME: pipe extract select done after " $(numdif $(uptimenow) $sttime) "sec." >> ${LOG}
 fi
@@ -181,8 +182,8 @@ do
 	then
 	    time_convert_after=$((time_convert_after + time_convert_after_incr))
 	    time_convert_after_incr=$((time_convert_after_incr + 1 + time_convert_after_incr / 2))
-	    echo $time_convert_after '(next) + ' $time_convert_after_incr
-	    echo "We are timing Imagemagick on frame "$frame
+	    #echo $time_convert_after '(next) + ' $time_convert_after_incr
+	    echo "(Timing) Imagemagick on 1b selected decimated movie frame "$frame
 	    #We must use eval or else Imagemagick gets circle, $i, etc as separate params.
 	    eval $time_cmd_prefix $BITMAP_EDIT_CMD
 	else
