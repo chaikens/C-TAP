@@ -16,6 +16,9 @@ fi
 # defaults
 #
 
+NEW_BABY_DEVEL=no
+
+
 # variations for performance improving development
 TRY_CONVERT_picbmp_TO_picbmp="no"  # see code-BABYMOVIE-BMP.h.sh
 ALLOW_THRASHING_BABIES="no"        # yes will disable semaphore mutexing of baby making.

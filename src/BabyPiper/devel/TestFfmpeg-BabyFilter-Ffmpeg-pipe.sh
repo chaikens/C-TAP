@@ -27,7 +27,7 @@ phase_1b_file=DS.out.1
 
 $FFMPEG -i $SRCMOV $SrcToProcPipe &
 
-./BabyFilter --phase-1b-file ${phase_1b_file} --offset 1 $S < $SrcToProcPipe > $ProcToBabyPipe 2>log &
+./BabyFilter --phase-1b-file ${phase_1b_file} --offset 1 $S 3< $SrcToProcPipe 4> $ProcToBabyPipe 2>log &
 
 $FFMPEG -s $S -threads 0 -r 60  -i $ProcToBabyPipe   -crf 25  $BABYMOV
 

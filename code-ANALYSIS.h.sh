@@ -22,7 +22,7 @@ phase1b_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS}"
 #frames.  (They are 54/2 bytes smaller than half the size of .bmp frames.)
 function ffmpeg_pipe_extract() {
     (echo ; echo -n; pwd; echo ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/${JOBNAME}PIPE.yuv '&>'${RESULTS_DIR}/ffmpeg.log ) >> ${COMMAND_ARCHIVE_PATHNAME}
-    $time_cmd_prefix ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/${JOBNAME}PIPE.yuv &>${RESULTS_DIR}/ffmpeg.log
+    $time_cmd_prefix ffmpeg -hide_banner -y -an -i $1 ${FFMPEG_EXTRACT_FILTER} ${PIPE_DIR}/${JOBNAME}PIPE.yuv &>>${RESULTS_DIR}/ffmpeg.log
 }
 
 #for .bmp frames: ffmpeg_bmp_extract <movie_file-file-name> <logfile>
