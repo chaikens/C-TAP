@@ -25,6 +25,7 @@ fi
 destd=$(realpath ${p_par}/$p_basename)
 #echo $destd
 
+jobname=${r_basename/RESULTS-/}
 #echo Writing clean FLIR product dir ${destd} of $r_dir
 
 
@@ -54,6 +55,8 @@ do
 #	echo Goodie!
 #	pwd
 #	echo ${m}.int.$logn
+
+	cp C-TAP-${jobname}.sh.${logn} ${destd}/C-TAP-${jobname}.sh
 	
 	cp ${m}.int.$logn ${destd}/${m}.int
 	cp ${m}.out.$logn ${destd}/${m}.out
