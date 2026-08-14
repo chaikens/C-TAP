@@ -12,9 +12,15 @@ cd ${SOFTWARE_DIR}
 phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
 #
 #####################
-if ! make ${PHASE_1a} ${phase1b}
+if ! make ${PHASE_1a} ${phase1b} semaphores
 then
-    echo make the C++ progs we need failed.  Check this out.
+    echo make the C++ progs in C-TAP we need failed.  Check this out.
+    exit 1
+fi
+
+if ! make -C ${SOFTWARE_DIR}/FrameExtractProcess
+then
+    echo make the C++ progs in C-TAP/FrameExtractProcess we need failed.  Check this out.
     exit 1
 fi
 
@@ -41,13 +47,19 @@ if ! SLOW_FILESYS_REPORT=$(df $SLOW_MOVIE_DIR 2>&1 )
        exit
 fi
 
-if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
+
+COPYMOVIES=
+
+if [ -n $FAST_MOVIE_DIR"" ]
 then
-    echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
-    COPYMOVIES=
-else
-    COPYMOVIES=true
-    mkdir -p $FAST_MOVIE_DIR
+    if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
+    then
+	echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
+	COPYMOVIES=
+    else
+	COPYMOVIES=true
+	mkdir -p $FAST_MOVIE_DIR
+    fi
 fi
 
 numMovieFiles=`ls $movie_files | wc -l`
@@ -57,7 +69,13 @@ echo "We will process this (these) $numMovieFiles movie file(s)."
 
 #echo $movie_files
 ls $movie_files
-echo
+if [ $? != 0 ]
+then
+   echo Trying to find the movies you requested.
+   echo Some error when commanding ls these arguments:
+   echo $movie_files
+fi
+
 o=0
 for movie_file in $movie_files
 do
@@ -98,7 +116,18 @@ do
     source ${SOFTWARE_DIR}/code-ONEMOVIE.h.sh
     ###########################################################################
 
+    if [ -e Please_Stop_${JOBNAME} ]
+    then
+	rm Please_Stop_${JOBNAME}
+	break
+    fi
     
+    if [ -e Please_Stop ]
+    then
+	rm Please_Stop
+	break
+    fi
+	
 done
 
 exit_greeting

@@ -15,11 +15,40 @@ echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 sky_limit=800
 BABY_MOVIE_CIRCLE_RAD_DIV=100;
 
+#if KEEP_BABY_BMPS=yes, new a picDDDDDD.bmp file is made
+#by putting a circle into the corresponding thumbDDDDDD.bmp file.
+#if no, thumbDDDDDD.bmp is renamed picDDDDDD.bmp and imagemagic
+#is commanded use that same filename for input and output.
+#So, when KEEP_BABY_BMPS=no (for production), the filenames
+# thumbDDDDDD.bmp are in sequence replaced by picDDDDDD.bmp
+#So, when this is disrupted, some (later) thumbDDDDDD.bmps
+# are retained and there appear other picDDDDDD.bmps from earlier.
+
+if [ ${ALLOW_THRASHING_BABIES}wawa != yeswawa ]
+then
+    ${SOFTWARE_DIR}/semopen BABYMAKER 1
+    (echo -n TIME: Will do semdown BABYMAKER; date) | cat >> ${LOG}
+    (echo -n Will do semdown BABYMAKER; date)
+    ${SOFTWARE_DIR}/semdown BABYMAKER
+    (echo -n TIME: Return from semdown BABYMAKER; date) | cat >> ${LOG}
+    (echo -n Return from semdown BABYMAKER; date) 
+else
+    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER STARTED '  '
+    date
+    echo -n TIME: A COMPETITIVE BABY MAKER STARTED '  ' >> ${LOG}
+    date >> ${LOG}
+fi
+
+    
+    
+pushd $BITMAPS_DIR > /dev/null
+rm -f pic*.bmp #before we only delete images used to make the previous "baby movie"
+
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
     #what to use for PIPE.yuv?
     pipe_yuv="${PIPE_DIR}/${JOBNAME}PIPE.yuv" #should end in .yuv to tell ffmpeg format
-    rm ${pipe_yuv}  #Need this??
+    rm -f ${pipe_yuv}  #Need this??
     mknod ${pipe_yuv} p
     echo PIPE_YUV ${pipe_yuv}
     #Use the same ffmpeg_pipe_extract() as before, should be defined.
@@ -34,27 +63,28 @@ then
 	xterm_ffmpeg_pid=$!  #to ensure just one xterm for ffmpeg; may kill at end.
     fi
 
+    sttime=$(uptimenow)
+    echo "TIME: pipe extract select for MOV began " $sttime " sec." >> ${LOG}
+    #ffmpeg_pipe_extract shell function already has $time_cmd_prefix
     $(ffmpeg_pipe_extract ${movie_file}) &
 
+    
+
     echo "yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm."
-    ${SOFTWARE_DIR}/yuvSelectMulti ${width}x${height} 3 4 3<${phase1b_out} 4<${pipe_yuv} \
+    ${time_cmd_prefix} ${SOFTWARE_DIR}/yuvSelectMulti ${width}x${height} 3 4 3<${phase1b_out} 4<${pipe_yuv} \
 	       --bmp-out-dirpath $BITMAPS_DIR        \
 	       --seline-fmt '%*d %d %*d %*d %*d %*f' \
 	       --offset 1
     rm ${pipe_yuv}
-    echo "yuvSelectMulti done.  Begin making frames with circles in'em."
+    echo "yuvSelectMulti done.  We now making frames with circles in'em."
+    echo "See progress reports here at geometrically increasing intervals, their time info in log:"
+
+    echo "TIME: pipe extract select done after " $(numdif $(uptimenow) $sttime) "sec." >> ${LOG}
 fi
 
 #When $ARCHITECTURE=framefile, all the needed frames along with all the others are in $BITMAPS_DIR
 
-pushd $BITMAPS_DIR > /dev/null
-
-rm -f pic*.bmp #only delete images used to make the previous "baby movie"
-#ffmpeg will input from this glob expression.
-#We must delete these even if KEEP_BABY_BMPS==yes because any old pic* frames will be
-#included in the baby movie made when ffmpeg inputs pic*.bmp
-
-echo 0 > ${RESULTS_DIR}/foutcount
+#echo 0 > ${RESULTS_DIR}/foutcount
 #The while loop runs in (another) subshell (process, since it's in a pipeline) so vars set there
 #are not those of the current shell. It seems the current shell creates the subshell to include
 #its params and their values, but the subshell's variable values are not copied back.
@@ -63,6 +93,11 @@ echo 0 > ${RESULTS_DIR}/foutcount
 
 ##scaling? x and y are anti-Microsoft pixel/processing coords, originally y-flipped by Phase1a
 firsttime=1
+sttime=$(uptimenow)
+
+time_convert_after=0
+time_convert_after_incr=1
+
 cat $phase1b_out | while read evt frame extr x y prob
 do
     ((++frame))  #We display the SECOND frame of the difference.  Important?
@@ -78,12 +113,12 @@ do
 	#Dont rely of an existing var. for the width
 	radpix=$(numquotintnz $(widthOfBmp ${inbmpPaName}) ${BABY_MOVIE_CIRCLE_RAD_DIV})
         ct=$(numquotintnz $radpix 6) #circle thickness
-	firsttime=0
+	firsttime=0 #will use firsttime again to time convert
     fi
 
     #if (( $frame %5 == 0 ))
     #then
-    #echo "processing frame number" $frame
+    #	echo "processing frame number" $frame
     #fi
 
 #    i=$((x-9))  ##scaling?  maybe 9 could remain unscaled
@@ -108,15 +143,27 @@ do
    if [ -r $inbmpPaName ] #check because offsets might point us to non-existant frames! 
    then
 
-       	if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
-	then
-	    #This renames frameNNNNNN.bmp to picNNNNNN.bmp
-	    mv  ${inbmpPaName} ${outbmpPaName}
-	    #And this directs Imagemagick to input picNNNNN.bmp
-	    #so when drawing circles, it replaces the contents.
-	    inbmpPaName=${outbmpPaName}
-	fi
+       #Try, instead of renaming so convert uses the same filename for in and out,
+       #input from thumb.., output to pic..., and deleted thumb after convert call
+       #We'll see if there is less thrashing
+       #if [ ${KEEP_BABY_BMPS}XXX != yesXXX ]
+       #then
+       #
+       #   see below
+       #
+       #fi
 	
+       if [ ${TRY_CONVERT_picbmp_TO_picbmp}xyz = yesxyz ]
+       then
+	   mv  ${inbmpPaName} ${outbmpPaName}
+	   #This renames frameNNNNNN.bmp to picNNNNNN.bmp
+	   inbmpPaName=${outbmpPaName}
+	   #And this gives Imagemagick/convert picNNNNN.bmp
+	   #for both input and output,
+	   #so when drawing circles, it seems to replace the contents.
+       fi
+
+
        
 	BITMAP_EDIT_CMD="convert ${inbmpPaName} "
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha remove "
@@ -124,26 +171,50 @@ do
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -draw 'circle $i,$j $k,$l' "
 	BITMAP_EDIT_CMD="${BITMAP_EDIT_CMD} -alpha off ${outbmpPaName}"
 
-	eval $BITMAP_EDIT_CMD
+	#Time a few Imagemagic commands, not the first, because
+	#each costs a NEW PROCESS.  (An Imagemagic server would be cool, and
+	#running this loop in a modern interpeter having an imagemagic api
+	#would be best.  Perhaps we can do this all with the ffmpeg draw filter,
+	#if we can get it to read params from a file, one read for each frame.
 
-	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
-	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
+	#if (( $frame %1500 == 0 ))
+	if (( frame > time_convert_after ))
+	then
+	    time_convert_after=$((time_convert_after + time_convert_after_incr))
+	    time_convert_after_incr=$((time_convert_after_incr + 1 + time_convert_after_incr / 2))
+	    #echo $time_convert_after '(next) + ' $time_convert_after_incr
+	    echo "(Timing) Imagemagick on 1b selected decimated movie frame "$frame
+	    #We must use eval or else Imagemagick gets circle, $i, etc as separate params.
+	    eval $time_cmd_prefix $BITMAP_EDIT_CMD
+	else
+	    eval $BITMAP_EDIT_CMD
+	fi
 
-
+	#Don't bother saving nohow since it differs little from outbmpPaName img
+	if [ ${inbmpPaName} != ${outbmpPaName} ]
+	   #whoops! when we TRY_CONVERT_picbmp_TO_picbmp, cheap direct problem sol'n if code.
+	then
+	    rm ${inbmpPaName}
+	fi
 	
+	
+#	temp=$(cat ${RESULTS_DIR}/foutcount); ((temp++)); echo $temp > ${RESULTS_DIR}/foutcount
+#	echo -n $'\r'"BabyFrame${temp}isOrigFrame${frame}" #cooler progress indicator.
+
    else
     	echo "Warning BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}"
     	echo "WARN: BABYMOVIE maker tried to use the non-existant frame ${inbmpPaName}" >> $LOG
    fi
 done
+echo "TIME: To draw circles into .bmps w/Imagemagick took " $(numdif $(uptimenow) $sttime) " sec." >> ${LOG}
 
-
-bmfcount=$(cat ${RESULTS_DIR}/foutcount)
-rm ${RESULTS_DIR}/foutcount
+#bmfcount=$(cat ${RESULTS_DIR}/foutcount)
+#rm ${RESULTS_DIR}/foutcount
 
 echo  
-echo "Breaking Lue's NDA...make a movie of them ${bmfcount} frames. Watch in ffmpeg's xterm."
-echo "INFO: ${bmfcount} baby movie frames." >> $LOG
+#echo "Breaking Lue's NDA...make a movie of them ${bmfcount} frames. Watch in ffmpeg's xterm."
+#echo "INFO: ${bmfcount} baby movie frames." >> $LOG
+echo "Breaking Lue's NDA...make a movie of them. Watch in ffmpeg's xterm."
 # cwd is ${BITMAPS_DIR}
 #We just had added the pic*.bmp frames for the 'baby movie'
 EXT="MOV" #NOT same as ext above!
@@ -197,11 +268,21 @@ popd
 
 
 echo 'in' $(pwd) code-BABYMOVIE-BMP.h.sh done 
-#as before, the shared shell parameter holding the symlinks name is
-# ${RESULTS_DIR}/{moviePrefix}.${EXT}
-# We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
 
-
+if [ ${ALLOW_THRASHING_BABIES}wawa != yeswawa ]
+then   
+    ${SOFTWARE_DIR}/semup BABYMAKER
+    (echo -n semup BABYMAKER ' ' ; date) | cat >> ${LOG}
+    (echo -n semup BABYMAKER ' '; date)
+    #as before, the shared shell parameter holding the symlinks name is
+    # ${RESULTS_DIR}/{moviePrefix}.${EXT}
+    # We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
+else
+    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER FINISHED
+    date
+    echo -n TIME: A COMPETITIVE BABY MAKER FINISHED '  ' >> ${LOG}
+    date >> ${LOG}
+fi
 
 #ffmpeg docs:
 #

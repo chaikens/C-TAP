@@ -9,4 +9,6 @@ bash: pa: parameter null or not set
 When building software, resolve missing libraries by installing their -dev package,
 runtime package is not sufficient.
 
+scp globbing, use single quotes to stop local shell filename substitution:
+scp 'ctap@lux.physics.albany.edu:/media/ctap/BENCAM-COPY/PP-2025-01-30/N*.mp4' .
 

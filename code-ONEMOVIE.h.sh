@@ -119,6 +119,12 @@ then
 
     cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
     #So stage loop can append results.
+
+    cat /dev/null > ${RESULTS_DIR}/ffmpeg.log
+    #We use ffmpeg_pipe_extract twice in the new baby pipeline architecture,
+    #so we don't want to make it start ffmpeg.log with &>, but
+    #we don't want to clutter it with previous movie entries.
+    
     if [ $ARCHITECTURE = "framefile" ]
     then
 	source "${SOFTWARE_DIR}/code-FRAMEFILE-EXTRACT-1A.h.sh"
@@ -316,7 +322,12 @@ then
     if [ $phase1b_failed"wawa" = "nowawa" ]
     then
 	echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
-	source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
+	if [ ${NEW_BABY_DEVEL} = "yes" ]
+	then
+	    source "${SOFTWARE_DIR}/code-BABYMOVIE-ALL-INCL-BITMAP.h.sh"
+	else
+	    source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
+	fi
     fi
 else
     echo "No baby movie today, someone said no."

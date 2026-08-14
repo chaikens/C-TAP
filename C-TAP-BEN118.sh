@@ -10,7 +10,26 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
-FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
+NEW_BABY_DEVEL=yes
+
+
+function xterm()
+{
+    echo
+    echo INFO: Not starting xterm log monitor. Do manually with:
+    echo '(but you must quote the #colors and (-ied) names)'
+    echo xterm $@
+    echo
+}
+
+TRY_CONVERT_picbmp_TO_picbmp=yes
+ALLOW_THRASHING_BABIES=yes
+
+KEEP_BABY_BMPS=no
+KILL_OUR_XTERMS_ONE_DONE=yes
+
+FAST_MOVIE_DIR=/dev/shm/TMPMOVIES
+FAST_FILESYS_DIR_IF_USED=/data/CTAP/scratch #"/media/seth/TerabyteSandisk/CTAP"
 #these are used even for pipeline arch, where
 #the BITMAP dir is used for the BABY MOVIE
 BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir 
@@ -24,12 +43,6 @@ ARCHITECTURE="pipeline"
 #"framefile" #vs pipeline
 
 
-
-
-
-
-
-
 ###########END OF YOUR-SYSCONF###
 source code-SYSCONFIG.h.sh      #
 #################################
@@ -41,15 +54,10 @@ echo YOUR-MOVIES-$JOBNAME       #
 #####################################################################
 ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 
+SLOW_MOVIE_DIR=/media/seth/CTAP/MOVIES/PP-2025-01-18
+#movie_files=$(echo ${SLOW_MOVIE_DIR}/*main_20250207{01,02,03,04,17,18,19,20,21,22}*.mp4)
+movie_files=$(echo ${SLOW_MOVIE_DIR}/N*.mp4)
 
-
-
-
-
-
-SLOW_MOVIE_DIR=/media/seth/BENCAM-COPY/2025-01-18
-#movie_files=$(echo ${SLOW_MOVIE_DIR}/*main_20250117{18,19,20,21,22,23}*.mp4)
-movie_files=$(echo ${SLOW_MOVIE_DIR}/*.mp4)
 
 
 
@@ -65,35 +73,40 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+#OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+
+############ Vary CamSett.txt settings here! #########
+#
+#Our diff from Camsett.ext is the max y cood clipping
+#is adjusted to add speed advantage to the new ground hugging
+#clipping we now have.  The exclusion zone is activated by
+#setting --camera-index 2
 
 
+cat > tempCamSett.txt <<EOF
+smallestThr= 0
+biggestThr= 254
+smallestPix= 0
+biggestPix= 67
+SkewGaussAmpl= 0.633
+SkewGaussXi= 1.97
+SkewGaussOmega= 1.89
+SkewGaussAlpha= 2.5
+NumPixAbvThrSumMin= 0
+NumPixAbvThrSumMax= 3
+SubThr= 20
+RewFram= 0
+ForFram= -2
+FramBefNew= 1
+FracYes= 1.0
+CROP_XI= 0
+CROP_XF= 858
+CROP_YI= 0
+CROP_YF= 1919
+mainThreshold= 14
+EOF
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
 #Not done yet: when we specify pipelining here, and include the below
 #analysis options, that is what is done.
@@ -115,7 +128,14 @@ OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 #for HALF-RESOLUTION with DECIMATION extraction.
 #Also, the 2nd filter setpts is set presentation timestamps
-FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
+FFMPEG_EXTRACT_FILTER=""
+# HPP means we use (P)re-(P)rocessed input:
+# 1. ORIGINAL frame numbering __before__ decimation
+# 2. scaling
+# 3. decimation,
+# also recoding from HEVC to AVC (default due to ffmpeg)
+# NOT
+# "-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
@@ -135,13 +155,14 @@ FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/1
 #     #In the Phase1a C++ program, we wrote an exclusion zone function for DroneShort1,
 #     #and also named a camera for it.
 
-#for HALF FRAME, (DECIMATED) extraction.
+#for HALF FRAME, (DECIMATED) extraction
+#PREPROCESSING produced this here
 
-MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
-MOVIE_SCALE_OPTION="--movie-scale 2"
+MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
+MOVIE_SCALE_OPTION="--movie-scale 1"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--camera-index 1"
+OTHER_OPTIONS="--camera-index 2"
 
 #In the Phase1a C++ program, we wrote
 #an exclusion zone function for DroneShort1,
@@ -149,7 +170,7 @@ OTHER_OPTIONS="--camera-index 1"
      
 ##### Explain your run into the log at top and for each movie###
 
-RUN_EXPLANATION="ffmpeg .mp4---->Half len/wid decimated frame (ffmpeg filter) .yuv raw (our table based YUVtoBMP pipeline)----->.bmp sequence -----> (Phase1aPipe) (redirects to/from files) > movie.int > (Phase1bPipe) > file.out  This is coded by $0"
+RUN_EXPLANATION="Pre numbering and decimation."
 
 echo $RUN_EXPLANATION
 

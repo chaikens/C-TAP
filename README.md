@@ -51,3 +51,15 @@ the beginning of developing support for clipping in terms
 of arbitrary image resolutions instead of 1920x1040 only.
 That is in progress on the devel-scaling branch.
 
+Developed on Ubuntu. 
+Packages required for just the FLIR algorithm:
+git
+gcc
+g++
+ffmpeg
+imagemagick
+xterm
+
+Optional:
+YUView (to display the yuv 420p to bgr conversion table we build)
+

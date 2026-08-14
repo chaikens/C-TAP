@@ -16,6 +16,14 @@ fi
 # defaults
 #
 
+NEW_BABY_DEVEL=no
+
+
+# variations for performance improving development
+TRY_CONVERT_picbmp_TO_picbmp="no"  # see code-BABYMOVIE-BMP.h.sh
+ALLOW_THRASHING_BABIES="no"        # yes will disable semaphore mutexing of baby making.
+#IDEA!! Use >1 initialize semaphore to limit HOW MANY baby makers compete!
+
 xterm_ffmpeg_pid=  #empty, store single pid so we can test and eventually kill
 
 KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
@@ -70,6 +78,13 @@ BITMAPS_PARENT_DIR=$(pwd)
 BITMAPS_DIR_NAME="bitmaps"
 
 SLOW_MOVIE_DIR=$(pwd)
+
+FAST_MOVIE_DIR=
+#Set this so that when the next movie is to be done,
+#it is copied to a faster dir, used from there, and
+#the copy is deleted when done.
+
+#In no case do we delete the original copy.
 
 #for ARCHITECTURE=pipeline only
 PIPE_DIR=${SOFTWARE_DIR}

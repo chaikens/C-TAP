@@ -10,14 +10,26 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
+function xterm()
+{
+    echo
+    echo INFO: Not starting xterm log monitor. Do manually with:
+    echo '(but you must quote the #colors and (-ied) names)'
+    echo xterm $@
+    echo
+}
+
+TRY_CONVERT_picbmp_TO_picbmp=yes
+ALLOW_THRASHING_BABIES=yes
+
 KEEP_BABY_BMPS=no
 KILL_OUR_XTERMS_ONE_DONE=yes
 
-FAST_MOVIE_DIR=/dev/shm/TMPMOVIES
-FAST_FILESYS_DIR_IF_USED="/media/seth/TerabyteSandisk/CTAP"
+FAST_MOVIE_DIR=
+FAST_FILESYS_DIR_IF_USED=/data/CTAP/scratch
 #these are used even for pipeline arch, where
 #the BITMAP dir is used for the BABY MOVIE
-BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir 
+BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir
 BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
@@ -50,10 +62,11 @@ ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 
 
 
-
-SLOW_MOVIE_DIR=/media/seth/TerabyteSandisk/2025-01-20
+SLOW_MOVIE_DIR=`pwd`
+#SLOW_MOVIE_DIR=/media/seth/TerabyteSandisk/2025-01-20
 #movie_files=$(echo ${SLOW_MOVIE_DIR}/*main_20250117{18,19,20,21,22,23}*.mp4)
-movie_files=$(echo ${SLOW_MOVIE_DIR}/*.mp4)
+#movie_files=$(echo ${SLOW_MOVIE_DIR}/*.mp4)
+movie_files=$(echo ${SLOW_MOVIE_DIR}/DS.mp4)
 
 
 
@@ -69,7 +82,7 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-
+#OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
 biggestThr= 254
@@ -94,7 +107,7 @@ mainThreshold= 14
 EOF
 
 OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
-
+ 
 
 
 
@@ -142,7 +155,7 @@ OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
 #for HALF-RESOLUTION with DECIMATION extraction.
 #Also, the 2nd filter setpts is set presentation timestamps
-FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB,drawtext=fontfile=arial.ttf:text=%{n}:x=(w-tw)-70:y=(2*lh)-30:fontcolor=white:box=1:boxcolor=0x00000099:fontsize=30" 
+FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
@@ -168,7 +181,7 @@ MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
 MOVIE_SCALE_OPTION="--movie-scale 2"
 PIXPROC_SCALE_OPTION="--pixproc-scale 1"
 USER_SCALE_OPTION="--user-scale 1"
-OTHER_OPTIONS="--camera-index 2"
+OTHER_OPTIONS="--camera-index 1"
 
 #In the Phase1a C++ program, we wrote
 #an exclusion zone function for DroneShort1,
