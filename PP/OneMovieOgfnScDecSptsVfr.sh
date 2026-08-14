@@ -2,7 +2,9 @@
 
 FF=ff
 
-FFOPT="-hide_banner -loglevel error"
+FFOPT=
+#Keep logs for experimentation.
+#FFOPT="-hide_banner -loglevel error"
 #We also used -threads 4 and got a small speedup when
 #running 2 jobs on the 8 processor 14 year old lux computer.
 
@@ -12,7 +14,7 @@ dstdir=$3
 
 mkdir -p $dstdir
 
-${FF}mpeg  -i $srcdir/$movie -an -filter:v 'drawtext=fontfile=arial.ttf:text=%{n}:x=(w-tw)-140:y=(2*lh)-80:fontcolor=white:box=1:boxcolor=0x00000099:fontsize=60,scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate=cycle=5,setpts=N/100/TB' -vsync vfr -y $dstdir/$movie &>>${dstdir}/${movie}.log
+${FF}mpeg  ${FFOPT} -i $srcdir/$movie -an -filter:v 'drawtext=fontfile=arial.ttf:text=%{n}:x=(w-tw)-140:y=(2*lh)-80:fontcolor=white:box=1:boxcolor=0x00000099:fontsize=60,scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate=cycle=5,setpts=N/100/TB' -vsync vfr -y $dstdir/$movie &>>${dstdir}/${movie}.log
 
 
 #varients we tried during experimentation.  Originally, we did preprocessing
