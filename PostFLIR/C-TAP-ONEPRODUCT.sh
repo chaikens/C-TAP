@@ -2,36 +2,43 @@
 
 set -u
 
+bads_filename=`pwd`/BAD_LOGS
+
 r_dir=$1 #RESULTS-<jobname> dir with run numbered files
 r_basename=$(basename $r_dir)
 
+
+hour=$2
+
 #echo $r_basename
 
-p_par=$2 #Where to create PRODS-<jobname> dirs with cleanly named product files
+p_par=$3 #Where to create PRODS-<jobname> dirs with cleanly named product files
 #echo $p_par
 
 p_basename=${r_basename/RESULTS/PRODS}
 #echo $p_basename
-mkdir  -p ${p_par}
+#mkdir  -p ${p_par}
 
 #Worry if we already did this
-if ! mkdir  ${p_par}/$p_basename
-then
-    echo Somethings Wrong..cleanly renamed copying should be done only
-    echo once.  If intentional, delete old ${p_par}/${p_basename} and rerun.
-    exit
-fi
+#if ! mkdir  ${p_par}/$p_basename
+#then
+#    echo Somethings Wrong..cleanly renamed copying should be done only
+#    echo once.  If intentional, delete old ${p_par}/${p_basename} and rerun.
+#    exit
+#fi
 
 destd=$(realpath ${p_par}/$p_basename)
 #echo $destd
 
 jobname=${r_basename/RESULTS-/}
+date=0${jobname/BEN/}
 #echo Writing clean FLIR product dir ${destd} of $r_dir
 
 
 pushd $r_dir > /dev/null
-logs=$(ls *.log.0)
-#echo $logs
+pwd
+logs=$(ls N*main_2025${date}${hour}*.log.0)
+echo $logs
 #echo
 for log in $logs
 do
@@ -48,6 +55,7 @@ do
 #    echo $logn
 #    echo
     lslogn=$(ls ${m}*.$logn)
+    echo $lslogn
     nrs=$(echo $lslogn | wc -w)
     if [ $nrs = 8 ]
     then
@@ -68,14 +76,9 @@ do
 	echo
 	echo
 	echo SOMETHINGS WRONG WITH $log
-	echo NO COPYING DONE
-	echo CHECK and HANDLE MANUALLY
+	echo $log >> ${bads_filename}
+	echo $log >> BAD_LOGS
 	echo
 	echo
     fi
 done
-
-
-
-
-
