@@ -55,7 +55,9 @@ echo YOUR-MOVIES-$JOBNAME       #
 ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 
 SLOW_MOVIE_DIR=/media/seth/SilverOrig/PP-2025-04-28
-#movie_files=$(echo ${SLOW_MOVIE_DIR}/*main_2025-mm-dd{21,22,23}*.mp4)
+#movie_files=$(echo ${SLOW_MOVIE_DIR}/N*main_2025mmdd{04,17,18,19,20,21,22,23}*.mp4)
+#------------------------------------------------0428------------------------------
+#  HERE YYYYMMDD must be 8 adjacent digits--no hyphens unlike our dir names.
 movie_files=$(echo ${SLOW_MOVIE_DIR}/N*.mp4)
 
 

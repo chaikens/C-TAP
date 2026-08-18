@@ -12,6 +12,7 @@ do
     echo $mov
     mov=$(basename $mov)
     echo $mov
+    echo OneMovie.sh Two ffmpegs: 1. OrigFn, decimate. 2. Draw Fn on decimated.  
     date
     OneMovie.sh $DIR $mov $DESTDIR
 done
