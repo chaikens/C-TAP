@@ -12,13 +12,13 @@ cd ${SOFTWARE_DIR}
 phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
 #
 #####################
-if ! make ${PHASE_1a} ${phase1b} semaphores
+if ! make --quiet ${PHASE_1a} ${phase1b} semaphores
 then
     echo make the C++ progs in C-TAP we need failed.  Check this out.
     exit 1
 fi
 
-if ! make -C ${SOFTWARE_DIR}/FrameExtractProcess
+if ! make --quiet -C ${SOFTWARE_DIR}/FrameExtractProcess
 then
     echo make the C++ progs in C-TAP/FrameExtractProcess we need failed.  Check this out.
     exit 1
@@ -62,26 +62,41 @@ then
     fi
 fi
 
-numMovieFiles=`ls $movie_files | wc -l`
+#echo DEBUG: calculating numMovieFiles
+mf_list=$(ls $movie_files 2>/dev/null)
+if [ $? != 0 ]
+then
+    echo Cannot find the movie files matching your pattern:
+    echo
+    echo $movie_files
+    echo
+    echo Giving up on $JOBNAME, exiting, bye bye.
+    exit 1
+fi
 
-echo "We will process this (these) $numMovieFiles movie file(s)."
+numMovieFiles=$(echo $mf_list | wc -w )
+echo "We will process this (these) size reported $numMovieFiles movie file(s)."
 
 
 #echo $movie_files
-ls $movie_files
+ls -hs $movie_files
 if [ $? != 0 ]
 then
    echo Trying to find the movies you requested.
    echo Some error when commanding ls these arguments:
    echo $movie_files
+   echo
+   echo Somethings weird, this error should have caused us to exit earlier.
+   exit 1
 fi
 
 o=0
 for movie_file in $movie_files
 do
     ((++o))
+    echo
+    echo "NEXT: Begin processing $o of $numMovieFiles movie file(s)"
     echo $(date)
-    echo "Begin processing $o of $numMovieFiles movie file(s)"
 
     precopy_movie_file=$movie_file
     

@@ -1,12 +1,15 @@
 echo SOURCED: code-SYSCONFIG.h.sh
 
 
-if [ $ARCHITECTURE = "pipeline" && ${NEW_BABY_DEVEL} = "yes" ]
+if [ $ARCHITECTURE = "pipeline" ]
 then
-    if ! mkdir -p $BITMAPS_DIR
+    if [ ${NEW_BABY_DEVEL} = "no" ]
     then
-	echo Cant make BITMAPS_DIR $BITMAPS_DIR
-	exit 1
+	if ! mkdir -p $BITMAPS_DIR
+	then
+	    echo Cant make BITMAPS_DIR $BITMAPS_DIR
+	    exit 1
+	fi
     fi
 fi
 
