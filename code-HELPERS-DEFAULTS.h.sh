@@ -115,6 +115,10 @@ function kill_our_xterms() {
 
 function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
+
+#the exiting skit is clumsy on slow ssh connections, so we don't do it for now
+exit 0
+
 echo "See the results in the xterms."
 cd ${start_dir}
 if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]

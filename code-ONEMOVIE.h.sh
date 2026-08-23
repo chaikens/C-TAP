@@ -38,7 +38,12 @@ chmod 644 $RESULTS_DIR/$0.$logn
 #Good for later visualization operations, to get at the original movie.
 pushd ${RESULTS_DIR} > /dev/null
 ln -s ${precopy_movie_file} ${FileName}.${logn}
-ln -s $BITMAPS_DIR ${BITMAPS_DIR_NAME}.${logn}
+
+if [ ${BITMAPS_DIR:-none} != none ]
+then
+    ln -s $BITMAPS_DIR ${BITMAPS_DIR_NAME}.${logn}
+fi
+
 popd > /dev/null
 
 LOG=${RESULTS_DIR}/$moviePrefix.log.$logn

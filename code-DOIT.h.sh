@@ -12,6 +12,16 @@ cd ${SOFTWARE_DIR}
 phase1b="Phase1bPipeOpt" #compiled from FLIRanalysisPhase1bCamXPipeOpt.cpp, alongside us.
 #
 #####################
+
+if ! make --quiet -C ${SOFTWARE_DIR}/src/BabyPiper BabyFilter
+then
+   echo make the C++ progs in ${SOFTWARE_DIR}/src/BabyPiper failed.  Check this out.
+   exit 1
+fi
+   
+
+
+
 if ! make --quiet ${PHASE_1a} ${phase1b} semaphores
 then
     echo make the C++ progs in C-TAP we need failed.  Check this out.
@@ -22,16 +32,6 @@ if ! make --quiet -C ${SOFTWARE_DIR}/FrameExtractProcess
 then
     echo make the C++ progs in C-TAP/FrameExtractProcess we need failed.  Check this out.
     exit 1
-fi
-
-if [ $ARCHITECTURE = "framefile" ]
-then
-    
-    if ! mkdir -p $BITMAPS_DIR
-    then
-	echo "Cant make BITMAPS_DIR $BITMAPS_DIR"
-	exit 1
-    fi
 fi
 
 if ! mkdir -p $RESULTS_DIR

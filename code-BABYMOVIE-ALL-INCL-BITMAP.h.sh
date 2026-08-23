@@ -52,9 +52,15 @@ EXT="MOV" #NOT same as ext above!
     #We use a movie name suffixed with .MOV so ffmpeg and ffplay know its type,
     #but we eventually keep the file named .MOV.${logn} and symlink .MOV to it.
 
+
+
 generic_baby_movie_name="${moviePrefix}.${EXT}"      #ffmpeg uses the (now) .MOV suffix to pick the format.
 baby_movie_logn="${generic_baby_movie_name}.${logn}" #movies are stored with run number suffix, and
-                                                     #eventually  <name>.MOV is symlinked to the last movie file.
+
+
+#eventually  <name>.MOV is symlinked to the last movie file.
+rm -f $RESULTS_DIR/${generic_baby_movie_name}
+
 
 if [ ${ARCHITECTURE} = "pipeline" ]
 then
@@ -255,7 +261,7 @@ mv $generic_baby_movie_name $baby_movie_logn  #rename what we save
 #so we make the symbolic link.  It will link to the most recently made movie.
 ln -s $baby_movie_logn $generic_baby_movie_name
 #In addition to this, we generate command ffplay -f mov ..
-    
+
 popd 
 
 
