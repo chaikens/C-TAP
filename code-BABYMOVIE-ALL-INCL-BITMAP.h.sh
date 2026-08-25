@@ -277,7 +277,7 @@ then
     # ${RESULTS_DIR}/{moviePrefix}.${EXT}
     # We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
 else
-    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER FINISHED
+    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER FINISHED '  '
     date
     echo -n TIME: A COMPETITIVE BABY MAKER FINISHED '  ' >> ${LOG}
     date >> ${LOG}
