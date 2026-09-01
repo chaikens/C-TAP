@@ -117,7 +117,6 @@ function exit_greeting() {
 echo "True, full consciousness can now be reasserted by you poor human user."
 
 #the exiting skit is clumsy on slow ssh connections, so we don't do it for now
-exit 0
 
 echo "See the results in the xterms."
 cd ${start_dir}
@@ -170,6 +169,7 @@ else
 	echo To cwd to RESULTS dir ${RESULTS_DIR}, type source m '(or . <space> m)'
 	echo
 fi
+stty echo
 exit 0
 }
 

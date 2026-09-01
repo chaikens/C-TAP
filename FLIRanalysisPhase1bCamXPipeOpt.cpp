@@ -98,7 +98,7 @@ selected by this program.  As noted below, the lines are grouped into clusters.
   
   - cluster number  (may be repeated, clusters of events are numbered successively)
   - number of first frame  (of one event)
-  - signed pixel diff with max abs value
+  - signed pixel intensity diff with max abs value
   - x, y coords of the pixel with diffs max abs value
   - naive bayisan classifier score range 0 to  1 corresponds to a 
     prediction quality ranging from garbage to a real thing.
@@ -220,7 +220,7 @@ int main ( int argc, char** argv ) {
     biggestPix = 300; //200 is min allowed to catch object at 09:20:48-50am in CamA4 (July 15)
   }
   else {
-    smallestThr = (int)CamSett[0];
+    smallestThr = (int)CamS                      ett[0];
     biggestThr = (int)CamSett[1];
     smallestPix = (int)CamSett[2];
     biggestPix = (int)CamSett[3];
@@ -254,7 +254,7 @@ int main ( int argc, char** argv ) {
     SkewGauss[1] = CamSett[5]; //Xi, mu
     SkewGauss[2] = CamSett[6]; //Omega, sig
     SkewGauss[3] = CamSett[7]; //Alpha, skew
-  }
+  }                                                                                                                                                                                                                                                                                                                                      
   else {
     SkewGauss[0] = 0.673;
     SkewGauss[1] = 2.;
@@ -272,8 +272,7 @@ Line4 Value=0.633(ignored Key =SkewGaussAmpl=)
 Line5 Value=1.97(ignored Key =SkewGaussXi=)
 Line6 Value=1.89(ignored Key =SkewGaussOmega=)
 Line7 Value=2.5(ignored Key =SkewGaussAlpha=)
-Line8 Value=0(ignored Key =NumPixAbvThrSumMin=)
-Line9 Value=3(ignored Key =NumPixAbvThrSumMax=)
+Line8 Value=0(ignored Key =NumPixAbvThrSumMin=)                                                                                   Line9 Value=3(ignored Key =NumPixAbvThrSumMax=)
 Line10 Value=20(ignored Key =SubThr=)
 Line11 Value=0(ignored Key =RewFram=)
 Line12 Value=-2(ignored Key =ForFram=)
