@@ -169,8 +169,14 @@ else
 	echo To cwd to RESULTS dir ${RESULTS_DIR}, type source m '(or . <space> m)'
 	echo
 fi
+
+#
+# THIS IS WEIRD
+# Somehow, we end up with -echo in terminal settings at this point.
+#Why is a mystery.  There are commented out DEBUG operations that had
+#been used to try to sort this out.  I'm giving up on this for now
+#
 stty echo
-exit 0
 }
 
 

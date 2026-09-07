@@ -150,8 +150,10 @@ do
 	
 done
 
+#exit_greeting doesn't exit now.
 exit_greeting
 
+exit 0
 
 
 # buy a Mac or install Linux. Just kidding (But get Ubuntu for Windows!)
