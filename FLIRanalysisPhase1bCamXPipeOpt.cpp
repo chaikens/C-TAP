@@ -66,8 +66,10 @@ Explanation of input, saved in (for now) moviename.int file:
   shown grouped and explained::
 
 +-----------------------------------------------------------------------------+
-| data[i] index below used to read in the .int file                           |
-| store[i][MaxNumFrames] store is the array of vectors storing .int in memory.| 
+| data[j] index below used to read in the .int file                           |
+| store[i][MaxNumFrames] store is the array of vectors storing .int in memory.|
++----------+---------------+--------------------------------------------------+
+| j        |example val(s) |     explanation                                  |
 +----------+---------------+--------------------------------------------------+
 | 0        |     4         | difference frame number from Frame_i-Frame_(i-1) |
 +----------+---------------+--------------------------------------------------+
@@ -220,7 +222,7 @@ int main ( int argc, char** argv ) {
     biggestPix = 300; //200 is min allowed to catch object at 09:20:48-50am in CamA4 (July 15)
   }
   else {
-    smallestThr = (int)CamS                      ett[0];
+    smallestThr = (int)CamSett[0];
     biggestThr = (int)CamSett[1];
     smallestPix = (int)CamSett[2];
     biggestPix = (int)CamSett[3];
