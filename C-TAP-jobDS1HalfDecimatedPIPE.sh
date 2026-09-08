@@ -10,6 +10,19 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
+#Omitting Phase1a omits detecting widthXheight from
+#the input movie, so we set them (unreliably) by
+#hand since they are needed baby movie making.
+#(We could program baby movie making to do this
+#when (in fileframe) it accesses bitmaps
+#or   (in pipeline) it accesses the movie to yuvstream
+# ffmpeg filter.  But for now we just hack for
+#DS1 Half-decimation
+PHASE_1a_RESULT_OLD_N_OR_NONE=2
+width=1920
+height=1080
+
+
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 #these are used even for pipeline arch, where
 #the BITMAP dir is used for the BABY MOVIE
@@ -18,7 +31,6 @@ BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
 PHASE_1a=F1a.orig
-PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 ARCHITECTURE="pipeline"
 #"framefile" #vs pipeline
@@ -56,7 +68,33 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+#OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+
+cat > tempCamSett.txt <<EOF
+smallestThr= 0
+biggestThr= 254
+smallestPix= 0
+biggestPix= 67
+SkewGaussAmpl= 0.633
+SkewGaussXi= 1.97
+SkewGaussOmega= 1.89
+SkewGaussAlpha= 2.5
+NumPixAbvThrSumMin= 0
+NumPixAbvThrSumMax= 3
+SubThr= 20
+RewFram= 0
+ForFram= -2
+FramBefNew= 1
+FracYes= 1.0
+CROP_XI= 0
+CROP_XF= 858
+CROP_YI= 0
+CROP_YF= 1919
+mainThreshold= 14
+EOF
+
+OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
+
 
 #The FLIR Algorithm requires the frame sequence to be decimated.
 #So, frame times get lost when extracted!

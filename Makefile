@@ -1,7 +1,7 @@
 all : F1a.orig F1a.all F1a.orig.backwards Phase1bPipeOpt semaphores
 
-CXXFLAGS = -O3
-#CXXFLAGS = -g
+#CXXFLAGS = -O3
+CXXFLAGS = -g
 
 semaphores:
 	$(MAKE) -C src/semaphores
