@@ -136,7 +136,7 @@ then
     # Also, this ensures xterm's tail doesn't fail.
 
     #xterm -geometry 200x30+0+500 -title 'Phase 1a (.int file) output'  -e tail -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
-    xterm -bg '#E0E0FF' ${XTERM_PARAM} -geometry 200x30+0+542 -title 'Phase 1a (.int file) output'  -e less +F -f ${RESULTS_DIR}/${RESULT_OF_1a_BASE} -s 0.1 &
+    xterm -bg '#E0E0FF' ${XTERM_PARAM} -geometry 200x30+0+542 -title 'Phase 1a (.int file) output'  -e less +F ${RESULTS_DIR}/${RESULT_OF_1a_BASE} &
     xterm_pids+=" $!" #for killing 'em
 
     #That's where the C++ image processors expect us to be
