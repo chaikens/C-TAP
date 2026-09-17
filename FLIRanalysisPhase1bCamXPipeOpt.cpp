@@ -135,8 +135,8 @@ pixCoord Mscale = 1; //original movies
 pixCoord Pscale = 1; //pixel processing
 pixCoord Uscale = 1; //user specification of clipping and exclusion zones
 const char *CamSett_file = "CamSett.txt"; //in cwd
+char *Vf = 0; //from cmd line --verbose-file option
 int pipeline = 0;  //option
-
 //Setting of not supported yet.
 //Only the Custom camera is used in this version of Phase1b
 //But now, in Phase1a, we use camera_index to select the exclusion zone 
@@ -155,6 +155,16 @@ int main ( int argc, char** argv ) {
   mycmdname = argv[0];
   get_our_options(&argc, &argv);
 
+  ofstream Vs,VKeys,VGs,VGKeys;
+  
+  if(Vf) {
+    string Vf_str(Vf);
+    Vs.open(string(Vf)); //Vf_str);  //Verbose frame-by-frame C++ ostream
+    VKeys.open(string(Vf).append(".key")); //Key for the above
+    VGs.open(string(Vf).append(".global")); //Verbose Global
+    VGKeys.open(string(Vf).append(".global.key")); //Key for the above
+  }
+  
   double data[26]; //for reading Phase1a .int data. Read as doubles but hard coded
   //casts are done to int types are done below.
   vector<double> store[26]; //Store ALL Phase1a data. store[i] is the i'th column
@@ -307,6 +317,28 @@ Line19 Value=14(ignored Key =mainThreshold=)
   cerr << endl;
   cerr << "level=Command argument[3]=" << level << endl << endl;
 
+  if(Vf ) {
+    VGs << SubThr << ", ";                            VGKeys << "Subthr, ";
+    VGs /*<< "RewFram="*/ << RewFram << ", ";         VGKeys << "RewFram, ";
+    VGs /*<< "ForFram="*/ << ForFram << ", ";         VGKeys << "ForFram, ";
+    VGs /*<< "FramBefNew="*/ << FramBefNew << ", ";   VGKeys << "FramBeNew, ";
+    VGs /*<< "FracYes="*/ << FracYes << ", ";         VGKeys << "FracYes, ";
+
+    VGs /*<< "smallestThr="*/ << smallestThr << ", "; VGKeys << "smallestThr, ";
+    VGs /*<< "biggestThr="*/ << biggestThr << ", ";   VGKeys << "biggestThr, ";
+    VGs /*<< "smallestPix="*/ << smallestPix << ", "; VGKeys << "smallestPix, ";
+    VGs /*<< "biggestPix="*/ << biggestPix << ", ";   VGKeys << "biggestPix, ";
+
+    /*<< "Skew Gaussian Params:"*/
+    VGs /*<< "SkewGaussAmpl"*/ << SkewGauss[0] <<", ";VGKeys << "SkewGaussAmpl, "; 
+    VGs /*<< "SkewGaussXi"*/ << SkewGauss[1] << ", "; VGKeys << "SkewGaussXi, ";
+    VGs /*<< "SkewGaussOmega"*/ << SkewGauss[2]<<", ";VGKeys << "SkewGaussOmega, ";
+    VGs /*<< "SkewGaussAlpha"*/ << SkewGauss[3]<<", ";VGKeys << "SkewGaussAlpha, ";
+    VGs /*<< "level=Command argument[3]="*/ << level; VGKeys << "level, ";
+
+  }
+
+
   long NumFrames = 0;
 
   //
@@ -351,6 +383,7 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	  }
       }
   }
+  // End of First Frame-pair loop.
 
   if (NumFrames == MaxNumFrames) {
     cerr << "INFO: Phase1b .int line reading stopped after reaching maximum param " << NumFrames << endl;
@@ -377,7 +410,15 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	  OverallAverage,
 	  OverallStdDev);
 
+  if(Vf) {VGs << ", " << OverallStdDev; VGKeys << "OverallStdDev";}
+
+  
+  if(Vf){
+    VGs << ", " << OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5;
+    VGKeys << ", (OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5) [for MinThr calc]";
+  }
   int MinThr = std::max(int(floor(OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5)),smallestThr);
+  if(Vf) {VGs << ", " << MinThr; VGKeys << ", MinThr"; }
   //33 for over-fit to initial test
   if ( MinThr > 43 && camera == "B1" ) MinThr = 43;
   int MaxThr = biggestThr;
@@ -400,8 +441,13 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	  SubThr,
 	  GlobPixMean[6],
 	  GlobPixSigma);
+
+  if(Vf) {VGs << ", " << GlobPixSigma; VGKeys << ", GlobalPixSigma"; }
+
+  if(Vf) {VGs << ", " << GlobPixMean[6]+1;  VGKeys << ", GlobalMean[6]+1 [for MinPix]"; }
   
   int MinPix = std::max(smallestPix,int(ceil(GlobPixMean[6]+1.)));
+  if(Vf) {VGs << ", " << MinPix; VGKeys << ", MinPix"; }
   int MaxPix = biggestPix;  //CamSett
   
   while ( MaxPix <= MinPix ) {
@@ -412,6 +458,9 @@ Line19 Value=14(ignored Key =mainThreshold=)
     else
       MaxPix += 5;
   }
+
+  if(Vf) {VGs << ", " << MaxPix; VGKeys << ", MaxPix"; }
+  
   fprintf(stderr,"RESULT: Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
   fprintf(stderr,"RESULT: Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
   fprintf(stderr,"\n");
@@ -507,7 +556,6 @@ Line19 Value=14(ignored Key =mainThreshold=)
   unsigned short int iEvtN = 0; // the global event number
   unsigned short FrameNum[2] = { 0, 0 }; if ( camera != "Custom" ) SignalTruth.erase(SignalTruth.begin());
 
-  //The Third Loop.
   for ( int i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
     
     bool GoldenEvent = false; unsigned int NumBools = 0;
@@ -528,7 +576,7 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	unsigned short maxR = (unsigned short)store[1][i];
 	unsigned short maxG = (unsigned short)store[4][i];
 	unsigned short maxB = (unsigned short)store[7][i];
-	unsigned short maxr = (unsigned short)(-store[10][i]);
+	unsigned short maxr = (unsigned short)(-store[10][i]); //make positive, but, make neg when using it.
 	unsigned short maxg = (unsigned short)(-store[13][i]);
 	unsigned short maxb = (unsigned short)(-store[16][i]);
 	vector<short> extrema;
@@ -542,12 +590,20 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	else if ( AbsMax == maxr ) { extrema.push_back(-maxr); extrema.push_back(store[11][i]); extrema.push_back(store[12][i]); }
 	else if ( AbsMax == maxg ) { extrema.push_back(-maxg); extrema.push_back(store[14][i]); extrema.push_back(store[15][i]); }
 	else { extrema.push_back(-maxb); extrema.push_back(store[17][i]); extrema.push_back(store[18][i]); }
-	
+
+	//extrema[0] = The (an) extreme PixIntDiff, SIGNED.
+	//extrema[1] = x-coord of the (a) pixel that has that extreme
+	//extrema[2] = y-coord of that.
+
 	FrameNum[1] = store[0][i];
 	
 	if ( (FrameNum[1]-FrameNum[0]) > FramBefNew && FrameNum[0] != 0 ) ++iEvtN;
 	
 	FrameNum[0] = FrameNum[1];
+
+	//remember this (3rd loops) initial previous[4]={1., 256., 0.0, 0.0}
+
+	//output line: <event #> <frame diff #> <signed extreme PixIntDiff> <x-cood of extreme> <y-coord of extrene> <prob>
 
 	if ( !GoldenEvent )
 	  {
@@ -593,7 +649,7 @@ static int get_our_options( int *argc, char **argv[])
       {"pixproc-scale", required_argument, 0, 0 },     //2
       {"user-scale",    required_argument, 0, 0 },     //3
       {"pipeline",    no_argument, &pipeline, 1 },     //4
-      {"verbose",    no_argument, 0, 0 },              //5 ignored, for regres. devel.
+      {"verbose-file",    required_argument, 0, 0 },   //5 give file of all intermediates for Visualization
       {"no-crop",    no_argument, 0, 0 },              //6 ignored, compat w Phase1a
       {"camera-index",    required_argument, 0, 0 },         //7 ignored, compat w Phase1a
       {"include-1a-lines", no_argument, &include_1a_lines, 1 },  //8
@@ -617,7 +673,8 @@ static int get_our_options( int *argc, char **argv[])
       case 3: Uscale = atoi(optarg);
 	break;
       case 4: fprintf(stderr, "%s Ignores Option --pipeline. Use PIPE.int instead.\n", (*argv)[0]);
-      case 5: fprintf(stderr, "%s Ignores Option --verbose.\n", (*argv)[0]);
+	break;
+      case 5: Vf = optarg;
 	break;
       }
     }
