@@ -315,8 +315,11 @@ Line19 Value=14(ignored Key =mainThreshold=)
   cerr << "SkewGaussOmega=SkewGauss[2]=" << SkewGauss[2] << endl;
   cerr << "SkewGaussAlpha=SkewGauss[3]=" << SkewGauss[3] << endl;
   cerr << endl;
-  cerr << "level=Command argument[3]=" << level << endl << endl;
+  cerr << "level=Command argument[3]=" << level << endl;
 
+  cerr << "NumPixAbvThrSumMin=" << CamSett[8] << endl;
+  cerr << "NumPixAbvThrSumMax=" << CamSett[9] << endl << endl;
+  
   if(Vf ) {
     VGs << SubThr << ", ";                            VGKeys << "Subthr, ";
     VGs /*<< "RewFram="*/ << RewFram << ", ";         VGKeys << "RewFram, ";
@@ -336,6 +339,11 @@ Line19 Value=14(ignored Key =mainThreshold=)
     VGs /*<< "SkewGaussAlpha"*/ << SkewGauss[3]<<", ";VGKeys << "SkewGaussAlpha, ";
     VGs /*<< "level=Command argument[3]="*/ << level; VGKeys << "level, ";
 
+    VGs /*<< "NumPixAbvThrSumMin="*/ << CamSett[8] <<", ";VGKeys << "NumPixAbvThrMin, ";
+    VGs /*<< "NumPixAbvThrSumMax="*/ << CamSett[9] <<", ";VGKeys << "NumPixAbvThrMax, ";
+
+
+    
   }
 
 

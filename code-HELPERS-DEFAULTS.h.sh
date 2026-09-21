@@ -58,6 +58,7 @@ PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 PHASE_1a="F1a.orig"
 PHASE_1b_RESULT_N_OR_NONE=
+PHASE_1b_VERBOSE=no
 
 MAKE_BABY_MOVIE=yes
 EXT="MOV" #baby movie extension

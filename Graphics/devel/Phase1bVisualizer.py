@@ -5,7 +5,7 @@
 
 
 def helpVis():
-    print(" Use SetIntFileName(_), and if you don't want to use cwd, SetDataDir(__); SetPlotDir(_); SetMovieName(_).")
+    print(" Get data and put plots a RESULTS dir: Use SetResultsDir(_), SetMovieName() and SetRunNumber( ).")
     print(" Then, doit(<start frame number>, <number of frames>)" )
 
 
@@ -16,32 +16,6 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
-
-
-# In[ ]:
-
-
-DataDir='./'
-IntFileName=""
-PlotDir='./'
-MovieName=""
-
-
-# In[ ]:
-
-
-def SetDataDir(x):
-    global DataDir
-    DataDir=x
-def SetIntFileName(x):
-    global IntFileName
-    IntFileName=x
-def SetPlotDir(x):
-    global PlotDir
-    PlotDir=x
-def SetMovieName(x):
-    global MovieName
-    MovieName=x
 
 
 # In[ ]:
@@ -69,7 +43,7 @@ dtype([('frame', '<i4'),
 
 ('rd', '<i8'), ('rx', '<i2'), ('ry', '<i2'), 
 ('gd', '<i8'), ('gx', '<i2'), ('gy', '<i2'), 
-('bd', '<i8'), ('bx', '<i2'), ('by', '<i2'), 
+('bd', '<i8'), ('bx', '<i2'), ('by', '<i2'),  endl; 
 
 ('Rn', '<i4'), ('Gn', '<i4'), ('Bn', '<i4'), 
 ('rn', '<i4'), ('gn', '<i4'), ('bn', '<i4'), 
@@ -77,17 +51,6 @@ dtype([('frame', '<i4'),
 ('stn', '<i4')])
 """
 
-Ph1bVdt =  np.dtype([('frame', np.int32), 
-               ('Rd','<i8'),('Rx',np.int16),('Ry',np.int16),
-               ('Gd','<i8'),('Gx',np.int16),('Gy',np.int16),
-               ('Bd','<i8'),('Bx',np.int16),('By',np.int16),
-               ('rd','<i8'),('rx',np.int16),('ry',np.int16),
-               ('gd','<i8'),('gx',np.int16),('gy',np.int16),
-               ('bd','<i8'),('bx',np.int16),('by',np.int16),
-               ('Rn',np.int32),('Gn',np.int32),('Bn',np.int32),
-               ('rn',np.int32),('gn',np.int32),('bn',np.int32),
-               ('stn',np.int32)]
-             )
 
 def makeDiffMats(v):
     PixIntDiffExtremal=np.vstack([v['Rd'],v['Gd'],v['Bd'],-v['rd'],-v['gd'],-v['bd']])
@@ -99,6 +62,78 @@ def makeDiffMats(v):
 # In[ ]:
 
 
+Ph1bVglobaldt =  np.dtype([
+               ('Subthr',np.int16),
+               ('RewFram',np.int16),('ForFram',np.int16),('FramBeNew',np.int16),
+               ('FracYes',np.single),('smallestThr',np.int16),('biggestThr',np.int16),
+               ('smallestPix',np.int16),('biggestPix',np.int16),
+               ('SkewGaussAmpl',np.single),('SkewGaussXi',np.single),
+               ('SkewGaussOmega',np.single),('SkewGaussAlpha',np.single),
+               ('level',np.single),('OverallStdDev',np.single),
+               ("NumPixAbvThrMin",np.int16),("NumPixAbvThrMax",np.int16),
+               ('forMinThr',np.single),('MinThr',np.int16),
+               ('GlobalPixSigma',np.single),
+               ('GmeanForMinPix',np.single),
+               ('MinPix',np.int16),('MaxPix',np.int16)
+])
+
+#obsolete settings for testing away from C-TAP script RESULTS dirs.
+"""
+ResultsDir='./'
+IntFileName=""
+PlotDir='./'
+MovieName=""
+"""
+# In[ ]:
+
+
+def SetResultsDir(x):
+    global ResultsDir
+    ResultsDir=x+"/"
+def SetMovieName(x):
+    global MovieName
+    MovieName=x
+def SetRunNumber(x):
+    global RunNumber
+    RunNumber=x
+def setfiles(): #called internally by doit(_,_)
+    global IntFilePath
+    global v1bFilePath
+    global v1bkeyFilePath
+    global v1bglobalFilePath
+    global v1bglobalkeyFilePath
+    global intdata
+
+    global v1bdata, v1bdatakey, v1bglobaldata, v1bglobalkeydata
+    v1bdata=None        #frame by frame phase 1b used and intermediate data
+    v1bdatakey=None     #its keys
+    v1bglobaldata=None  #settings and data computed from all frames and then used
+    v1bglobalkeydata=None #its keys
+
+    RunNumberStr=""
+    if RunNumber != "":
+        RunNumberStr+="."+str(RunNumber)
+    MovieNamePath=ResultsDir+MovieName
+    IntFilePath=ResultsDir+MovieName+".int"+RunNumberStr
+    v1bFilePath=MovieNamePath+".v1b"+RunNumberStr
+    v1bkeyFilePath=MovieNamePath+".v1b.key"+RunNumberStr
+    v1bglobalFilePath=MovieNamePath+".v1b.global"+RunNumberStr
+    v1bglobalkeyFilePath=MovieNamePath+".v1b.global.key"+RunNumberStr
+
+    intdata=np.loadtxt(IntFilePath,converters=float,dtype=Ph1adt)
+    v1bglobaldata=np.genfromtxt(v1bglobalFilePath,unpack=False,dtype=Ph1bVglobaldt,delimiter=",",missing_values="",filling_values=0.0)
+
+#testing
+"""
+SetResultsDir("/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE")
+SetMovieName("DroneShort1HalfDecimated")
+SetRunNumber(7)
+setfiles()
+"""
+# In[ ]:
+
+
+#to do:  Get the params from 1b global data!
 SkewGaussAmpl= 0.633
 SkewGaussXi= 1.97
 SkewGaussOmega= 1.89
@@ -119,7 +154,7 @@ def plotprob(start,finish):
     #print(ys)
     ax.plot(xs,ys)
     #plt.show()
-    plt.savefig(Plotdir+"ProbFunction.jpg")
+    plt.savefig(ResultsDir+"ProbFunction.jpg")
 
 
 # In[ ]:
@@ -136,8 +171,9 @@ PCntColor={ 'Rn' : (1,0,0), 'Gn' : (0,1,0), 'Bn' : (0,0,1),
 # In[ ]:
 
 
-def plotDiffs(intdata, fns, w,movn):
+def plotDiffs( fns, w,movn):
 
+    #print(v1bglobaldata)
 
     Ms=makeDiffMats(intdata)
     PIDE=Ms['PixIntDiffExtremal']
@@ -171,6 +207,14 @@ def plotDiffs(intdata, fns, w,movn):
     vfunstd=np.vectorize(funstd)
     vfunmean=np.vectorize(funmean) 
     xes=np.arange(fns,fns+w)
+    yones=np.ones(w)
+
+    yes=yones*v1bglobaldata['biggestThr']
+    ax.plot(xes,yes,label='biggestThr')
+
+    yes=yones*v1bglobaldata['smallestThr']
+    ax.plot(xes,yes,label='smallestThr')
+
     yes=vfunstd(xes)*2
     ax.plot(xes,yes,label='std*2')
     yes=vfunmean(xes)
@@ -188,13 +232,15 @@ def plotDiffs(intdata, fns, w,movn):
 
     ax.legend()
 
-    plt.savefig(PlotDir+movn+str(fns)+"."+str(fns+w)+".tiff")
+    plt.savefig(ResultsDir+movn+str(fns)+"."+str(fns+w)+".tiff")
 
 
 # In[ ]:
 
 
-def plotCounts(intdata, fns, w,movn):
+def plotCounts( fns, w,movn):
+
+    #print(v1bglobaldata)
 
     def PIDEstd(PIDE,n):
         return PIDE[:,n].std(ddof=1)
@@ -240,6 +286,20 @@ def plotCounts(intdata, fns, w,movn):
 
     frseph=math.floor(1+(frseph)*1.1) #leave 10% empty at top, ensure bott is 0.
 
+    yones=np.ones(w)
+    yes=yones*v1bglobaldata['MinPix']
+    ax.plot(xes,yes,label='MinPix')
+
+    yes=yones*v1bglobaldata['MaxPix']
+    ax.plot(xes,yes,label='MaxPix')
+
+    yes=yones*v1bglobaldata['NumPixAbvThrMin']
+    ax.plot(xes,yes,label='NumPixAbvThrMin')
+
+    yes=yones*v1bglobaldata['NumPixAbvThrMax']
+    ax.plot(xes,yes,label='NumPixAbvThrMax')
+
+
     for i in range(fns-1,fns+w):
         line=lines.Line2D([i+0.5,i+0.5],   [0.0,frseph], color='white',linewidth=0.25)
         ax.add_line(line)
@@ -247,22 +307,20 @@ def plotCounts(intdata, fns, w,movn):
 
     ax.legend()
 
-    plt.savefig(PlotDir+movn+str(fns)+"."+str(fns+w)+"counts.tiff")
+    plt.savefig(ResultsDir+movn+str(fns)+"."+str(fns+w)+"counts.tiff")
 
 
 # In[ ]:
 
 
 def doit(fns,w):
-    global intndarray #so I can look at it when I am developing
-    global MovieName
-    global DataDir
-    global IntFileName
-    if MovieName == "":
-        MovieName = IntFileName
-    intndarray=np.loadtxt(DataDir+IntFileName,converters=float,dtype=Ph1adt)
-    plotDiffs(intndarray,fns,w,MovieName)
-    plotCounts(intndarray,fns,w,MovieName)
+    #global intndarray #so I can look at it when I am developing
+
+    global IntFilePath
+    setfiles()
+    #intndarray=np.loadtxt(IntFilePath,converters=float,dtype=Ph1adt)
+    plotDiffs(fns,w,MovieName)
+    plotCounts(fns,w,MovieName)
 
 
 # import Phase1bVisualizer as vs
@@ -270,61 +328,15 @@ def doit(fns,w):
 # In[ ]:
 
 
-#vs.#
 if __name__ == "__main__" :
-    #Hmm... we could query the user for these arguments.
-    SetIntFileName("321-18.int")
-#vs.#
-    SetMovieName("321-18")
-#vs.#
+
+    SetResultsDir("/data/GIT/C-TAP/RESULTS-jobDS1HalfDecimatedPIPE")
+    SetMovieName("DroneShort1HalfDecimated")
+    SetRunNumber(9)
+
     doit(1,200)
+    doit(200,200)
+    doit(400,44)
 
 #Yes, Python's running a package script as an application works in Jupyter notebooks.
-
-
-# In[ ]:
-
-
-intndarray[0]
-
-First 3 lines of an .int file
-1          39  1436  165     39  1436  165     39 1436  165      -19   352  559    -19   352  559    -19  352  559    3  3  3    1  1  1   6
-2          11   784  591     11   784  591     11  784  591      -17   853   85    -17   853   85    -17  853   85    0  0  0    1  1  1   0
-3          29  1076  391     29  1076  391     29 1076  391      -14  1280  458    -14  1280  458    -15 1745  320    4  5  4    0  0  1   10
-
-
-# In[ ]:
-
-
-from io import StringIO
-
-
-# In[ ]:
-
-
-sorig=StringIO("""1          39  1436  165     39  1436  165     39 1436  165      -19   352  559    -19   352  559    -19  352  559    3  3  3    1  1  1   6 24 34 24
-2          11   784  591     11   784  591     11  784  591      -17   853   85    -17   853   85    -17  853   85    0  0  0    1  1  1   0
-3          29  1076  391     29  1076  391     29 1076  391      -14  1280  458    -14  1280  458    -15 1745  320    4  5  4    0  0  1   10
-""")
-
-s=StringIO("""1,          39,  1436,  165,     39,  1436,  165,     39, 1436,  165,      -19,   352,  559,    -19,   352,  559,    -19,  352,  559,    3,  3,  3,    1,  1,  1,   6, 24, 34, 24
-2,          11,   784,  591,     11,   784,  591,     11,  784,  591,      -17,   853,   85,    -17,   853,   85,    -17,  853,   85,    0,  0,  0,    1,  1,  1,   0, , ,
-3,         29, 1076,  391,     29,  1076,  391,     29, 1076,  391,      -14,  1280,  458,    -14,  1280,  458,    -15, 1745,  320,    4,  5,  4,   0,  0,  1,   10, , ,
-""")
-
-print(s.getvalue())
-a=np.genfromtxt(s,unpack=False,dtype=Ph1adt,delimiter=",",missing_values="",filling_values=0.0)
-print(a)
-
-
-# In[ ]:
-
-
-a
-
-
-# In[ ]:
-
-
-
 

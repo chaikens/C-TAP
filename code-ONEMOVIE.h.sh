@@ -222,12 +222,22 @@ xterm_pids+=" $!" #for killing 'em
 phase1b_failed="no"
 
 phase1b_out=${RESULTS_DIR}/${RESULT_OF_1b_BASE}
+phase1b_verbose_base=${RESULTS_DIR}/${moviePrefix}.v1b
+#When we activate verbose output, 4 files will be made:
+# phase1b_verbose_base
+# phase1b_verbose_base.key
+# phase1b_verbose_base.global
+# phase1b_verbose_base.global.key
 phase1b_cmd="$time_cmd_prefix ${SOFTWARE_DIR}/$phase1b "
 #
 # level for Phase1b was 0.5 here, now this is set by our DEFAULTS and C-TAP scripts
 #                                                                --V---
 phase1b_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE_1b_LEVEL} "
 phase1b_cmd+=" ${OPT_CamSett} "
+if [ ${PHASE_1b_VERBOSE}xx == "yes"xx ]
+then
+    phase1b_cmd+=" --verbose-file $phase1b_verbose_base "
+fi
 phase1b_cmd+=" > $phase1b_out 2>>$LOG"
 
 echo Running Phase1b first try
@@ -256,6 +266,17 @@ echo
 echo "First try of Phase1b reported $n frames have objects, see the lines in:"
 echo $phase1b_out
 echo
+
+if [ ${PHASE_1b_VERBOSE}xx == "yes"xx ]
+then
+    mv ${phase1b_verbose_base} ${phase1b_verbose_base}.${logn}
+    mv ${phase1b_verbose_base}.key ${phase1b_verbose_base}.key.${logn}
+    mv ${phase1b_verbose_base}.global ${phase1b_verbose_base}.global.${logn}
+    mv ${phase1b_verbose_base}.global.key ${phase1b_verbose_base}.global.key.${logn}
+fi
+
+    
+
 
 if [ $n -gt 50000 ] || [ $n -eq 0 ]
 then
@@ -295,6 +316,10 @@ then
 	#                                                                           --V---
 	phase1b_redo_cmd+=" ${RESULTS_DIR}/${RESULT_OF_1a_BASE} $ndiffs ${PHASE_1b_LEVEL_REDO} "
 	phase1b_redo_cmd+=" ${OPT_CamSett} "
+	if [ ${PHASE_1b_VERBOSE}xx == yesxx ]
+	then
+	    phase1b_redo_cmd+=" --verbose-file $phase1b_verbose_base "
+	fi
 	phase1b_redo_cmd+="  > $phase1b_out 2>>$LOG"
 	( echo  ; echo -n "cd "; pwd; echo "${phase1b_redo_cmd}" ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}	
 	#echo "CMD:"
@@ -317,6 +342,14 @@ then
 	echo "INFO:" "Phase 1B: Re-Done reports $n frames with objects." >> $LOG
 	echo "TIME:" "Phase 1B finished at $phase1b_finish_time sec" >> $LOG
 	echo "TIME:" "Took $(numdif $phase1b_finish_time $phase1b_start_time) sec." >> $LOG
+
+	if [ ${PHASE_1b_VERBOSE}xx == "yes"xx ]
+	then
+	    mv ${phase1b_verbose_base} ${phase1b_verbose_base}.redo.${logn}
+	    mv ${phase1b_verbose_base}.key ${phase1b_verbose_base}.redo.key.${logn}
+	    mv ${phase1b_verbose_base}.global ${phase1b_verbose_base}.redo.global.${logn}
+	    mv ${phase1b_verbose_base}.global.key ${phase1b_verbose_base}.redo.global.key.${logn}
+	fi
     fi
 fi
     

@@ -18,7 +18,10 @@ echo YOUR-SYSCONF-$JOBNAME          #
 #or   (in pipeline) it accesses the movie to yuvstream
 # ffmpeg filter.  But for now we just hack for
 #DS1 Half-decimation
-PHASE_1a_RESULT_OLD_N_OR_NONE=2
+
+PHASE_1b_VERBOSE=yes
+
+PHASE_1a_RESULT_OLD_N_OR_NONE=
 width=1920
 height=1080
 
@@ -68,7 +71,7 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-#OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
