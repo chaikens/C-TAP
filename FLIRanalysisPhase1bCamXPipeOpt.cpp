@@ -167,7 +167,11 @@ int main ( int argc, char** argv ) {
   
   double data[26]; //for reading Phase1a .int data. Read as doubles but hard coded
   //casts are done to int types are done below.
-  vector<double> store[26]; //Store ALL Phase1a data. store[i] is the i'th column
+  //
+  // for --verbose-file <filename> we will store intermediate values in
+  // vectors stored in the lengthening of  the original store array.
+  const int nVs = 17; //A guess to be adjusted when done.
+  vector<double> store[26+nVs]; //Store ALL Phase1a data. store[i] is the i'th column
   // when the .int file is printed.  Ditto about casting and use. See doc. above.
   //for storing that data, store[kind of data][which diff frame]
   //
@@ -374,6 +378,9 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	for ( int j = 0; j < 26; ++j ) {
 	  store[j].push_back(data[j]);  //store .int line in memory
 	}
+	for ( int j = 26; j < 26+nVs; ++j ) {
+	  store[j].push_back(0);  //create vector entries for --verbose-file data
+	}
       }
     else
       { //read of next or first line failed.
@@ -513,6 +520,8 @@ Line19 Value=14(ignored Key =mainThreshold=)
     AbsMax = *max_element( maxine.begin(), maxine.end() ); 
     }
 
+    //for verbose
+    store[26+0][i]=AbsMax;
 
     //Calc AbsStdDev of our 6 max absolute color changes to score with our Skew Gaussian
     float AbsAvg = ( maxR + maxG + maxB + maxr + maxg + maxb ) / 6.;
@@ -520,6 +529,8 @@ Line19 Value=14(ignored Key =mainThreshold=)
       ( maxr - AbsAvg ) * ( maxr - AbsAvg ) + ( maxg - AbsAvg ) * ( maxg - AbsAvg ) + ( maxb - AbsAvg ) * ( maxb - AbsAvg );
     AbsStdDev = sqrt ( AbsStdDev / 5. );
     
+    //for verbose
+    store[26+1][i] = AbsStdDev;
     //prob = 1 - OurSkewGaussian(AbsStdDev)
     
     prob[i] = 1. -
@@ -529,6 +540,10 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	   )
       *( 1. + erf(SkewGauss[3]*(AbsStdDev-SkewGauss[1])/(SkewGauss[2]*sqrt(2.))) );
 
+    //for verbose
+    store[26+2][i] = prob[i];
+
+    
     //prob is used to make the bool SignalTruth judgement
     //and 
 
@@ -537,18 +552,49 @@ Line19 Value=14(ignored Key =mainThreshold=)
     // decision below depends on camera
     //
     // level is used only one time, here:
-    //  --------------V--
-    if ( (prob[i] > level && (AbsMax > MinThr && AbsMax < MaxThr) && NumPixAbvSubThrSum > MinPix && NumPixAbvSubThrSum < MaxPix)
+    //
+    int probGTlevel = (prob[i] > level);
+    //for verbose
+    store[26+3][i] = probGTlevel;
+
+    int AbsMaxGTMinThr = (AbsMax > MinThr);
+    store[26+4][i] = AbsMaxGTMinThr;
+
+    int AbsMaxLTMaxThr = (AbsMax < MaxThr);
+    store[26+5][i] = AbsMaxLTMaxThr;
+
+    int NumPixAbvSubThrSumGTMinPix = NumPixAbvSubThrSum > MinPix;
+    store[26+6][i] = NumPixAbvSubThrSumGTMinPix;
+
+    int NumPixAbvSubThrSumLTMaxPix = NumPixAbvSubThrSum < MaxPix;
+    store[26+7][i] = NumPixAbvSubThrSumLTMaxPix;
+
+    store[26+8][i] = NumPixAbvSubThrSum;
+
+    int NumPixAbvThrSumMin = CamSett[8];
+    int NumPixAbvThrSumMax = CamSett[9];
+
+    int stnGTNumPixAbvThrSumMin = NumPixAbvThrSum > NumPixAbvThrSumMin;
+    store[26+9][i] =  stnGTNumPixAbvThrSumMin;
+
+    int stnLTNumPixAbvThrSumMax = NumPixAbvThrSum < NumPixAbvThrSumMax;
+    store[26+10][i] =  stnLTNumPixAbvThrSumMax;
+    
+    if ( (probGTlevel &&
+	  (AbsMaxGTMinThr && AbsMaxLTMaxThr) &&
+	  NumPixAbvSubThrSumGTMinPix && NumPixAbvSubThrSumLTMaxPix)
 	 || (NumPixAbvThrSum > 36 && NumPixAbvThrSum < 44 && camera == "B1")
 	 || (NumPixAbvThrSum > 100 && (camera == "B3" || camera == "B4"))
-	 || (camera == "Custom" && NumPixAbvThrSum > CamSett[8] && NumPixAbvThrSum < CamSett[9]) )
+	 || (camera == "Custom" && stnGTNumPixAbvThrSumMin && stnLTNumPixAbvThrSumMax ) )
       //.............................  NumPixAbvThrSumMin====^=0 ....  NumPixAbvThrSumMax====^=3
 
       {
       SignalTruth.push_back(true);
+      store[26+11][i] = true;
     }
     else {
       SignalTruth.push_back(false);
+      store[26+11][i] = false;
     }
   }  //end Second big diff frame loop on i
   
@@ -561,80 +607,124 @@ Line19 Value=14(ignored Key =mainThreshold=)
   //the extrema from Golden events 
   double previous[4] = {1.,256.,0.,0.};
 
+  //Events are numbered beginning at 0.
   unsigned short int iEvtN = 0; // the global event number
   unsigned short FrameNum[2] = { 0, 0 }; if ( camera != "Custom" ) SignalTruth.erase(SignalTruth.begin());
 
-  for ( int i = RewFram; i < (NumFrames-ForFram-2); ++i ) {
+  for ( int i = 0; i < NumFrames; i++ ) {
+    //initial values to mean this frame is not in the RewFram ... NumFrames-ForFram-1 range.
+    store[26+13][i] = -1; //NumBoolsDivRange
+    store[26+14][i] = -1; //ManyBools
+    store[26+15][i] = -1; //GoldnE
+    store[26+16][i] = -1; //EvtN
+
+    //refactor for ( int i = RewFram; i < (NumFrames-ForFram-2); ++i )
+    if( (RewFram <= i) && (i < NumFrames-ForFram-2 )) {
     
-    bool GoldenEvent = false; unsigned int NumBools = 0;
-    if ( camera == "Custom" ) {
-      if ( SignalTruth[i] ) GoldenEvent = true;
-    }
-    else {
-      if ( SignalTruth[i-1] ) GoldenEvent = true;
-    }
-    for ( int j = -RewFram; j < ForFram; ++j ) {
-      if ( SignalTruth[i+j] ) ++NumBools; //used with "FracYes" below
-    }
-    //End of SignalTruth useage.
+	bool GoldenEvent = false;
+	unsigned int NumBools = 0;
 
-    
-    if ( GoldenEvent || float(NumBools) / float(ForFram+RewFram) > FracYes )
-      {
-	unsigned short maxR = (unsigned short)store[1][i];
-	unsigned short maxG = (unsigned short)store[4][i];
-	unsigned short maxB = (unsigned short)store[7][i];
-	unsigned short maxr = (unsigned short)(-store[10][i]); //make positive, but, make neg when using it.
-	unsigned short maxg = (unsigned short)(-store[13][i]);
-	unsigned short maxb = (unsigned short)(-store[16][i]);
-	vector<short> extrema;
-	extrema.push_back(maxR); extrema.push_back(maxG); extrema.push_back(maxB); extrema.push_back(maxr); extrema.push_back(maxg); extrema.push_back(maxb);
-	std::sort(extrema.begin(),extrema.end()); unsigned short AbsMax = abs(extrema.back());
+	if ( camera == "Custom" ) {
+	  if ( SignalTruth[i] ) GoldenEvent = true;  //in current work
+	}
+	else {
+	  if ( SignalTruth[i-1] ) GoldenEvent = true;
+	}
+
+	//in current work, RewFram=0 and ForFram=-2 ??
+	for ( int j = -RewFram; j < ForFram; ++j ) {
+	  if ( SignalTruth[i+j] ) ++NumBools; //used with "FracYes" below
+	}
+
+	store[26+12][i] = NumBools;
+	//End of SignalTruth useage.
+
+	float NumBoolsDivFRange = NumBools/float(ForFram+RewFram);
+	int ManyBools = NumBoolsDivFRange > FracYes;
 	
-	extrema.clear();
-	if ( AbsMax == maxR ) { extrema.push_back( maxR); extrema.push_back(store[2][i]); extrema.push_back(store[3][i]); }
-	else if ( AbsMax == maxG ) { extrema.push_back( maxG); extrema.push_back(store[5][i]); extrema.push_back(store[6][i]); }
-	else if ( AbsMax == maxB ) { extrema.push_back( maxB); extrema.push_back(store[8][i]); extrema.push_back(store[9][i]); }
-	else if ( AbsMax == maxr ) { extrema.push_back(-maxr); extrema.push_back(store[11][i]); extrema.push_back(store[12][i]); }
-	else if ( AbsMax == maxg ) { extrema.push_back(-maxg); extrema.push_back(store[14][i]); extrema.push_back(store[15][i]); }
-	else { extrema.push_back(-maxb); extrema.push_back(store[17][i]); extrema.push_back(store[18][i]); }
+	store[26+13][i] = NumBoolsDivFRange;
+	store[26+14][i] = ManyBools;
+	store[26+15][i] = GoldenEvent;
 
-	//extrema[0] = The (an) extreme PixIntDiff, SIGNED.
-	//extrema[1] = x-coord of the (a) pixel that has that extreme
-	//extrema[2] = y-coord of that.
-
-	FrameNum[1] = store[0][i];
+	//LAST INDEX COUNTED BY nVs
 	
-	if ( (FrameNum[1]-FrameNum[0]) > FramBefNew && FrameNum[0] != 0 ) ++iEvtN;
-	
-	FrameNum[0] = FrameNum[1];
-
-	//remember this (3rd loops) initial previous[4]={1., 256., 0.0, 0.0}
-
-	//output line: <event #> <frame diff #> <signed extreme PixIntDiff> <x-cood of extreme> <y-coord of extrene> <prob>
-
-	if ( !GoldenEvent )
+	if ( GoldenEvent || ManyBools  )
 	  {
-	    cout << iEvtN << "\t\t" << store[0][i] << "\t" << short(previous[0]) << "  "
-		 << (unsigned short)previous[1] << " " << (unsigned short)previous[2]
-		 << "\t" << previous[3] << endl;
-	  }
-	else
-	  {
-	    cout << iEvtN << "\t\t" << store[0][i] << "\t" << extrema[0] << "  " << extrema[1] << " " << extrema[2] << "\t" << prob[i] << endl;
-	    previous[3] = prob[i];
-	    previous[0] = double(extrema[0]);
-	    previous[1] = double(extrema[1]);
-	    previous[2] = double(extrema[2]);
-	  }
-	if(include_1a_lines)
-	   printf("#%.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f %.0f %.0f\t%.0f %.0f %.0f\t\t%.0f\t%.12f\n",store[0][i],
-	  store[1][i],store[2][i],store[3][i],store[4][i],store[5][i],store[6][i],store[7][i],store[8][i],store[9][i],
-	  store[10][i],store[11][i],store[12][i],store[13][i],store[14][i],store[15][i],store[16][i],store[17][i],store[18][i],
-	  store[19][i],store[20][i],store[21][i],
-	  store[22][i],store[23][i],store[24][i],store[25][i],prob[i]);
-      } /* if GoldenEvent || ... */
-  } /* Loop RewFram <= i < NumFrames-ForFram-2 */ 
+	    unsigned short maxR = (unsigned short)store[1][i];
+	    unsigned short maxG = (unsigned short)store[4][i];
+	    unsigned short maxB = (unsigned short)store[7][i];
+	    unsigned short maxr = (unsigned short)(-store[10][i]); //make positive, but, make neg when using it.
+	    unsigned short maxg = (unsigned short)(-store[13][i]);
+
+	    unsigned short maxb = (unsigned short)(-store[16][i]);
+	    vector<short> extrema;
+	    extrema.push_back(maxR); extrema.push_back(maxG); extrema.push_back(maxB); extrema.push_back(maxr); extrema.push_back(maxg); extrema.push_back(maxb);
+	    std::sort(extrema.begin(),extrema.end()); unsigned short AbsMax = abs(extrema.back());
+	
+	    extrema.clear();
+	    if ( AbsMax == maxR ) { extrema.push_back( maxR); extrema.push_back(store[2][i]); extrema.push_back(store[3][i]); }
+	    else if ( AbsMax == maxG ) { extrema.push_back( maxG); extrema.push_back(store[5][i]); extrema.push_back(store[6][i]); }
+	    else if ( AbsMax == maxB ) { extrema.push_back( maxB); extrema.push_back(store[8][i]); extrema.push_back(store[9][i]); }
+	    else if ( AbsMax == maxr ) { extrema.push_back(-maxr); extrema.push_back(store[11][i]); extrema.push_back(store[12][i]); }
+	    else if ( AbsMax == maxg ) { extrema.push_back(-maxg); extrema.push_back(store[14][i]); extrema.push_back(store[15][i]); }
+	    else { extrema.push_back(-maxb); extrema.push_back(store[17][i]); extrema.push_back(store[18][i]); }
+
+	    //extrema[0] = The (an) extreme PixIntDiff, SIGNED.
+	    //extrema[1] = x-coord of the (a) pixel that has that extreme
+	    //extrema[2] = y-coord of that.
+
+	    FrameNum[1] = store[0][i];
+	
+	    if ( (FrameNum[1]-FrameNum[0]) > FramBefNew && FrameNum[0] != 0 ) ++iEvtN;
+
+	    store[26+16][i] = iEvtN;
+	    //LAST INDEX COUNTED BY nVs
+	    static_assert(16==nVs-1,"16==nVs-1 fails, please recompile with nVs set properly.");
+	    
+	    FrameNum[0] = FrameNum[1];
+
+	    //remember this (3rd loops) initial previous[4]={1., 256., 0.0, 0.0}
+
+	    //output line: <event #> <frame diff #> <signed extreme PixIntDiff> <x-cood of extreme> <y-coord of extrene> <prob>
+
+	    if ( !GoldenEvent )
+	      {
+		cout << iEvtN << "\t\t" << store[0][i] << "\t" << short(previous[0]) << "  "
+		     << (unsigned short)previous[1] << " " << (unsigned short)previous[2]
+		     << "\t" << previous[3] << endl;
+	      }
+	    else
+	      {
+		cout << iEvtN << "\t\t" << store[0][i] << "\t" << extrema[0] << "  " << extrema[1] << " " << extrema[2] << "\t" << prob[i] << endl;
+		previous[3] = prob[i];
+		previous[0] = double(extrema[0]);
+		previous[1] = double(extrema[1]);
+		previous[2] = double(extrema[2]);
+	      }
+	    if(include_1a_lines)
+	      printf("#%.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t%.0f  %.0f %.0f\t\t%.0f %.0f %.0f\t%.0f %.0f %.0f\t\t%.0f\t%.12f\n",store[0][i],
+		     store[1][i],store[2][i],store[3][i],store[4][i],store[5][i],store[6][i],store[7][i],store[8][i],store[9][i],
+		     store[10][i],store[11][i],store[12][i],store[13][i],store[14][i],store[15][i],store[16][i],store[17][i],store[18][i],
+		     store[19][i],store[20][i],store[21][i],
+		     store[22][i],store[23][i],store[24][i],store[25][i],prob[i]);
+	  } /* if GoldenEvent || ManyBools */
+      } /* if RewFram <= i < NumFrames-ForFram-2 */
+  } /* for (int i = 0; i < NumFrames; i++) */
+
+  if(Vf) {
+    for( int i = 0; i < NumFrames; i++ ) {
+      int j = 0;
+      for ( ; j < 26+nVs-1  ; j++) {
+	Vs << store[j][i] << ", ";
+      }
+      Vs << store[j][i] << endl;
+    }
+  }
+  Vs.close();
+  VKeys.close();
+  VGs.close();
+  VGKeys.close();
+
   return 0;
 } /*main*/
 
