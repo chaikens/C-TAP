@@ -11,6 +11,7 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
+PHASE_1b_VERBOSE=yes
 
 #Omitting Phase1a omits detecting widthXheight from
 #the input movie, so we set them (unreliably) by
@@ -72,7 +73,7 @@ cat > tempCamSett.txt <<EOF
 smallestThr= 0
 biggestThr= 254
 smallestPix= 0
-biggestPix= 67
+biggestPix= 300
 SkewGaussAmpl= 0.633
 SkewGaussXi= 2.2
 SkewGaussOmega= 2.1
