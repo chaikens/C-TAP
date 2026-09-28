@@ -325,26 +325,43 @@ Line19 Value=14(ignored Key =mainThreshold=)
   cerr << "NumPixAbvThrSumMax=" << CamSett[9] << endl << endl;
   
   if(Vf ) {
-    VGs << SubThr << ", ";                            VGKeys << "Subthr, ";
-    VGs /*<< "RewFram="*/ << RewFram << ", ";         VGKeys << "RewFram, ";
-    VGs /*<< "ForFram="*/ << ForFram << ", ";         VGKeys << "ForFram, ";
-    VGs /*<< "FramBefNew="*/ << FramBefNew << ", ";   VGKeys << "FramBeNew, ";
-    VGs /*<< "FracYes="*/ << FracYes << ", ";         VGKeys << "FracYes, ";
+    //the first number, do not preceed by ", "
+    VGs << SubThr ; //0
+    VGKeys << "SubThr";
+    VGs /*<< "RewFram="*/ << ", " << RewFram ; //1
+    VGKeys << ", RewFram";
+    VGs /*<< "ForFram="*/ << ", " << ForFram; //2
+    VGKeys << ", ForFram";
+    VGs /*<< "FramBefNew="*/ <<  ", " << FramBefNew; //3
+    VGKeys << ", FramBeNew";
+    VGs /*<< "FracYes="*/ << ", " << FracYes; //4
+    VGKeys << ", FracYes";
 
-    VGs /*<< "smallestThr="*/ << smallestThr << ", "; VGKeys << "smallestThr, ";
-    VGs /*<< "biggestThr="*/ << biggestThr << ", ";   VGKeys << "biggestThr, ";
-    VGs /*<< "smallestPix="*/ << smallestPix << ", "; VGKeys << "smallestPix, ";
-    VGs /*<< "biggestPix="*/ << biggestPix << ", ";   VGKeys << "biggestPix, ";
+    VGs /*<< "smallestThr="*/ << ", " <<  smallestThr; //5
+    VGKeys << ", smallestThr";
+    VGs /*<< "biggestThr="*/ << ", " <<  biggestThr;  //6
+    VGKeys << ", biggestThr";
+    VGs /*<< "smallestPix="*/ <<  ", " << smallestPix; //7
+    VGKeys << ", smallestPix";
+    VGs /*<< "biggestPix="*/ <<  ", " << biggestPix;  //8
+    VGKeys << ", biggestPix";
 
     /*<< "Skew Gaussian Params:"*/
-    VGs /*<< "SkewGaussAmpl"*/ << SkewGauss[0] <<", ";VGKeys << "SkewGaussAmpl, "; 
-    VGs /*<< "SkewGaussXi"*/ << SkewGauss[1] << ", "; VGKeys << "SkewGaussXi, ";
-    VGs /*<< "SkewGaussOmega"*/ << SkewGauss[2]<<", ";VGKeys << "SkewGaussOmega, ";
-    VGs /*<< "SkewGaussAlpha"*/ << SkewGauss[3]<<", ";VGKeys << "SkewGaussAlpha, ";
-    VGs /*<< "level=Command argument[3]="*/ << level; VGKeys << "level, ";
+    VGs /*<< "SkewGaussAmpl"*/ << ", " <<  SkewGauss[0]; //9
+    VGKeys << ", SkewGaussAmpl"; 
+    VGs /*<< "SkewGaussXi"*/ <<  ", " << SkewGauss[1];  //10
+    VGKeys << ", SkewGaussXi";
+    VGs /*<< "SkewGaussOmega"*/ <<  ", " << SkewGauss[2]; //11
+    VGKeys << ", SkewGaussOmega";
+    VGs /*<< "SkewGaussAlpha"*/ <<  ", " << SkewGauss[3]; //12
+    VGKeys << ", SkewGaussAlpha";
+    VGs /*<< "level=Command argument[3]="*/ <<  ", " << level; //13
+    VGKeys << ", level";
 
-    VGs /*<< "NumPixAbvThrSumMin="*/ << CamSett[8] <<", ";VGKeys << "NumPixAbvThrMin, ";
-    VGs /*<< "NumPixAbvThrSumMax="*/ << CamSett[9] <<", ";VGKeys << "NumPixAbvThrMax, ";
+    VGs /*<< "NumPixAbvThrSumMin="*/ <<  ", " << CamSett[8];  //14
+    VGKeys << ", NumPixAbvThrMin";
+    VGs /*<< "NumPixAbvThrSumMax="*/ <<  ", " << CamSett[9];  //15
+    VGKeys << ", NumPixAbvThrMax";
 
 
     
@@ -425,15 +442,17 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	  OverallAverage,
 	  OverallStdDev);
 
-  if(Vf) {VGs << ", " << OverallStdDev; VGKeys << "OverallStdDev";}
+  if(Vf) {
+    VGs << ", " << OverallAverage << ", " << OverallStdDev;  //16, 17
+    VGKeys << ", OverallAverage, OverallStdDev";}
 
   
   if(Vf){
-    VGs << ", " << OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5;
+    VGs << ", " << OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5; //18
     VGKeys << ", (OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5) [for MinThr calc]";
   }
   int MinThr = std::max(int(floor(OverallAverage+OverallStdDev*floor(OverallStdDev)-0.5)),smallestThr);
-  if(Vf) {VGs << ", " << MinThr; VGKeys << ", MinThr"; }
+  if(Vf) {VGs << ", " << MinThr; VGKeys << ", MinThr"; } //19
   //33 for over-fit to initial test
   if ( MinThr > 43 && camera == "B1" ) MinThr = 43;
   int MaxThr = biggestThr;
@@ -457,12 +476,12 @@ Line19 Value=14(ignored Key =mainThreshold=)
 	  GlobPixMean[6],
 	  GlobPixSigma);
 
-  if(Vf) {VGs << ", " << GlobPixSigma; VGKeys << ", GlobalPixSigma"; }
+  if(Vf) {VGs << ", " << GlobPixSigma; VGKeys << ", GlobalPixSigma"; } //20
 
-  if(Vf) {VGs << ", " << GlobPixMean[6]+1;  VGKeys << ", GlobalMean[6]+1 [for MinPix]"; }
+  if(Vf) {VGs << ", " << GlobPixMean[6]+1;  VGKeys << ", GlobalMean[6]+1 [for MinPix]"; } //21
   
   int MinPix = std::max(smallestPix,int(ceil(GlobPixMean[6]+1.)));
-  if(Vf) {VGs << ", " << MinPix; VGKeys << ", MinPix"; }
+  if(Vf) {VGs << ", " << MinPix; VGKeys << ", MinPix"; } //22
   int MaxPix = biggestPix;  //CamSett
   
   while ( MaxPix <= MinPix ) {
@@ -474,7 +493,8 @@ Line19 Value=14(ignored Key =mainThreshold=)
       MaxPix += 5;
   }
 
-  if(Vf) {VGs << ", " << MaxPix; VGKeys << ", MaxPix"; }
+  if(Vf) {VGs << ", " << MaxPix; VGKeys << ", MaxPix"; } //23
+  //LAST entry to VGs.
   
   fprintf(stderr,"RESULT: Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
   fprintf(stderr,"RESULT: Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
