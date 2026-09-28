@@ -21,7 +21,7 @@ echo YOUR-SYSCONF-$JOBNAME          #
 
 PHASE_1b_VERBOSE=yes
 
-PHASE_1a_RESULT_OLD_N_OR_NONE=
+PHASE_1a_RESULT_OLD_N_OR_NONE=2
 width=1920
 height=1080
 
@@ -75,7 +75,7 @@ OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
-biggestThr= 254
+biggestThr= 256
 smallestPix= 0
 biggestPix= 67
 SkewGaussAmpl= 0.633

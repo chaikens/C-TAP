@@ -71,7 +71,7 @@ echo YOUR-ANALYSIS-$JOBNAME     #
 #OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
-biggestThr= 254
+biggestThr= 256
 smallestPix= 0
 biggestPix= 300
 SkewGaussAmpl= 0.633
