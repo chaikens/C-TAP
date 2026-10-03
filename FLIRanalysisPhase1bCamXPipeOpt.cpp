@@ -363,7 +363,9 @@ Line19 Value=14(ignored Key =mainThreshold=)
     VGs /*<< "NumPixAbvThrSumMax="*/ <<  ", " << CamSett[9];  //15
     VGKeys << ", NumPixAbvThrMax";
 
-
+    //See below for adding mainThr=CamSett[19] at the end, since
+    //I don't want to renumber the other global keys and I want
+    //to display this in the visualizer.
     
   }
 
@@ -493,8 +495,15 @@ Line19 Value=14(ignored Key =mainThreshold=)
       MaxPix += 5;
   }
 
-  if(Vf) {VGs << ", " << MaxPix; VGKeys << ", MaxPix"; } //23
-  //LAST entry to VGs.
+  if(Vf) {
+    VGs << ", " << MaxPix; VGKeys << ", MaxPix";  //23
+    VGs << ", " << CamSett[19] << endl; VGKeys << ", MainThr" << endl; //24
+    //this value is not used in this file, there's no MainThr var (so far)
+    //but is included so it can be visualized.  It controls what's counted
+    //by Phase1a: for the 6 extremals, how many pix int diffs are within
+    //MainThr of their max.
+    //LAST entry to VGs.
+  }
   
   fprintf(stderr,"RESULT: Minimum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MinPix);
   fprintf(stderr,"RESULT: Maximum number of pixels allowed to be above the sub-threshold of %d is %d\n",SubThr,MaxPix);
