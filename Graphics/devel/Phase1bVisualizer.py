@@ -59,9 +59,12 @@ def howto(what="see_frames"):
 
 import numpy as np
 import math
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
 from scipy import optimize as opt
+
+matplotlib.use('qtagg')
 
 
 # In[ ]:
@@ -238,12 +241,10 @@ def GetData(): #common for any frame number range
     v1bglobalkeydata=None #its keys
 
     if (ResultsDir is None) :
-        print( "Please do SetResultsDir( your results dir )")
-        PleaseSetResultsDir() #call an undefined function to make Jupyter report an error and stop here.
+        raise(Exception("Please do SetResultsDir( your results dir )"))
 
     if (MovieName is None): 
-        print( "Please do SetMovieName( your movie name )")
-        PleaseSetMovieName() #call an undefined function to make Jupyter report an error and stop here.
+        raise(Exception("Please do SetMovieName( your movie name )"))
 
     MovieNamePath=ResultsDir+MovieName
 
@@ -348,10 +349,8 @@ def plotprob(start,finish,level=0):
         ax.vlines(sdlo,0,1.0)
         ax.vlines(sdhi,0,1.0)
     ax.legend()
-    #plt.show()
     plt.savefig(ResultsDir+"ProbFunction.jpg")
-    if __name__ == "__main__" :
-        plt.show(block=False)
+    #plt.show(block=False)
 #for testing
 #plotprob(0.0,20,0.5)
 #plotprob(0.0,20,0.98)
@@ -486,8 +485,7 @@ def plotDiffs(fns, w, movn):
     ax.legend(title="Pix Color Intensities",bbox_to_anchor=(0.95, 0.83))
 
     plt.savefig(ResultsDir+movn+str(fns)+"-"+str(fns-1+w)+".tiff")
-    if __name__ == "__main__" :
-        plt.show(block=False)
+    #plt.show(block=False)
 
 
 # In[ ]:
@@ -594,8 +592,7 @@ def plotCounts(fns, w, movn):
 
 
     plt.savefig(ResultsDir+movn+str(fns)+"-"+str(fns+w)+"counts.tiff")
-    if __name__ == "__main__" :
-        plt.show(block=True)
+    #plt.show(block=False)
 
 
 # In[ ]:
@@ -692,11 +689,28 @@ f"""Case 2 is NumPixAbvThrSumMin:NPC < NinSubThr[i] < NumPixAbvThrSumMax:NPC
 # In[ ]:
 
 
+def askcontinue():
+    fig = plt.figure("CLOSE ME and OTHER GRAPHICS WINDOWS to go on", figsize=[15,1],facecolor='red')
+    plt.show(block=True)
+
+
+# In[ ]:
+
+
 def doit(fns,w):
+    if fns <= 0:
+        print("Diff frame numbers must start at 1 or greater, not ", fns)
+        fns = 1
+    if w < 1 or w > len(v1bdata):
+        print("Number of frames ",w," must >= 1 and < data length ", len(v1bdata))
+        print("Program reset it to 50.")
+        w = 50
+
     printstuff(fns,w)
     plotDiffs(fns,w,MovieName)
     plotCounts(fns,w,MovieName)
     printEvtNandbabyfn(fns,w)
+    askcontinue()
 
 
 # In[ ]:
@@ -714,8 +728,9 @@ if __name__ == "__main__" :
 
 
     #doit(70,50)
-    doit(130,25)
-    doit(154,9)
+    doit(101,100)
+    doit(201,100)
+    #doit(154,9)
     #doit(300,130)
 
 
@@ -723,12 +738,6 @@ if __name__ == "__main__" :
     #doit(400,44)
 
 #Yes, Python's running a package script as an application works in Jupyter notebooks.
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:
