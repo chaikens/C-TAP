@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 def helpVis():
@@ -17,7 +17,7 @@ Then, any numbers of
 doit(<start frame number>, <number of frames""")
 
 
-# In[2]:
+# In[ ]:
 
 
 def howto(what="see_frames"):
@@ -54,7 +54,7 @@ def howto(what="see_frames"):
     print("Read Phase1bVisualizer source or in jupyter, do howto? and read the documentation")
 
 
-# In[3]:
+# In[ ]:
 
 
 import numpy as np
@@ -64,7 +64,7 @@ import matplotlib.lines as lines
 from scipy import optimize as opt
 
 
-# In[4]:
+# In[ ]:
 
 
 # We save this list instead of just passing it to np.dtype(_) so we can iterate thru the fields of our data type.
@@ -107,7 +107,7 @@ def makeDiffMats(v):
     return { 'PixIntDiffExtremal':PixIntDiffExtremal, 'NsPixInThr':NsPixInThr, 'NPixInSThr':NPixInSThr}
 
 
-# In[5]:
+# In[ ]:
 
 
 # develop an extension of Ph1adt for --verbose-file output
@@ -147,7 +147,7 @@ Ph1bVdt = np.dtype(Ph1bVdtList)
 # Originally bool values are np.int16 because some must be multipled by larger factors for plotting.
 
 
-# In[6]:
+# In[ ]:
 
 
 # We save this list instead of just passing it to np.dtype(_) so we can iterate thru the fields of our data type.
@@ -178,7 +178,7 @@ def printglobals(v1bglobaldata):
         i = i + 1
 
 
-# In[7]:
+# In[ ]:
 
 
 ResultsDir = None
@@ -302,7 +302,7 @@ def GetData(): #common for any frame number range
     plotprob(0,10,v1bglobaldata['level'])
 
 
-# In[8]:
+# In[ ]:
 
 
 #Later, getdata() replaces these with params from 1b global data, and calls for the plot.
@@ -357,7 +357,7 @@ def plotprob(start,finish,level=0):
 #plotprob(0.0,20,0.98)
 
 
-# In[9]:
+# In[ ]:
 
 
 def plotsetup(fns, w, movn):
@@ -368,7 +368,7 @@ def plotsetup(fns, w, movn):
     return fig, ax
 
 
-# In[10]:
+# In[ ]:
 
 
 #for plotting Differences
@@ -408,13 +408,13 @@ def plotDiffs(fns, w, movn):
 
     xes=np.arange(fns,fns+w)
 
-    ax.hlines(v1bglobaldata['biggestThr'],fns-1,fns+w,label='MaxThr:=biggestThr param',color='green')
+    ax.hlines(v1bglobaldata['biggestThr'],fns,fns-1+w,label='MaxThr:=biggestThr param',color='green')
     frseph=max(frseph,v1bglobaldata['biggestThr'])
 
-    ax.hlines(v1bglobaldata['smallestThr'],fns-1,fns+w,label='smallestThr(smtThr) param',color='blue')
+    ax.hlines(v1bglobaldata['smallestThr'],fns,fns-1+w,label='smallestThr(smtThr) param',color='blue')
     frseph=max(frseph,v1bglobaldata['smallestThr'])
 
-    ax.hlines(v1bglobaldata['MinThr'],fns-1,fns+w,label='MinThr(overall avg,std)but>=smtThr',color='red')
+    ax.hlines(v1bglobaldata['MinThr'],fns,fns-1+w,label='MinThr(overall avg,std)but>=smtThr',color='red')
     frseph=max(frseph,v1bglobaldata['smallestThr'])
 
     yes=vfunstd(xes)*2
@@ -422,14 +422,14 @@ def plotDiffs(fns, w, movn):
     frseph=max(frseph,yes.max())
 
     [sdlo,sdhi]=mysdranges(v1bglobaldata['level'])
-    ax.hlines(sdhi*2,fns-1,fns+w,label='prob>level if stdev>upper line')
-    ax.hlines(sdlo*2,fns-1,fns+w,label='prob>level if stdev<lower line')
+    ax.hlines(sdhi*2,fns,fns-1+w,label='prob>level if stdev>upper line')
+    ax.hlines(sdlo*2,fns,fns-1+w,label='prob>level if stdev<lower line')
 
     yes=vfunmean(xes)
     ax.plot(xes,yes,label='mean')
 
-    ax.plot(v1bdata['frame'][fns-1:fns+w],v1bdata['AbsMax'][fns-1:fns+w],label='AbsMax')
-    frseph=max(frseph,v1bdata['AbsMax'][fns-1:fns+w].max())
+    ax.plot(v1bdata['frame'][fns-1:fns-1+w],v1bdata['AbsMax'][fns-1:fns-1+w],label='AbsMax')
+    frseph=max(frseph,v1bdata['AbsMax'][fns-1:fns-1+w].max())
 
 
     #We no longer plot the "prob[i]" because we now plot 
@@ -451,31 +451,31 @@ def plotDiffs(fns, w, movn):
 
     #Highlight diff frames contained in events--pink for the first of a new event, white for the rest
     #ax.bar(v1bdata['frame'][fns-1:fns+w],frseph*notnegv(v1bdata['EvtN'][fns-1:fns+w]),alpha=0.25,color='white')
-    ax.bar(v1bdata['frame'][fns-1:fns+w], frseph*newevtfrm[fns-1:fns+w],alpha=0.25,color='pink')
-    ax.bar(v1bdata['frame'][fns-1:fns+w], frseph*oldevtfrm[fns-1:fns+w],alpha=0.25,color='white')
+    ax.bar(v1bdata['frame'][fns-1:fns-1+w], frseph*newevtfrm[fns-1:fns-1+w],alpha=0.25,color='pink')
+    ax.bar(v1bdata['frame'][fns-1:fns-1+w], frseph*oldevtfrm[fns-1:fns-1+w],alpha=0.25,color='white')
 
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],frseph*v1bdata['SignalTruth'][fns-1:fns+w],marker='s',s=6,color='white',label='SignalTruth')
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.99)*v1bdata['GoldE'][fns-1:fns+w],marker='^',s=6,color='white',label='GoldE')
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],frseph*v1bdata['SignalTruth'][fns-1:fns-1+w],marker='s',s=6,color='white',label='SignalTruth')
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.99)*v1bdata['GoldE'][fns-1:fns-1+w],marker='^',s=6,color='white',label='GoldE')
 
     # Case 1: probGTlevel &&
     # AbsMaxGTMinThr AbsMaxLTMaxThr NumPixAbvSubThrSumGTMinPix NumPixAbvSubThrSumLTMaxPix
     name='probGTlevel'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.98)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.98)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='AbsMaxGTMinThr'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.97)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.97)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='AbsMaxLTMaxThr' 
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.96)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.96)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='NumPixAbvSubThrSumGTMinPix' 
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.95)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.95)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='NumPixAbvSubThrSumLTMaxPix'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.94)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name )
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.94)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name )
 
     # Case 4: (2 and 3 are for obsolete B1,3,4 cameras, ignore)
     # stnGTNumPixAbvThrSumMin && stnLTNumPixAbvThrSumMax
     name='stnGTNumPixAbvThrSumMin'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.93)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='orange',label=name )
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.93)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='orange',label=name )
     name='stnLTNumPixAbvThrSumMax'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.92)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='orange',label=name )
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.92)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='orange',label=name )
 
     #Visualize values of SubThr and MainThr
     goodleftplace=(v1bdata['frame'][fns-1])+0.98*w
@@ -485,12 +485,12 @@ def plotDiffs(fns, w, movn):
 
     ax.legend(title="Pix Color Intensities",bbox_to_anchor=(0.95, 0.83))
 
-    plt.savefig(ResultsDir+movn+str(fns)+"."+str(fns+w)+".tiff")
+    plt.savefig(ResultsDir+movn+str(fns)+"-"+str(fns-1+w)+".tiff")
     if __name__ == "__main__" :
         plt.show(block=False)
 
 
-# In[11]:
+# In[ ]:
 
 
 #for plotting Counts, numbers
@@ -564,41 +564,41 @@ def plotCounts(fns, w, movn):
 
     #Highlight diff frames contained in events--pink for the first of a new event, white for the rest
     #ax.bar(v1bdata['frame'][fns-1:fns+w],frseph*notnegv(v1bdata['EvtN'][fns-1:fns+w]),alpha=0.25,color='white')
-    ax.bar(v1bdata['frame'][fns-1:fns+w], frseph*newevtfrm[fns-1:fns+w],alpha=0.25,color='pink')
-    ax.bar(v1bdata['frame'][fns-1:fns+w], frseph*oldevtfrm[fns-1:fns+w],alpha=0.25,color='white')
+    ax.bar(v1bdata['frame'][fns-1:fns-1+w], frseph*newevtfrm[fns-1:fns-1+w],alpha=0.25,color='pink')
+    ax.bar(v1bdata['frame'][fns-1:fns-1+w], frseph*oldevtfrm[fns-1:fns-1+w],alpha=0.25,color='white')
 
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],frseph*v1bdata['SignalTruth'][fns-1:fns+w],marker='s',s=6,color='white',label='SignalTruth')
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.99)*v1bdata['GoldE'][fns-1:fns+w],marker='^',s=6,color='white',label='GoldE')
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],frseph*v1bdata['SignalTruth'][fns-1:fns-1+w],marker='s',s=6,color='white',label='SignalTruth')
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.99)*v1bdata['GoldE'][fns-1:fns-1+w],marker='^',s=6,color='white',label='GoldE')
 
     # Case 1: probGTlevel &&
     # AbsMaxGTMinThr AbsMaxLTMaxThr NumPixAbvSubThrSumGTMinPix NumPixAbvSubThrSumLTMaxPix
     name='probGTlevel'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.98)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.98)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='AbsMaxGTMinThr'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.97)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.97)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='AbsMaxLTMaxThr' 
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.96)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.96)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='NumPixAbvSubThrSumGTMinPix' 
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.95)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name)
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.95)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name)
     name='NumPixAbvSubThrSumLTMaxPix'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.94)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='yellow',label=name )
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.94)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='yellow',label=name )
 
     # Case 4: (2 and 3 are for obsolete B1,3,4 cameras, ignore)
     # stnGTNumPixAbvThrSumMin && stnLTNumPixAbvThrSumMax
     name='stnGTNumPixAbvThrSumMin'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.93)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='orange',label=name+' for Case2' )
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.93)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='orange',label=name+' for Case2' )
     name='stnLTNumPixAbvThrSumMax'
-    ax.scatter(v1bdata['frame'][fns-1:fns+w],(frseph*0.92)*v1bdata[name][fns-1:fns+w],marker='+',s=6,color='orange',label=name+' for Case2' )
+    ax.scatter(v1bdata['frame'][fns-1:fns-1+w],(frseph*0.92)*v1bdata[name][fns-1:fns-1+w],marker='+',s=6,color='orange',label=name+' for Case2' )
 
     ax.legend(title='Counts', bbox_to_anchor=(0.95, 0.83))
 
 
-    plt.savefig(ResultsDir+movn+str(fns)+"."+str(fns+w)+"counts.tiff")
+    plt.savefig(ResultsDir+movn+str(fns)+"-"+str(fns+w)+"counts.tiff")
     if __name__ == "__main__" :
         plt.show(block=True)
 
 
-# In[12]:
+# In[ ]:
 
 
 def whereinbaby(i):
@@ -623,7 +623,7 @@ def printEvtNandbabyfn(fns,w=200,limit=200):
     print("")
 
 
-# In[13]:
+# In[ ]:
 
 
 def printstuff(fns,w):
@@ -689,7 +689,7 @@ f"""Case 2 is NumPixAbvThrSumMin:NPC < NinSubThr[i] < NumPixAbvThrSumMax:NPC
 
 
 
-# In[14]:
+# In[ ]:
 
 
 def doit(fns,w):
@@ -699,7 +699,7 @@ def doit(fns,w):
     printEvtNandbabyfn(fns,w)
 
 
-# In[15]:
+# In[ ]:
 
 
 if __name__ == "__main__" :
@@ -708,18 +708,27 @@ if __name__ == "__main__" :
     SetMovieName("DroneShort1FullDecimated")
     #SetRunNumber()
     GetData()
+    #doit(1,2)
 
 
 
-    doit(70,100)
-    doit(170,130)
-    doit(300,130)
+
+    #doit(70,50)
+    doit(130,25)
+    doit(154,9)
+    #doit(300,130)
 
 
     #doit(200,200)
     #doit(400,44)
 
 #Yes, Python's running a package script as an application works in Jupyter notebooks.
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
