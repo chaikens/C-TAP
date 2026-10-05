@@ -17,16 +17,33 @@ Then, any numbers of
 doit(<start frame number>, <number of frames""")
 
 
-# In[ ]:
+# In[1]:
 
 
 def howto(what="see_frames"):
     """
     How to view the movie frames corresponding to Phase1bVisualizer output:
 
-    This sofware visualizes FLIR's processing of data from frame diffs to the lines in FLIR's .int file.
+    (1) Get a tick number from the x-axis--the frame number of the movie input to Phase1a.
+        - (Pixel intensity differences are from this frame MINUS the previous frame.) 
+        - This movie input is the pre-decimated, half-resolution, numbered Preprocessing (PP) result;
+           not the original movie if preprocessing is done.
+        - Input the tick number to YUView's the lower-left box. 
+          (When YUView is commanded to open from a folder, see the lower-left corner, 
+           and instead of "All supported file format", select "Any files".)
 
-    These are the frames in the movie input to Phase1a. That movie is NOT the original from the camera.
+    (1a) If the column is transparently highlit, you can also get the corresponding frame in
+         the baby movie from the corresponding triple explained in (4) below.  
+         - You can also get it by evaluating vs.whereinbaby(<frame number>)
+
+    (2) The corresponding original movie's frame number is drawn in the upper left corner of 
+        the above, if preprocessing was done.  Otherwise, you are looking at the original frame.
+
+    (3) A transparently highlit column corresponds to a line in the .out file and baby movie frame.
+        - Pink denotes the first frame of an event.
+
+    (4) This baby movie frame number is the 3rd of the triple whose first is the above frame number.
+        - The 2nd is the event number.  Note they repeat until the next corresponds to a pink column.
 
     When preprocessing is done, these frames belong to the movie in the PP directory.
     They
@@ -40,15 +57,7 @@ def howto(what="see_frames"):
          (3) Ffmpeg is called with a draw filter called before the decimate filter to draw the 
              frame number from the original, non-decimated movie in the upper left corner.
 
-    The PP input frame number [ipp] is indexed by the horizontal axis ticks.
-
-    This number can be entered into the small bottom left corner box of our recommended viewer YUView.
-    (Fix for YUView minor annoyance: when opening a file, in the file selector window's lower left corner,
-    instead of "All supported file format", select "Any files" 
-
-    Frames that comprise the baby movie (with .MOV) suffix are flagged by transparent white columns.
-    To view them in the baby movie, look up ipp in the printed list of triples, or call whereinbaby(ipp).
-    The baby movie frame number is the third of your found triple, or returned by whereinbaby(ipp).
+    The PP input frame number [ipp] is indexed by the horizontal axis ticks. 
     """
     #if what = "see_frames":
     print("Read Phase1bVisualizer source or in jupyter, do howto? and read the documentation")
