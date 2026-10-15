@@ -68,7 +68,10 @@ then
     #ffmpeg_pipe_extract shell function already has $time_cmd_prefix
     $(ffmpeg_pipe_extract ${movie_file}) &
 
-    
+    # : means evaluate args but do nothing
+    : ${width:=$(widthOfMovie $movie_file)}
+    : ${height:=$(heightOfMovie $movie_file)}
+
 
     echo "yuvSelectMulti will block to make bmps from Phase1b's picked yuv frames. Get coffee and watch ffmpeg xterm."
     ${time_cmd_prefix} ${SOFTWARE_DIR}/yuvSelectMulti ${width}x${height} 3 4 3<${phase1b_out} 4<${pipe_yuv} \

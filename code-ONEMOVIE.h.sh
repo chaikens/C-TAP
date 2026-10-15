@@ -125,7 +125,7 @@ IMAGE_MASK_BASE="${moviePrefix}.btmask.${logn}"
 # or be symbolically linked to an old Phase1a results file (or symlink!)
 # or be ignored, depending on the following tests
 
-if [ ${PHASE_1a_RESULT_OLD_N_OR_NONE}xxx = xxx ]
+if [ ${USE_OLD_PHASE_1a_RESULT_N}xxx = xxx ]
 then
     #Make a file to hold a result we will compute.
     cat /dev/null > ${RESULTS_DIR}/${RESULT_OF_1a_BASE}
@@ -164,34 +164,29 @@ then
     ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
 else
 
-    if [[ $PHASE_1a_RESULT_OLD_N_OR_NONE =~ ^[0-9]+$ ]]
+    if [[ $USE_OLD_PHASE_1a_RESULT_N =~ ^[0-9]+$ ]]
     then
    	#This value is decimal whole number
 	#We do not do Phase 1a but make a symlink for other stages to use an old version
 	pushd ${RESULTS_DIR}
-	if [ -r ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ]
+	if [ -r ${moviePrefix}.int.${USE_OLD_PHASE_1a_RESULT_N} ]
 	then
-	    ln -s ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.int.${logn}
-            ln -s ${moviePrefix}.btmask.${PHASE_1a_RESULT_OLD_N_OR_NONE} ${moviePrefix}.btmask.${logn}
+	    ln -s ${moviePrefix}.int.${USE_OLD_PHASE_1a_RESULT_N} ${moviePrefix}.int.${logn}
+            ln -s ${moviePrefix}.btmask.${USE_OLD_PHASE_1a_RESULT_N} ${moviePrefix}.btmask.${logn}
 	    popd
 	else
    	    echo You are trying to reuse a Phase1a result that doesn\'t exist.
 	    echo In $0
-	    echo You set PHASE_1a_RESULT_OLD_N_OR_NONE to $PHASE_1a_RESULT_OLD_N_OR_NONE
+	    echo You set USE_PHASE_1a_RESULT_N to $USE_OLD_PHASE_1a_RESULT_N
 	    echo but we can\'t read
-	    echo ${moviePrefix}.int.${PHASE_1a_RESULT_OLD_N_OR_NONE}
+	    echo ${moviePrefix}.int.${USE_PHASE_1a_OLD_RESULT_N}
 	    kill_our_xterms
 	    exit 1
 	fi
 	ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
     else
-	if [ ${PHASE_1a_RESULT_OLD_N_OR_NONE}Y = NONEY ]
-	then
-	    echo We are scripted to both no do and not use Phase1a results
-	    echo It is not implemented yet to using old Phase1b results for something new.
-	    echo ERROR
-	    exit 1
-	fi
+	echo USE_PHASE_1a_RESULT_N should be a number, not $USE_OLD_PHASE_1a_RESULT_N
+	exit 1
     fi
 fi
 echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."

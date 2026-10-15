@@ -57,8 +57,13 @@ then
 	echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
 	COPYMOVIES=
     else
-	COPYMOVIES=true
-	mkdir -p $FAST_MOVIE_DIR
+	if [ ${USE_OLD_PHASE_1a_RESULT_N}x = "x" ]
+	then
+	    COPYMOVIES=
+	else
+	    COPYMOVIES=true
+	    mkdir -p $FAST_MOVIE_DIR
+	fi
     fi
 fi
 

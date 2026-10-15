@@ -21,17 +21,12 @@ echo YOUR-SYSCONF-$JOBNAME          #
 
 PHASE_1b_VERBOSE=yes
 
-PHASE_1a_RESULT_OLD_N_OR_NONE=2
-width=1920
-height=1080
+PHASE_1a_RESULT_OLD_N_OR_NONE=
+#width=1920
+#height=1080
 
 
-FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
-#these are used even for pipeline arch, where
-#the BITMAP dir is used for the BABY MOVIE
-BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED/bmdir 
-BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
-BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
+OPT_BIG_FAST_DIR="/media/seth/CTAP"
 
 PHASE_1a=F1a.orig
 

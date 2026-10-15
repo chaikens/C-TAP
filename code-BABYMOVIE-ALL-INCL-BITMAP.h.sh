@@ -227,6 +227,15 @@ do
     make_baby_cmd="ffmpeg -hide_banner -y -threads 0 -r 60 -f image2 -pattern_type glob -i 'pic*.bmp' -vcodec libx264 -crf 25 -pix_fmt yuv420p "${RESULTS_DIR}/${generic_baby_movie_name}" &>> ${RESULTS_DIR}/ffmpeg.log"
     (echo ; echo -n "cd "; pwd; echo ${make_baby_cmd}; echo ) | cat >> ${COMMAND_ARCHIVE_PATHNAME}
 
+
+    if [ -${xterm_ffmpeg_pid}x = "x" ]
+    then
+	touch ${RESULTS_DIR}/ffmpeg.log
+	xterm -bg '#E0FFFF' ${XTERM_PARAM} -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
+	#xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
+	xterm_ffmpeg_pid=$!  #to ensure just one xterm for ffmpeg; may kill at end.
+    fi
+
     eval ${time_cmd_prefix} ${make_baby_cmd}
     
     if [ ${KEEP_BABY_BMPS}poo != yespoo ]
