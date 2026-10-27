@@ -53,8 +53,7 @@ int main(int argc, char *argv[])
 {
   xml_document doc;
   if(!argv[1]) { error(1, 0, "Must give something.xml argument."); }
-  cout << "node_element=" << node_element << endl;
-  xml_parse_result pres = doc.load_file(argv[1]);
+  xml_parse_result pres = doc.load_file(argv[1], parse_default | parse_trim_pcdata);
   cout << "Load status=" << pres.description() << endl;
   xml_node top = doc.first_child();
   //traverse( top, 0);

@@ -1,4 +1,3 @@
-node_element=2
 Load status=No error
 Node type="1"
 Node name=""
@@ -15,9 +14,7 @@ Begin children loop (will recurse).
 1Begin children loop (will recurse).
 12Node type="3"
 12Node name=""
-12Node valu="
-  #attributes must be quoted
-  "
+12Node valu="#attributes must be quoted"
 12Begin attribute loop
 12End attr loop.
 12Begin children loop (will recurse).
@@ -32,9 +29,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    0
-  "
+123Node valu="0"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -50,9 +45,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-                         254
-  "
+123Node valu="254"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -68,9 +61,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    0
-  "
+123Node valu="0"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -86,9 +77,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    67
-  "
+123Node valu="67"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -104,9 +93,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    0.633
-  "
+123Node valu="0.633"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -122,9 +109,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    1.97
-  "
+123Node valu="1.97"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -140,9 +125,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    1.89
-  "
+123Node valu="1.89"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -158,9 +141,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    2.5
-  "
+123Node valu="2.5"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -176,9 +157,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    0
-  "
+123Node valu="0"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -194,9 +173,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    3
-  "
+123Node valu="3"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -212,9 +189,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    20
-  "
+123Node valu="20"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -230,9 +205,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    0
-  "
+123Node valu="0"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -248,9 +221,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    -2
-  "
+123Node valu="-2"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -266,9 +237,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    1
-  "
+123Node valu="1"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -284,9 +253,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    1.0
-  "
+123Node valu="1.0"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -302,9 +269,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    100
-  "
+123Node valu="100"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -320,9 +285,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    900
-  "
+123Node valu="900"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -338,9 +301,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    0
-  "
+123Node valu="0"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -356,9 +317,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    1919
-  "
+123Node valu="1919"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
@@ -374,9 +333,7 @@ Begin children loop (will recurse).
 12Begin children loop (will recurse).
 123Node type="3"
 123Node name=""
-123Node valu="
-    14
-  "
+123Node valu="14"
 123Begin attribute loop
 123End attr loop.
 123Begin children loop (will recurse).
