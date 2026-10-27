@@ -35,6 +35,8 @@ BABY_MOVIE_CIRCLE_RAD_DIV=100;
 # So, default for now is yes
 if [ ${ALLOW_THRASHING_BABIES}wawa != yeswawa ]
 then
+    ${SOFTWARE_DIR}/semclose BABYMAKER 2>/dev/null #rid hangup when
+    # the semaphore remains after a failure or a killing.
     ${SOFTWARE_DIR}/semopen BABYMAKER 1
     (echo -n TIME: Will do semdown BABYMAKER; date) | cat >> ${LOG}
     (echo -n Will do semdown BABYMAKER; date)
