@@ -181,7 +181,6 @@ do
 	#running this loop in a modern interpeter having an imagemagic api
 	#would be best.  Perhaps we can do this all with the ffmpeg draw filter,
 	#if we can get it to read params from a file, one read for each frame.
-
 	#if (( $frame %1500 == 0 ))
 	if (( frame > time_convert_after ))
 	then
@@ -189,11 +188,9 @@ do
 	    time_convert_after_incr=$((time_convert_after_incr + 1 + time_convert_after_incr / 2))
 	    #echo $time_convert_after '(next) + ' $time_convert_after_incr
 	    echo "(Timing) Imagemagick on 1b selected decimated movie frame "$frame
-	    #We must use eval or else Imagemagick gets circle, $i, etc as separate params.
-	    eval $time_cmd_prefix $BITMAP_EDIT_CMD
 	else
 	    eval $BITMAP_EDIT_CMD
-	fi
+	fi	
 
 	#Don't bother saving nohow since it differs little from outbmpPaName img
 	if [ ${inbmpPaName} != ${outbmpPaName} ]

@@ -69,6 +69,15 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
+#OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+
+############ Vary CamSett.txt settings here! #########
+#
+#Our diff from Camsett.ext is the max y cood clipping
+#is adjusted to add speed advantage to the new ground hugging
+#clipping we now have.  The exclusion zone is activated by
+#setting --camera-index 2
+
 
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
@@ -142,7 +151,7 @@ OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 
 #for HALF-RESOLUTION with DECIMATION extraction.
 #Also, the 2nd filter setpts is set presentation timestamps
-FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB,drawtext=fontfile=arial.ttf:text=%{n}:x=(w-tw)-70:y=(2*lh)-30:fontcolor=white:box=1:boxcolor=0x00000099:fontsize=30" 
+FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 #See code-ANALYSIS.h.sh for the ffmpeg commands using this (or these) above
 # single output options.
