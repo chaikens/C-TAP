@@ -13,7 +13,10 @@ UnivI420pUnc4096x4096.yuv : MakeUnivI420pUnc.cpp
 	$(CXX) $(CXXFLAGS)  MakeUnivI420pUnc.cpp
 	./a.out
 	rm a.out
-	-YUView UnivI420pUnc4096x4096.yuv &
+        #To see the BMP to YUV conversion table we will use to make UnivI420pUnc4096x4096.bmp,
+        # use the line below with the given, recommended,
+        #or other software that will display a YUV image
+        #-YUView UnivI420pUnc4096x4096.yuv &
 
 
 UnivI420pUnc4096x4096.bmp  : UnivI420pUnc4096x4096.yuv
