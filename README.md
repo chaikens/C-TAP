@@ -8,21 +8,21 @@ Google drive folder https://drive.google.com/drive/folders/15EOdKlvIPG9ORDVy3WBh
 If you don't have access, contact Matthew Szydagis at <matthew.szydagis@gmail.com>.
 
 The results of today's 4-way comparison are visible in the 4 directories
-RESULTS-jobDS1[Full,Half]Decimated[FRAME,PIPE].
+`RESULTS-jobDS1[Full,Half]Decimated[FRAME,PIPE]`.
 
 Try it yourself:
-First, put DroneShort1.mp4 in  this directory.
+First, put `DroneShort1.mp4` in  this directory.
 
 Then, edit directory entries in
-the 4 C-TAP-jobDS1*.sh files for your system.
+the 4 `C-TAP-jobDS1*.sh` files for your system.
 
-Finally, execute DEMO.sh
+Finally, execute `./DEMO.sh`
 A shell run of all 4 is in DEMO.shellrun.txt
 
 The results and logs for the 4 demo runs, except for the .MOV baby movies, are in the
-directories symbolically linked from DemoFullFrame DemoFullPipe DemoHalfFrame DemoHalfPipe.
+directories symbolically linked from `DemoFullFrame DemoFullPipe DemoHalfFrame DemoHalfPipe`.
 
-We now have pipelining and .bmp frame storage as options to the same system. The results 
+We now have pipelining and .bmp (image) frame storage as options to the same system. The results 
 show that for this test movie, the (1) .bmp disk storage architecture and (2) architecture
 to pipe extract raw YUV images through our table-based YUV-BMP converter to the first
 phase of the FLIR algorithm 
@@ -34,7 +34,7 @@ tests and (2) testing the functionality automatically iterating over
 a collection of movies.
 
  and improved configuration
-(CamSett.txt) management, to demonstrate the cropping functionality.
+(`CamSett.txt`) management, to demonstrate the cropping functionality.
 
 v1.0 (in the main branch) is mild refactorization of the original C-TAP. 
 It puts .bmp (Classical, 54-byte header) files on the disk after using 
@@ -52,14 +52,31 @@ of arbitrary image resolutions instead of 1920x1040 only.
 That is in progress on the devel-scaling branch.
 
 Developed on Ubuntu. 
-Packages required for just the FLIR algorithm:
-git
-gcc
-g++
-ffmpeg
-imagemagick
-xterm
+
+## Packages required for just the FLIR algorithm: ##
+
+* `git`
+* `gcc`
+* `g++`
+* `ffmpeg`
+* `imagemagick`
+
+## Optional Packages for additional features: ##
+
+* `xterm` or other command to run a shell command argument (`less`): Supports our option
+to display the logs and data file outputs as they are written.
 
 Optional:
 YUView (to display the yuv 420p to bgr conversion table we build)
 
+# Kinds of files and directories #
+
+  * `m-some-*`  directory of input, original or preprocessed movies, or symlink to one.
+  
+  * `RESULTS`-jobname directory of outputs and logs for the possibly multimovie named job.
+  
+  * `C-TAP-jobname.sh` Execute (./C-TAP-jobname.sh) to run this named job.
+  
+  * `code-*.h.sh` Subscripts constituting the software executed via ./C-TAP-jobname.sh
+  
+  
