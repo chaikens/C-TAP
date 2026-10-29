@@ -45,6 +45,12 @@ imgdim=${width:=$(widthOfMovie $movie_file)}x${height:=$(heightOfMovie $movie_fi
 #BabyFilter hard codes fd=3 for yuv input, fd=4 for yuv output
 ${time_cmd_prefix} ${SOFTWARE_DIR}/BabyFilter --phase-1b-file ${phase1b_out} --offset 1 ${imgdim} 3< ${pipe_yuv_to_filter} 4> ${pipe_yuv_from_filter} 2>>${LOG} &
 
+#Not put in jobname.cmds.n because the 3 file redirections didn't occur when the script assigned the above line, "quoted", to a variable,
+#(that variable echo'ed to the cmds log), and that variable run as $var &
+#We don't really need the cmds log when we time the commands, because the verbosed time command puts the cmd line in the log.
+#I guess the redirections should be done to the time command's process, not the timed command.
+#More systems research might give a better fix.
+
 #Stage 3
 ${time_cmd_prefix} ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25  "${RESULTS_DIR}/${generic_baby_movie_name}" &>>${RESULTS_DIR}/ffmpeg.log
 
