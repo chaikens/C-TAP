@@ -13,22 +13,7 @@ echo YOUR-SYSCONF-$JOBNAME          #
 
 PHASE_1b_VERBOSE=yes
 
-#Omitting Phase1a omits detecting widthXheight from
-#the input movie, so we set them (unreliably) by
-#hand since they are needed baby movie making.
-#(We could program baby movie making to do this
-#when (in fileframe) it accesses bitmaps
-#or   (in pipeline) it accesses the movie to yuvstream
-# ffmpeg filter.  But for now we just hack for
-#DS1 Full-decimation
-PHASE_1a_RESULT_OLD_N_OR_NONE=2
-width=3840
-height=2160
-
-
-
-
-
+USE_OLD_PHASE_1a_RESULT_N=2
 
 
 

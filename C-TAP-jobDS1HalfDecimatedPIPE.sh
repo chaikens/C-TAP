@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+ #!/usr/bin/bash
 #FOR STANDARD USAGE, EDIT ONLY      #
 #THE FILE-NAME OF THIS SCRIPT       #
 #AND CODE OUTSIDE BOXES LIKE THIS.  #
@@ -10,27 +10,11 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
-#Omitting Phase1a omits detecting widthXheight from
-#the input movie, so we set them (unreliably) by
-#hand since they are needed baby movie making.
-#(We could program baby movie making to do this
-#when (in fileframe) it accesses bitmaps
-#or   (in pipeline) it accesses the movie to yuvstream
-# ffmpeg filter.  But for now we just hack for
-#DS1 Half-decimation
-
-PHASE_1b_VERBOSE=yes
-
-PHASE_1a_RESULT_OLD_N_OR_NONE=
-#width=1920
-#height=1080
-
-
 OPT_BIG_FAST_DIR="/media/seth/CTAP"
 
-PHASE_1a=F1a.orig
+PHASE_1a=F1a.orig #keep for devel
 
-ARCHITECTURE="pipeline"
+ARCHITECTURE="pipeline" #keep for devel
 #"framefile" #vs pipeline
 
 
