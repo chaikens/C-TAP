@@ -16,7 +16,7 @@ fi
 #We try to set these when needed automatically now.
 #After testing, please remove any settings in C-TAP-job.sh scripts.
 #When Phase1a is run, the input movie file is probed by ffmpeg to set these
-#However, when PHASE_1a_OLD_RESULT_N=nnn is set so movie.out.nnn
+#However, when USE_OLD_PHASE_1a_RESULT_N=nnn is set so movie.out.nnn
 #is reused, the movie is not probed (since we don't need it and may have
 #removed or reused its storage).  Then, width and height should be set
 #manually.
@@ -31,7 +31,12 @@ fi
 # on the output of a 2nd run of ffmpeg that writes yuv frames to a pipe.
 # When set to no, bitmaps must have been extracted and they are used
 # to make the baby movie
-NEW_BABY_DEVEL=yes
+
+#For current releases, the 1a pipeline arch will be mandatory, so
+#babymovie making will be mandatory also.  Hence we don't use this
+#variable for decision making
+ARCHITECTURE=pipeline
+#NEW_BABY_DEVEL=yes
 
 #DOC: TRY_CONVERT_picbmp_TO_picbmpsee code-BABYMOVIE-BMP.h.sh
 # variations for performance improving development
@@ -89,14 +94,13 @@ USE_OLD_PHASE_1a_RESULT_N=
 #DOD: PHASE_1a executable name in SOFTWARE_DIR.
 PHASE_1a="F1a.orig"
 
-#DOC: PHASE_1b_RESULT_N_OR_NONE
-#intention is to skip 1b processing, say to modify features of the baby movie.
-PHASE_1b_RESULT_N_OR_NONE=
-
 #DOC: PHASE_1b_VERBOSE gives the Phase1b option
 # " --verbose-file $phase1b_verbose_base "
 # phase1b_verbose_base is local to code_ONEMOVIE.h.sh
-PHASE_1b_VERBOSE=no
+#The resulting files are input to the Python plotting
+#visualization of how frames are selected for the baby movie.
+
+PHASE_1b_VERBOSE=yes
 
 #DOC: MAKE_BABY_MOVIE name tells all
 MAKE_BABY_MOVIE=yes
@@ -136,8 +140,6 @@ SLOW_MOVIE_DIR=$(pwd)
 #it is copied to a faster dir, used from there, and
 #the copy is deleted when done.
 FAST_MOVIE_DIR=$(pwd)/TMPMOVIEDIR
-
-
 
 #In no case do we delete the original copy.
 

@@ -374,12 +374,13 @@ then
     if [ $phase1b_failed"wawa" = "nowawa" ]
     then
 	echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
-	if [ ${NEW_BABY_DEVEL} = "yes" ]
-	then
+	#for current releases, always use pipelined baby movie making.
+	#if [ ${NEW_BABY_DEVEL} = "yes" ]
+	#then
 	    source "${SOFTWARE_DIR}/code-BABYMOVIE-ALL-INCL-BITMAP.h.sh"
-	else
-	    source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
-	fi
+	#else
+	#    source "${SOFTWARE_DIR}/code-BABYMOVIE-BMP.h.sh"
+	#fi
     fi
 else
     echo "No baby movie today, someone said no."

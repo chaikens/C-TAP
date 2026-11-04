@@ -26,7 +26,6 @@ echo YOUR-SYSCONF-$JOBNAME #
 ############################
 
 PHASE_1a=F1a.orig.backwards
-PHASE_1a_RESULT_OLD_N_OR_NONE=
 
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 

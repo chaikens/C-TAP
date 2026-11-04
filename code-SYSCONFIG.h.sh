@@ -11,17 +11,18 @@ if [ $ARCHITECTURE = "pipeline" ]
 then
     #echo DEBUG: code-SYSCONFIG pipeline branch
     unset REUSE_BMPS
-    if [ ${NEW_BABY_DEVEL} = "no" ]
-    then
+    #for current releases, we always pipeline the babymovie making.
+    #if [ ${NEW_BABY_DEVEL} = "no" ]
+    #then
 	#echo DEBUG: making bitmaps dir in NEW_BABY_DEVEL = no branch.
-	if ! mkdir -p $BITMAPS_DIR
-	then
-	    echo Cant make BITMAPS_DIR $BITMAPS_DIR
-	    exit 1
-	fi
-    else
+	#if ! mkdir -p $BITMAPS_DIR
+	#then
+	#    echo Cant make BITMAPS_DIR $BITMAPS_DIR
+	#    exit 1
+	#fi
+    #else
 	unset BITMAPS_DIR
-    fi
+    #fi
 fi
 
 if [ $ARCHITECTURE = "framefile" ]
