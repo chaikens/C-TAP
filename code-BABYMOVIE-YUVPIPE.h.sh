@@ -13,7 +13,7 @@ mknod ${pipe_yuv_from_filter} p
 echo "Starting baby making yuv extract-->BabyFilter--->MOV pipeline"
 
 
-if [ -${xterm_ffmpeg_pid}x = "x" ]
+if [ ${xterm_ffmpeg_pid}x = "x" ]
 then
     touch ${RESULTS_DIR}/ffmpeg.log
     xterm -bg '#E0FFFF' ${XTERM_PARAM} -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
@@ -23,15 +23,6 @@ fi
 
 sttime=$(uptimenow)
 echo "TIME: Baby pipeline ffmpeg->yuv->BabyFilter->ffmpeg->MOV began " $sttime "sec." >> $LOG
-
-if [ -${xterm_ffmpeg_pid}x = "x" ]
-then
-    touch ${RESULTS_DIR}/ffmpeg.log
-    xterm -bg '#E0FFFF' ${XTERM_PARAM} -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &
-    #xterm -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e less -f +F ${RESULTS_DIR}/ffmpeg.log &
-    xterm_ffmpeg_pid=$!  #to ensure just one xterm for ffmpeg; may kill at end.
-fi
-
 
 # 3 Stage Pipeline
 # Stage 1
