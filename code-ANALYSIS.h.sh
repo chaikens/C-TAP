@@ -1,7 +1,20 @@
-echo SOURCED: code-ANALYSIS.h.sh
+#echo SOURCED: code-ANALYSIS.h.sh
+
+if (( PIXPROC_SCALE > MOVIE_SCALE )) 
+then
+    echo ERR: "PIXPROC_SCALE="$PIXPROC_SCALE '>' "MOVIE_SCALE"=$MOVIE_SCALE is not supported yet.
+    exit 1
+fi
+
+
+movie_scale_option="--movie-scale ${MOVIE_SCALE}"
+pixproc_scale_option="--pixproc-scale ${PIXPROC_SCALE}"
+user_scale_option="--user-scale ${USER_SCALE}"
+
+
 
 #Phase1ab common options
-opt_scaling="${MOVIE_SCALE_OPTION} ${PIXPROC_SCALE_OPTION} ${USER_SCALE_OPTION}"
+opt_scaling="${movie_scale_option} ${pixproc_scale_option} ${user_scale_option}"
 
 phase1a_options="${opt_scaling} ${OPT_CamSett} ${OTHER_OPTIONS} ${PHASE1A_OTHER_OPTIONS}"
 #check if $BITMAPS_DIR is null if we are not reusing bitmaps..I think that's done??

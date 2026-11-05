@@ -1,4 +1,4 @@
-echo SOURCED: code-HELPERS-DEFAULTS.h.sh
+#echo SOURCED: code-HELPERS-DEFAULTS.h.sh
 set -u #NOW, expanding undefined shell variables will give an error like in decent languages!
 source code-HELPERS.h.sh
 start_dir=$(pwd)
@@ -21,9 +21,19 @@ fi
 #removed or reused its storage).  Then, width and height should be set
 #manually.
 
+
 #
 # defaults
 #
+
+
+
+#Specify relative scaling between:
+MOVIE_SCALE=1    #the original or preprocessed movie
+PIXPROC_SCALE=1  #FLIR processing and baby movie
+USER_SCALE=1     #Position, size, crops in CamSett and exclusion zones
+
+
 
 #DOC: NEW_BABY_DEVEL
 # for now, new means the baby movie frames are selected by a filter
@@ -40,19 +50,23 @@ ARCHITECTURE=pipeline
 #DOC: TRY_CONVERT_picbmp_TO_picbmpsee code-BABYMOVIE-BMP.h.sh
 # variations for performance improving development
 TRY_CONVERT_picbmp_TO_picbmp="no"  # see code-BABYMOVIE-BMP.h.sh
+#I thought that when running parallel jobs on an overloaded system, thrashing
+#would reduce performance.  But I noted little or no difference.
 ALLOW_THRASHING_BABIES="yes"       # yes will disable semaphore mutexing of baby making.
 #IDEA!! Use >1 initialize semaphore to limit HOW MANY baby makers compete!
 
 xterm_ffmpeg_pid=  #not for config.  empty, store single pid so we can test and eventually kill
 
 #DOC: KILLALL_XTERMS_AT_START control whether to run killall xterm near the beginning
-KILLALL_XTERMS_AT_START="no" #default is do killall xterm near beginning
-#so xterms still running after we fail will be killed.
-#Yes may be user preference, also in case they have  named xterm are used
+KILLALL_XTERMS_AT_START="yes" #default is do killall xterm near beginning
+#so xterms still running after a previous job had failedwill be killed.
+#Yes may be user preference.
+#No might be helpful if xterms are used for other things too.
 #no is a good choice when running concurrent jobs!
 
 #DOC: KILL_OUR_XTERMS_BEFORE_EACH_MOVIE
 KILL_OUR_XTERMS_BEFORE_EACH_MOVIE="yes"
+#"OUR" means xterms our job run created, their pids stored in our xterm_.._pid variables.
 #no is a good choice when analyzing single movies
 
 #DOC: KILL_XTERMS_DONT_ASK

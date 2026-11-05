@@ -1,58 +1,56 @@
 #!/usr/bin/bash
-#              (hmm---no comment can follow bash above)#
 #FOR STANDARD USAGE, EDIT ONLY      #
 #THE FILE-NAME OF THIS SCRIPT       #
 #AND CODE OUTSIDE BOXES LIKE THIS.  #
 #THE FILE-NAME SHOULD HAVE THE FORM #
 #  C-TAP-<jobname>.sh               #
 source code-HELPERS-DEFAULTS.h.sh   #
-echo Running your job $JOBNAME      #
-#####################################
-echo YOUR-SYSCONF-$JOBNAME          #
+echo STEP: Do and check settings.   #
 #####################################
 
-PHASE_1b_VERBOSE=yes
+#When you had a good run numbered N, you could just
+#redo Phase1b and babymovie by setting this:
+#USE_OLD_PHASE_1a_RESULT_N=2
 
-USE_OLD_PHASE_1a_RESULT_N=2
+#When input movies are in a slow filesystem, you can specify
+#where in big fast filesystem we will copy them for temporary use.
+#(If the filesystems are the same, we don't copy.)
+OPT_BIG_FAST_DIR="/media/seth/CTAP"
 
+PHASE_1a=F1a.orig #keep for devel
 
-
-FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
-#these are used even for pipeline arch, where
-#the BITMAP dir is used for the BABY MOVIE
-BITMAPS_PARENT_DIR=$FAST_FILESYS_DIR_IF_USED 
-BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
-BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
-
-ARCHITECTURE="pipeline"
+ARCHITECTURE="pipeline"  #keep for devel
 #"framefile" #vs #pipeline
 
-###########END OF YOUR-SYSCONF###
-source code-SYSCONFIG.h.sh      #
-#################################
-echo YOUR-MOVIES-$JOBNAME       #
-#################################
+###########END OF users' system configuration settings###
+source code-SYSCONFIG.h.sh                              #
+#########################################################
 
-#####################################################################
-#           Configure here which movie(s) to process                #
-#####################################################################
+###################################################
+# Please configure here which movie(s) to process #
+# SLOW_MOVIE_DIR default is cwd of this script,   #
+# but it is convenient to change it since movies  #
+# are typically on removable media.               #
+###################################################
+#SLOW_MOVIE_DIR=$(pwd)
 
 ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
-movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
-#### note-we used multiple names for the same movie to separated different experiments.
+movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
+#### note-we use different names for the same movie
+#    to separate results of different experiments.
 
-#####################################################################
-#Here is how to configure a dir full of movies for research, not    #
-# testing: movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"     #
-#####################################################################
+###################################################################
+#Here is how to configure a dir full of movies for research, not  #
+# testing: movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"   #
+###################################################################
 
 #################################
 source code-MOVIES.h.sh         #
 #################################
-echo YOUR-ANALYSIS-$JOBNAME     #
-#################################
 
+#Now for settings relevent for movies with common origin and details
 
+#Don't use default CamSett.txt file
 #OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
@@ -90,7 +88,6 @@ OPT_CamSett="--CamSett-file $(pwd)/tempCamSett.txt"
 #Beware: ffmpeg option names are -single_dash_underscore_sep.
 #Whilst our C++ commands use Unix style --double-dash-dash-sep.
 
-
 #For FULL FRAME with DECIMATION extraction by ffmpeg
 #Also, the 2nd filter setpts is set presentation timestamps
 FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
@@ -99,6 +96,7 @@ FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 #FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 #for HALF-RESOLUTION with DECIMATION extraction.
+#Also, the 2nd filter setpts is set presentation timestamps
 #FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/100/TB" 
 
 # THIS DroneShort1.mov ONLY: In the Phase1a C++ program, we wrote an exclusion
@@ -108,14 +106,22 @@ FFMPEG_EXTRACT_FILTER="-vf decimate,setpts=N/100/TB"
 #    We hard coded this and camera name DroneShort1.
 #(2) CROP half-way down, 1080/2 to eliminate the trees. (more than original Camsett)
 
+# These are used for both pipeline and frame .bmp architectures.
+
+
+
 #for FULL FRAME resolution, DECIMATED/pts extraction: 
 
 MOVIE_TO_FRAME_DIV=1 #used by the pipe architecture, but not yet here.
-MOVIE_SCALE_OPTION="--movie-scale 2"
-PIXPROC_SCALE_OPTION="--pixproc-scale 2"
-USER_SCALE_OPTION="--user-scale 1"
+
+MOVIE_SCALE=2     #the original or preprocessed movie		      
+PIXPROC_SCALE=2	  #FLIR processing and baby movie		      
+USER_SCALE=1	  #Position, size, crops in CamSett and exclusion zones
+
 OTHER_OPTIONS=" --camera-index 1"
+
 PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 0 --CROP_YF 1920"
+
 #PHASE1A_OTHER_OPTIONS="--crop-args --CROP_XI 0  --CROP_XF 540 --CROP_YI 960 --CROP_YF 1920"
 
 #for HALF FRAME, (DECIMATED) extraction.

@@ -1,7 +1,12 @@
 
+
+
+
 pipe_yuv_to_filter="${PIPE_DIR}/${JOBNAME}PIPE.yuv" #should end in .yuv to tell ffmpeg format
 #This pipe filename expression is hardcoded in our shell fn ffmpeg_pipe_extract,
 #which also was used for Phase1a extraction:  Same ffmpeg filter and other parameters.
+#WARNING: THIS MUST EQUAL "${PIPE_DIR}/${JOBNAME}PIPE.yuv" used in code-ANALYSIS.h.sh: ffmpeg_pipe_extract()
+
 
 rm -f ${pipe_yuv_to_filter} 
 mknod ${pipe_yuv_to_filter} p
@@ -10,8 +15,7 @@ pipe_yuv_from_filter="${PIPE_DIR}/${JOBNAME}PIPE2.yuv" #should end in .yuv to te
 rm -f ${pipe_yuv_from_filter}  
 mknod ${pipe_yuv_from_filter} p
 
-echo "Starting baby making yuv extract-->BabyFilter--->MOV pipeline"
-
+echo STEP: "Starting baby making yuv extract-->BabyFilter--->MOV pipeline" Please wait...
 
 if [ ${xterm_ffmpeg_pid}x = "x" ]
 then
@@ -24,7 +28,19 @@ fi
 sttime=$(uptimenow)
 echo "TIME: Baby pipeline ffmpeg->yuv->BabyFilter->ffmpeg->MOV began " $sttime "sec." >> $LOG
 
-imgdim=${width:=$(widthOfMovie $movie_file)}x${height:=$(heightOfMovie $movie_file)}
+inwidth=$(widthOfMovie $movie_file)   #input
+inheight=$(heightOfMovie $movie_file) #input
+
+if (($MOVIE_SCALE > $PIXPROC_SCALE))
+then
+    width=$((inwidth * PIXPROC_SCALE / MOVIE_SCALE))
+    height=$((inheight * PIXPROC_SCALE / MOVIE_SCALE))
+else
+    width=$inwidth
+    height=$inheight
+fi
+
+imgdim="${width}x${height}"
 #trying to do this first, before starting extraction.
 
 # 3 Stage Pipeline
@@ -32,23 +48,12 @@ imgdim=${width:=$(widthOfMovie $movie_file)}x${height:=$(heightOfMovie $movie_fi
 
 
 # Stage 1
-echo DEBUG: Start ffmpeg_pipe_extract in bg. Do ps now
-ps  x -f
 $(ffmpeg_pipe_extract ${movie_file}) &
 #ffmpeg_pipe_extract shell function already has $time_cmd_prefix and ffmpeg.log logging.
-echo DEBUG: cmd to start ffmpeg_pipe_extract returned. Do ps
-ps x -f
-echo DEBUG: start BabyFilter
 
 #Stage 2
 #BabyFilter hard codes fd=3 for yuv input, fd=4 for yuv output
 ${time_cmd_prefix} ${SOFTWARE_DIR}/BabyFilter --phase-1b-file ${phase1b_out} --offset 1 ${imgdim} 3< ${pipe_yuv_to_filter} 4> ${pipe_yuv_from_filter} 2>>${LOG} &
-echo DEBUG: cmd to start BabyFilter returned. Do ps
-ps x -f
-
-
-
-
 
 #Not put in jobname.cmds.n because the 3 file redirections didn't occur when the script assigned the above line, "quoted", to a variable,
 #(that variable echo'ed to the cmds log), and that variable run as $var &
@@ -57,10 +62,8 @@ ps x -f
 #More systems research might give a better fix.
 
 #Stage 3
-echo DEBUG: start ffmpeg movie maker in foreground.
 ${time_cmd_prefix} ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25  "${RESULTS_DIR}/${generic_baby_movie_name}" &>>${RESULTS_DIR}/ffmpeg.log
-echo DEBUG ffmpeg fg returned. Do ps
-ps x -f
+
 
 #from the original baby making code,
 #$FFMPEG -s $S -threads 0 -r 60  -i $SrcToBabyPipe  -vcodec libx264 -crf 25 -pix_fmt yuv420p $BABYMOV

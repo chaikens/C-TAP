@@ -1,4 +1,4 @@
-echo SOURCED: code-ONEMOVIE.h.sh
+#echo SOURCED: code-ONEMOVIE.h.sh
 #echo DEBUG:
 #stty
 #
@@ -9,12 +9,11 @@ echo SOURCED: code-ONEMOVIE.h.sh
 
 
 
-echo "We got moviePrefix=$moviePrefix"
-echo "We got movie_file=$movie_file"   #full pathname
+#echo "INFO: movie_file=$movie_file"   #full pathname
 
 echo "Making Mick West redundant, processing ONI FOIA files..."
 FileName="${moviePrefix}.${ext}"       #basename (last pathname component)
-echo "FileName=$FileName"
+#echo "FileName=$FileName"
 
 #
 # PipeOpt version logging edited to use v1 vars.
@@ -73,7 +72,7 @@ then
 fi
 
 start_time_one_movie=$(uptimenow)
-echo Started $movie_file
+echo STEP: Started $movie_file
 
 #echo DEBUG: before echo to show date
 #stty
@@ -182,7 +181,7 @@ else
             ln -s ${moviePrefix}.btmask.${USE_OLD_PHASE_1a_RESULT_N} ${moviePrefix}.btmask.${logn}
 	    popd
 	else
-   	    echo You are trying to reuse a Phase1a result that doesn\'t exist.
+   	    echo ERR: You are trying to reuse a Phase1a result that doesn\'t exist.
 	    echo In $0
 	    echo You set USE_PHASE_1a_RESULT_N to $USE_OLD_PHASE_1a_RESULT_N
 	    echo but we can\'t read
@@ -192,7 +191,7 @@ else
 	fi
 	ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
     else
-	echo USE_PHASE_1a_RESULT_N should be a number, not $USE_OLD_PHASE_1a_RESULT_N
+	echo ERR: USE_PHASE_1a_RESULT_N should be a number, not $USE_OLD_PHASE_1a_RESULT_N
 	exit 1
     fi
 fi
@@ -205,7 +204,7 @@ echo "Repaying TTSA investors, straightening Uri Gellar's spoons..."
 
 phase1b_start_time=$(uptimenow)
 echo
-echo Beginning Phase1b
+echo STEP: Beginning Phase1b, first try
 date
 echo
 
@@ -242,7 +241,6 @@ then
 fi
 phase1b_cmd+=" > $phase1b_out 2>>$LOG"
 
-echo Running Phase1b first try
 #echofold ${phase1b_cmd}
 ( echo ; echo -n "cd "; pwd; echo ${phase1b_cmd} ) | cat >>${COMMAND_ARCHIVE_PATHNAME}
 #HUH? commanding ${Phase1b_cmd} makes some shell fail to redirect stdout!
@@ -250,14 +248,13 @@ echo Running Phase1b first try
 
 (echo "CMD:" ; echo "CMD:" "First 1b try command:") | cat >> $LOG 
 
-echo -n "CMD:"
-echo $(echofold $phase1b_cmd) >> $LOG
+echo CMD: $(echofold $phase1b_cmd) >> $LOG
 echo -n "INFO:" Phase1b report: >> $LOG
 eval ${phase1b_cmd} 
 err=$?
 if [ ${err} != 0 ]
 then
-    echo "Phase1b run returned error code $err"
+    echo ERR: "Phase1b run returned error code $err"
     echo "$0 running in cwd=" $(pwd)
     #echo "$0 will continue and do a redo with level=0.98 instead of 0.5"
     echo "$0 will exit.  See cmd above^^."
@@ -265,7 +262,7 @@ then
 fi
 n=`cat $phase1b_out | wc -l`
 echo
-echo "First try of Phase1b reported $n frames have objects, see the lines in:"
+echo "INFO: First try of Phase1b reported $n frames have objects, see the lines in:"
 echo $phase1b_out
 echo
 
@@ -284,7 +281,7 @@ if [ $n -gt 50000 ] || [ $n -eq 0 ]
 then
     if [ $n == 0 ]
     then
-	echo "Part deux: electric boogaloo... First try found 0 frames with objects."
+	echo "STEP: Part deux: electric boogaloo... First try found 0 frames with objects."
 	echo "About to redo Phase1b."
 	echo "INFO:" "Part deux: electric boogaloo... First try found 0 frames with objects." >> $LOG
 	
@@ -331,7 +328,7 @@ then
 	phase1b_finish_time=$(uptimenow)
 	if [ ${err} != 0 ]
 	then
-	    echo "phase1b redo run returned error code $err"
+	    echo ERR: "phase1b redo run returned error code $err"
 	    echo "$0 running in cwd=" $(pwd)
 	    #echo "$0 will continue and do a redo with level=0.98 instead of 0.5"
 	    echo "$0 will exit.  See cmd above^^."
@@ -340,7 +337,7 @@ then
 
 	
 	n=`cat $phase1b_out | wc -l`
-	echo "phase 1B: Re-Done reports $n frames with objects."
+	echo INFO: "phase 1B: Re-Done reports $n frames with objects."
 	echo "INFO:" "Phase 1B: Re-Done reports $n frames with objects." >> $LOG
 	echo "TIME:" "Phase 1B finished at $phase1b_finish_time sec" >> $LOG
 	echo "TIME:" "Took $(numdif $phase1b_finish_time $phase1b_start_time) sec." >> $LOG
@@ -359,11 +356,11 @@ fi
 # don't waste time on empty file OR overloading your HD
 if [ $n -gt 465000 ] || [ $n -eq 0 ]
 then
-    (echo "Either too many or too few objects..." ; echo "On to the next movie, if any" )
+    (echo "INFO: Either too many or too few objects..." ; echo "On to the next movie, if any" )
     (echo "INFO:" "Either too many or too few objects..." ; echo "On to the next movie, if any" ) >> $LOG
 
     finish_time_one_movie=$(uptimenow)
-    echo Finished movie $movie_file
+    echo STEP: Finished movie $movie_file
     date
     echo "TIME:" finish at $finish_time_one_movie seconds. >> $LOG
     et=$(numdif $finish_time_one_movie $start_time_one_movie)
@@ -380,6 +377,7 @@ if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then
     if [ $phase1b_failed"wawa" = "nowawa" ]
     then
+	echo STEP: making baby movie of frames selected by Phase1b.
 	echo "Logging range, deploying Little Green Men..circling 'em in picnn.bmps"
 	if [ ${NEW_BABY_DEVEL} = "yes" ]
 	then
@@ -389,7 +387,7 @@ then
 	fi
     fi
 else
-    echo "No baby movie today, someone said no."
+    echo INFO: "No baby movie today, someone said no."
 fi
 
 # We're done with I/O thru the bitmaps dir
@@ -408,7 +406,7 @@ pushd ${SOFTWARE_DIR} > /dev/null
 
 if [ $COPYMOVIES ]
 then
-    echo "about to delete input movie" $movie_file
+    echo INFO: "about to delete input movie" $movie_file
     echo "STEP:" "about to delete input movie" $movie_file >> $LOG
     rm $movie_file
 fi
@@ -419,7 +417,7 @@ echo "Cosmic consciousness has been achieved!!"
 echo "from yet another movie $o of $numMovieFiles."
 
 finish_time_one_movie=$(uptimenow)
-echo Finished movie $movie_file
+echo INFO: Finished movie $movie_file
 date
 echo "TIME:" finish at $finish_time_one_movie seconds. >> $LOG
 et=$(numdif $finish_time_one_movie $start_time_one_movie)

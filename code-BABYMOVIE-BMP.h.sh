@@ -1,4 +1,4 @@
-echo SOURCED:  code-BABYMOVIE-BMP.h.sh
+#echo SOURCED:  code-BABYMOVIE-BMP.h.sh
 #We write -BMP because in the future, we might draw circles, etc into yuv frames!
 
 #The baby movie is composed of frames selected by Phase1b and reported in .out

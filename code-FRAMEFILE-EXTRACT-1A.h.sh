@@ -1,5 +1,5 @@
-echo SOURCED: code-FRAMEFILE-EXTRACT-1A.h.sh
-echo "bitmaps dir="${BITMAPS_DIR}
+#echo SOURCED: code-FRAMEFILE-EXTRACT-1A.h.sh
+echo STEP: Ensuring frames are in "bitmaps dir="${BITMAPS_DIR}
 
 pushd $BITMAPS_DIR  > /dev/null #ffmpeg puts bitmaps in its cwd.
     
@@ -24,8 +24,7 @@ then
 	bmp_width=$(widthOfBmp thumb000001.bmp)
 	bmp_height=$(heightOfBmp thumb000001.bmp)
 	must_extract=no
-	echo
-	echo "We're reusing movie bitmaps for debugging speed."
+	echo INFO: "We're reusing movie bitmaps for debugging speed."
 	echo "INFO:" >> $LOG
 	echo "INFO:" "We're reusing movie bitmaps for debugging speed." >> $LOG
 	echo >> $LOG

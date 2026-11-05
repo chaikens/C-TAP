@@ -1,4 +1,4 @@
-echo SOURCED:  code-BABYMOVIE-ALL-INCL-BITMAP.h.sh
+#echo SOURCED:  code-BABYMOVIE-ALL-INCL-BITMAP.h.sh
 #Now, we make baby movies either by drawing on streamed yuv frames in a pipeline
 # or saving bitmap files, drawing on them, and ffpeg globbing.
 #Below is most of the common code, conditional sourcing of code-BABYMOVIE-YUVPIPE.h.sh

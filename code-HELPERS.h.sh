@@ -1,4 +1,4 @@
-echo SOURCED: code-HELPERS.h.sh
+#echo SOURCED: code-HELPERS.h.sh
 #
 #  Helper shell functions
 #

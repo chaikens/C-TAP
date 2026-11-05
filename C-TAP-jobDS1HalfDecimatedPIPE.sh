@@ -1,59 +1,57 @@
- #!/usr/bin/bash
+#!/usr/bin/bash
 #FOR STANDARD USAGE, EDIT ONLY      #
 #THE FILE-NAME OF THIS SCRIPT       #
 #AND CODE OUTSIDE BOXES LIKE THIS.  #
 #THE FILE-NAME SHOULD HAVE THE FORM #
 #  C-TAP-<jobname>.sh               #
 source code-HELPERS-DEFAULTS.h.sh   #
-echo Running your job $JOBNAME      #
-#####################################
-echo YOUR-SYSCONF-$JOBNAME          #
+echo STEP: Do and check settings.   #
 #####################################
 
-USE_OLD_PHASE_1a_RESULT_N=2
+#When you had a good run numbered N, you could just
+#redo Phase1b and babymovie by setting this:
+#USE_OLD_PHASE_1a_RESULT_N=2
 
+#When input movies are in a slow filesystem, you can specify
+#where in big fast filesystem we will copy them for temporary use.
+#(If the filesystems are the same, we don't copy.)
 OPT_BIG_FAST_DIR="/media/seth/CTAP"
 
 PHASE_1a=F1a.orig #keep for devel
 
-ARCHITECTURE="pipeline" #keep for devel
-#"framefile" #vs pipeline
+ARCHITECTURE="pipeline"  #keep for devel
+#"framefile" #vs #pipeline
 
+###########END OF users' system configuration settings###
+source code-SYSCONFIG.h.sh                              #
+#########################################################
 
-
-
-
-
-
-
-
-###########END OF YOUR-SYSCONF###
-source code-SYSCONFIG.h.sh      #
-#################################
-echo YOUR-MOVIES-$JOBNAME       #
-#################################
-
-#####################################################################
-#           Configure here which movie(s) to process                #
-#####################################################################
+###################################################
+# Please configure here which movie(s) to process #
+# SLOW_MOVIE_DIR default is cwd of this script,   #
+# but it is convenient to change it since movies  #
+# are typically on removable media.               #
+###################################################
+#SLOW_MOVIE_DIR=$(pwd)
 
 ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
 movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
-#### note-we used multiple names for the same movie to separated different experiments.
+#### note-we use different names for the same movie
+#    to separate results of different experiments.
 
-#####################################################################
-#Here is how to configure a dir full of movies for research, not    #
-# testing: movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"     #
-#####################################################################
+###################################################################
+#Here is how to configure a dir full of movies for research, not  #
+# testing: movie_files="$SLOW_MOVIE_DIR/N884A6_ch1_main_*.$ext"   #
+###################################################################
 
 #################################
 source code-MOVIES.h.sh         #
 #################################
-echo YOUR-ANALYSIS-$JOBNAME     #
-#################################
 
-OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
+#Now for settings relevent for movies with common origin and details
 
+#Don't use default CamSett.txt file
+#OPT_CamSett="--CamSett-file $(pwd)/CamSett.txt"
 cat > tempCamSett.txt <<EOF
 smallestThr= 0
 biggestThr= 256
@@ -119,9 +117,11 @@ FFMPEG_EXTRACT_FILTER="-vf scale=trunc(iw/4)*2:trunc(ih/4)*2,decimate,setpts=N/1
 #for HALF FRAME, (DECIMATED) extraction.
 
 MOVIE_TO_FRAME_DIV=2 #used by the pipe architecture, but not yet here.
-MOVIE_SCALE_OPTION="--movie-scale 2"
-PIXPROC_SCALE_OPTION="--pixproc-scale 1"
-USER_SCALE_OPTION="--user-scale 1"
+
+MOVIE_SCALE=2    #the original or preprocessed movie		      
+PIXPROC_SCALE=1  #FLIR processing and baby movie		      
+USER_SCALE=1     #Position, size, crops in CamSett and exclusion zones
+
 OTHER_OPTIONS="--camera-index 1"
 
 #In the Phase1a C++ program, we wrote an exclusion zone

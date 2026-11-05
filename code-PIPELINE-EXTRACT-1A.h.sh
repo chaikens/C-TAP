@@ -1,100 +1,7 @@
-echo SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
+#echo SOURCED: code-PIPELINE-EXTRACT-1A.h.sh
 
-pushd $PIPE_DIR > /dev/null
+#pushd $PIPE_DIR > /dev/null
 
-################################# from runthis.halfdecimated.sh #######
-
-#example moviePrefix = DroneShortHalfDecimated
-#  movie_file=fullpathname
-
-MOVIE_FILE=DS1HalfDecimatedYUVTablePipe.mp4
-MOVIE_BASE=${MOVIE_FILE%.*} #Basename without the DOT
-# We have $LOG
-result_file_1a=${RESULTS_DIR}/${RESULT_OF_1a_BASE}
-
-###---working ^^^^
-#maybe restore timing later  Script below is GONE.
-#########   Code what to do here to go in our  time command ########################
-#                                                                                  #
-#  DO_ONE_MOVIE_SHELL_SCRIPT=./DoOneMovieHalfDecimated1ab.sh                       #
-#                                                                                  #
-####################################################################################
-#/usr/bin/time -o ${MOVIE_BASE}.time \
-#     -f 'real    %U\nuser  %E\nsys      %S' \
-#     ${DO_ONE_MOVIE_SHELL_SCRIPT} \
-#     $MOVIE_FILE $LOG &
-####################################################################################
-
-#wait %/usr/bin/time
-
-#echo 
-#echo Time Report
-#cat ${MOVIE_BASE}.time
-###############################################
-
-
-########################### from DoOneMovieHalfDecimated1ab.sh ###
-#### we only do 1a here #########################################
-#!/usr/bin/bash
-#/*
-# DoOneMovieHalfDecimated1ab.sh MOVIEFILENAME.mp4 Logfile
-#
-# Half resolution and decimation coded by ffmpeg filter below.  NO--parameters do it.
-#
-# All files should be in or symbolically linked
-# in the CWD.  NO MORE!!
-#
-# Result: Phase1a report, one line for each frame,
-# named MOVIEFILENAME.int
-# You can watch progress with tail -f MOVIEFILENAME.int
-#
-# Required programs:
-# ffmpeg
-# ./YUVToBMPStreamFilter
-# ./Phase1a (or other name for variations)
-# ./Phase1bPipeOpt
-#*/
-
-
-
-###################  from DoOneMoviePipeCommon.h.sh
-
-
-# (2) scale settings--depend on movie and subsequent processing.
-#     Here defaults are documented
-#
-#     If ffmpeg_pipe_extract changes the resolution then this
-#     parameter must be set.  For example, with the 2nd extracting
-#     function, you must code MOVIE_TO_FRAME_DIV=2
-#
-#     MOVIE_TO_FRAME_DIV (undefined, defaults to 1)
-#
-#     MOVIE_SCALE_OPTION="--movie-scale 1"
-#     PIXPROC_SCALE_OPTION="--pixproc-scale 1"
-#     USER_SCALE_OPTION="--user-scale 1"
-#     OTHER_OPTIONS (undefined, so it expands to ""
-# After this regression test against orig stuff, movie scale (relative
-# to the others) should be read from the original .mp4 movie, using
-# widthOfMovie() and heightOfMovie() below. (eventually put in HELPERS).
-
-#
-#
-# All files should be in or symbolically linked
-# in the CWD.  NO MORE
-#
-# Result: Phase1a report, one line for each frame,
-# named MOVIEFILENAME.int
-# You can watch progress with tail -f MOVIEFILENAME.int
-
-
-############################
-# STILL RELEVENT
-# Required programs:
-# ffmpeg
-# ./YUVToBMPStreamFilter
-# ./Phase1aPipeOpt (or other name for variations)
-# ./Phase1bPipeOpt
-#*/
 
 if [ ! -r ${movie_file} ];then echo Cant read movie file; exit 1; fi
 
@@ -130,7 +37,7 @@ mknod ${bmppipe} p
 
 now=$(uptimenow)
 echo "STEP:" 'STARTING pipeline EXTRACTION->YUVtoBMP->Phase1a at ' ${now} "seconds." >> $LOG
-echo 'Starting pipeline EXTRACTION->YUVtoBMP->Phase1a'
+echo 'STEP: Starting pipeline EXTRACTION->YUVtoBMP->Phase1a' Please wait...
 date
 
 if [ ${xterm_ffmpeg_pid}x = "x" ]
@@ -160,15 +67,9 @@ eval $time_cmd_prefix $yuv_filter_cmd &
 
 echo "TIME:" Started YUVToBMPStreamFilter at /proc/uptime=$(uptimenow) seconds. | cat >> $LOG
 
-echo
-echo $0 "Begnning Phase1a"
-echo
-
 echo "STEP:" $0 "STARTING Phase1aPipeOpt"  | cat >> $LOG
 phase1a_start_time=$(uptimenow)
 prt=" /proc/uptime=${phase1a_start_time}"
-echo "STARTING Phase1a, see log."
-date
 echo "TIME:" $prt >> $LOG
 
 phase1a_cmd_args="$time_cmd_prefix ${SOFTWARE_DIR}/${PHASE_1a} --pipeline "
@@ -180,7 +81,7 @@ phase1a_cmd="${phase1a_cmd_args} >> ${RESULTS_DIR}/${RESULT_OF_1a_BASE} 2>>$LOG"
 
 (echo "CMD:" ; echo "CMD:" ${phase1a_cmd}; echo ) >> $LOG
 (echo ; echo -n "cd "; pwd; echo ${phase1a_cmd}; echo ) >> ${COMMAND_ARCHIVE_PATHNAME}
-echo "About to call Phase1a  ...Report is in Log."
+#echo "About to call Phase1a  ...Report is in Log."
 #echo "eval" "${phase1a_cmd}"
 
 eval " ${phase1a_cmd}"  #FOREGROUND. stderr from cmd and time go to LOG.
@@ -193,8 +94,8 @@ echo "TIME:" Finished: $phase1a_finish_time >> $LOG
 phase1a_net_time=$(numdif $phase1a_finish_time $phase1a_start_time)
 
 echo "TIME:" "${PHASE_1a} FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec." >> $LOG
-echo "${PHASE_1a} FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec."
-date
+echo INFO: "${PHASE_1a} FINISHED returned $RET, took wallclock time ${phase1a_net_time} sec."
+#date
 
 echo "INFO:" "Find Phase1aPipeOpt results in  ${RESULTS_DIR}/${RESULT_OF_1a_BASE}" >> $LOG
 
@@ -203,9 +104,8 @@ rm -f ${yuvpipe}
 
 if [ $RET != 0 ]
 then
-    echo $phase1a_cmd
+    echo ERR: $phase1a_cmd
     echo returned status $RET
     echo $0 exiting, bye bye.
     exit $RET
 fi
-

@@ -1,4 +1,4 @@
-echo SOURCED: c-TAP-DOIT.h.sh
+#echo SOURCED: c-TAP-DOIT.h.sh
 
 #Phase 1a,b options additions (value is --option optvalue, etc)
 #use opt_phase1a_bitmaps
@@ -54,7 +54,7 @@ if [ -n $FAST_MOVIE_DIR"" ]
 then
     if [ "$(df $SLOW_MOVIE_DIR)" == "$(df .)" ]
     then
-	echo "Movie dir $SLOW_MOVIE_DIR and programs $(pwd) are on the same filesystem"
+	echo "INF: No movie copying, $SLOW_MOVIE_DIR and $(pwd) are on the same filesystem"
 	COPYMOVIES=
     else
 	if [ ${USE_OLD_PHASE_1a_RESULT_N}x = "x" ]
@@ -71,27 +71,27 @@ fi
 mf_list=$(ls $movie_files 2>/dev/null)
 if [ $? != 0 ]
 then
-    echo Cannot find the movie files matching your pattern:
+    echo ERR: Cannot find the movie files matching your pattern:
     echo
     echo $movie_files
     echo
-    echo Giving up on $JOBNAME, exiting, bye bye.
+    echo ERR: Giving up on $JOBNAME, exiting, bye bye.
     exit 1
 fi
 
 numMovieFiles=$(echo $mf_list | wc -w )
-echo "We will process this (these) size reported $numMovieFiles movie file(s)."
+echo "INF: We will process this (these) size reported $numMovieFiles movie file(s)."
 
 
 #echo $movie_files
 ls -hs $movie_files
 if [ $? != 0 ]
 then
-   echo Trying to find the movies you requested.
-   echo Some error when commanding ls these arguments:
+   echo ERR: Trying to find the movies you requested.
+   echo ERR: Some error when commanding ls these arguments:
    echo $movie_files
    echo
-   echo Somethings weird, this error should have caused us to exit earlier.
+   echo ERR: Somethings weird, this error should have caused us to exit earlier.
    exit 1
 fi
 
@@ -101,7 +101,7 @@ for movie_file in $movie_files
 do
     ((++o))
     echo
-    echo "NEXT: Begin processing $o of $numMovieFiles movie file(s)"
+    echo -n "STEP: Begin processing $o of $numMovieFiles movie file(s) "
     echo $(date)
 
     precopy_movie_file=$movie_file
@@ -109,16 +109,16 @@ do
     if [ $COPYMOVIES ]
     then
 	moviePrefix=`basename ${movie_file%.$ext}`
-	echo "Checking if we already have the copy"
+	echo INFO: "Checking if we already have the copy"
 	if diff $movie_file $FAST_MOVIE_DIR/$moviePrefix.$ext
 	then
-	    echo 'They are the same'
+	    : 'They are the same'
 	else
-	    echo 'Copying (rsync) one movie from slow to fast filesystem.'
+	    echo STEP: 'Copying (rsync) one movie from slow to fast filesystem.'
 	    rsync -pH --progress $movie_file $FAST_MOVIE_DIR 
 	    if [ $? != 0 ]
 	    then
-		echo 'Copying (rsync) failed.  exiting.'
+		echo ERR: 'Copying (rsync) failed.  exiting.'
 	    fi
 	fi
 	
