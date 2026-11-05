@@ -57,7 +57,7 @@ then
     echo "Starting MOV making yuv extraction background task."
     echo "INFO: Starting MOV making yuv extraction background task." >> $LOG
     echo "PGM: Same ffmpeg_pipe_extract() runs again." >> $LOG
-    if [ -${xterm_ffmpeg_pid}x = "x" ]
+    if [ ${xterm_ffmpeg_pid}x = "x" ]
     then
 	touch ${RESULTS_DIR}/ffmpeg.log
 	xterm -bg '#E0FFFF' ${XTERM_PARAM} -geometry 160x30+0+100 -title 'ffmpeg extract bitmaps'  -e tail -f ${RESULTS_DIR}/ffmpeg.log &

@@ -145,9 +145,10 @@ then
     #So stage loop can append results.
 
     cat /dev/null > ${RESULTS_DIR}/ffmpeg.log
-    #We use ffmpeg_pipe_extract twice in the new baby pipeline architecture,
-    #so we don't want to make it start ffmpeg.log with &>, but
+    #We use ffmpeg_pipe_extract twice in the new baby pipeline architecture.
+    #So we don't want to make it start ffmpeg.log with &>, but
     #we don't want to clutter it with previous movie entries.
+    #When reusing PHASE1a, we needn't keep the orig PHASE1a log since it was good.
     
     if [ $ARCHITECTURE = "framefile" ]
     then
@@ -164,6 +165,12 @@ then
     ndiffs=$(cat ${RESULTS_DIR}/${RESULT_OF_1a_BASE} | wc -l )
 else
 
+    cat /dev/null > ${RESULTS_DIR}/ffmpeg.log
+    #We use ffmpeg_pipe_extract twice in the new baby pipeline architecture.
+    #So we don't want to make it start ffmpeg.log with &>, but
+    #we don't want to clutter it with previous movie entries.
+    #When reusing PHASE1a, we needn't keep the orig PHASE1a log since it was good.
+    
     if [[ $USE_OLD_PHASE_1a_RESULT_N =~ ^[0-9]+$ ]]
     then
    	#This value is decimal whole number

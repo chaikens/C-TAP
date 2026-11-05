@@ -10,6 +10,8 @@ echo Running your job $JOBNAME      #
 echo YOUR-SYSCONF-$JOBNAME          #
 #####################################
 
+USE_OLD_PHASE_1a_RESULT_N=2
+
 OPT_BIG_FAST_DIR="/media/seth/CTAP"
 
 PHASE_1a=F1a.orig #keep for devel

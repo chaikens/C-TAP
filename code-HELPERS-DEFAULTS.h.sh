@@ -40,7 +40,7 @@ ARCHITECTURE=pipeline
 #DOC: TRY_CONVERT_picbmp_TO_picbmpsee code-BABYMOVIE-BMP.h.sh
 # variations for performance improving development
 TRY_CONVERT_picbmp_TO_picbmp="no"  # see code-BABYMOVIE-BMP.h.sh
-ALLOW_THRASHING_BABIES="no"        # yes will disable semaphore mutexing of baby making.
+ALLOW_THRASHING_BABIES="yes"       # yes will disable semaphore mutexing of baby making.
 #IDEA!! Use >1 initialize semaphore to limit HOW MANY baby makers compete!
 
 xterm_ffmpeg_pid=  #not for config.  empty, store single pid so we can test and eventually kill
@@ -186,10 +186,14 @@ NEW_BABY_DEVEL=yes
 xterm_pids=
 function kill_our_xterms() {
     #do it by PID
-    if [ "${xterm_pids}none" != "none" ]
+    if [ "${xterm_pids}"none != "none" ]
     then
 	kill ${xterm_pids[*]}
 	xterm_pids=
+    fi
+    if [ ${xterm_ffmpeg_pid}x != "x" ]
+    then
+	kill ${xterm_ffmpeg_pid}
     fi
 }
 
@@ -203,10 +207,7 @@ echo "See the results in the xterms."
 cd ${start_dir}
 if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]
 then
-    if [ "${xterm_pids}"none != "none" ]
-    then
 	$(kill_our_xterms) 
-    fi
 else
     echo -n "Type yes to kill the xterms. Or, no, or wait 30sec:"
     if ! read -t 30 yes
@@ -214,17 +215,12 @@ else
 	echo OK. Time for asking done, leaving the xterms.
 	echo Kill them manually or use ./killxterms.sh
     else
-	if [ ${yes}"x" = "yesx" ]
-	then
-	    kill_our_xterms
-	    if [ ${xterm_ffmpeg_pid}x != "x" ]
-	    then
-	       kill ${xterm_ffmpeg_pid}
-	    fi
-	fi
+	$(kill_our_xterms)
     fi
 fi
+
 echo $0 Done
+
 if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then
     if [ ${phase1b_failed}"wawa" = "nowawa" ]
