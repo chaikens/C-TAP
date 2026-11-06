@@ -1,7 +1,6 @@
 
 
 
-
 pipe_yuv_to_filter="${PIPE_DIR}/${JOBNAME}PIPE.yuv" #should end in .yuv to tell ffmpeg format
 #This pipe filename expression is hardcoded in our shell fn ffmpeg_pipe_extract,
 #which also was used for Phase1a extraction:  Same ffmpeg filter and other parameters.
@@ -46,10 +45,10 @@ imgdim="${width}x${height}"
 # 3 Stage Pipeline
 
 
-
 # Stage 1
 $(ffmpeg_pipe_extract ${movie_file}) &
 #ffmpeg_pipe_extract shell function already has $time_cmd_prefix and ffmpeg.log logging.
+
 
 #Stage 2
 #BabyFilter hard codes fd=3 for yuv input, fd=4 for yuv output
@@ -61,9 +60,12 @@ ${time_cmd_prefix} ${SOFTWARE_DIR}/BabyFilter --phase-1b-file ${phase1b_out} --o
 #I guess the redirections should be done to the time command's process, not the timed command.
 #More systems research might give a better fix.
 
-#Stage 3
-${time_cmd_prefix} ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25  "${RESULTS_DIR}/${generic_baby_movie_name}" &>>${RESULTS_DIR}/ffmpeg.log
 
+#echo BEFORE STARTING STAGE 3 OF YUVPIPE BABYMAKER, A TIMED CALL TO FFMPEG
+#stty -g
+#Stage 3
+#${time_cmd_prefix}
+eval ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25 "${RESULTS_DIR}/${generic_baby_movie_name}" &>>${RESULTS_DIR}/ffmpeg.log
 
 #from the original baby making code,
 #$FFMPEG -s $S -threads 0 -r 60  -i $SrcToBabyPipe  -vcodec libx264 -crf 25 -pix_fmt yuv420p $BABYMOV
@@ -71,8 +73,55 @@ ${time_cmd_prefix} ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_fil
 #$FFMPEG -s $S -threads 0 -r 60  -i $SrcToBabyPipe   -crf 25 -pix_fmt yuv420p $BABYMOV
 #                                   dont need................|--------------|
 
+#echo AFTER STAGE 3 WE HAVE WEIRDNESS
+#stty -g
+
+#
+# Here's a story of weirdness. The /usr/bin/time command on the ffmpeg command and arguments
+# coded above worked EXCEPT it left the invoking shell's stty settings an abnormal state, including
+# that there was no echoing and the CR key was not interpreted as an end of shell line.
+# So, I removed the command timing, and invoked ffmpeg via the bash eval builtin.
+#(ffmpeg logging only goes to cwd and has no append to log file option,
+# so I can't get dynamic monitoring that way).  We'll just have to do without timing.
+#If you want timing, replace eval with ${time_cmd_prefix} and fix your messed up shell terminal
+# reset when the job is done.  (This all worked fine when runs were scripted.)
+
+#IT WORKS FINE WHEN THE -crf 25 option to ffmpeg IS REMOVED!  -crf is an option to stty!  UGGHH
+
+#Here is the original state interleaved with the abnormal state, reported by stty -g:
+#speed 38400 baud; rows 36; columns 120; line = 0;
+#
+#intr = ^C; quit = ^\; erase = ^?; kill = ^U; eof = ^D; eol = <undef>; eol2 = <undef>; swtch = <undef>; start = ^Q;
+#intr = ^C; quit = ^\; erase = ^?; kill = ^U; eof = ^D; eol = <undef>; eol2 = <undef>; swtch = <undef>; start = ^Q;
+#
+#stop = ^S; susp = ^Z; rprnt = ^R; werase = ^W; lnext = ^V; discard = ^O; min = 1; time = 0;
+#stop = ^S; susp = ^Z; rprnt = ^R; werase = ^W; lnext = ^V; discard = ^O; min = 1; time = 0;
+#
+#-parenb -parodd -cmspar cs8 -hupcl -cstopb cread -clocal -crtscts
+#-parenb -parodd -cmspar cs8 -hupcl -cstopb cread -clocal -crtscts
+#
+#-ignbrk -brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr  icrnl  ixon -ixoff -iuclc -ixany -imaxbel iutf8
+#-ignbrk -brkint -ignpar -parmrk -inpck -istrip -inlcr -igncr -icrnl -ixon -ixoff -iuclc -ixany -imaxbel iutf8
+#--------------------------------------------------------------^------^
+#
+#
+#opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
+#opost -olcuc -ocrnl onlcr -onocr -onlret -ofill -ofdel nl0 cr0 tab0 bs0 vt0 ff0
+#
+#isig  icanon  iexten  echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke -flusho -extproc
+#isig -icanon -iexten -echo echoe echok -echonl -noflsh -xcase -tostop -echoprt echoctl echoke -flusho -extproc
+#-------^-------^-------^
+#
+#4500:5:bf:8a3b:3:1c:7f:15:4:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0
+#4000:5:bf:0a31:3:1c:7f:15:4:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0
+
+
+
+
 rm -f ${pipe_yuv_to_filter} ${pipe_yuv_from_filter}
 
 echo "TIME: Baby pipeline runtime was " $(numdif $(uptimenow) $sttime) " sec." >> ${LOG}
 echo "Baby making pipeline finished, " $(numdif $(uptimenow) $sttime) " sec." 
 
+echo YUVPIPE ending
+stty -g

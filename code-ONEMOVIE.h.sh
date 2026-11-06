@@ -1,6 +1,3 @@
-#echo SOURCED: code-ONEMOVIE.h.sh
-#echo DEBUG:
-#stty
 #
 # (1) Set up or increment, for one movie, job repetition number ($logn below)
 # to be appended to the RESULTS dir files relevent to that movie.
@@ -74,11 +71,7 @@ fi
 start_time_one_movie=$(uptimenow)
 echo STEP: Started $movie_file
 
-#echo DEBUG: before echo to show date
-#stty
 echo $(date)
-#echo DEBUG: after date
-#stty
 
 echo "TIME:" $start_time_one_movie seconds. >>$LOG
 
@@ -93,28 +86,21 @@ fi
 #It's a good idea to first commit the scripts, programs, settings, etc to be tested.
 #   Of course, the test results will go into the next commit, but at least
 #   the state before the experiment is archived.
-#echo DEBUG: Before calling git
-#stty
 gitcommit=$(git log HEAD -n 1 | sed -n  's/^\(commit.\{9\}\).*/\1/p')
 echo "CMD:" $0 >>$LOG
 echo "TIME:" $( date )  >>$LOG
 echo "PGM:" $gitcommit  >>$LOG
 ( echo "PGM:"; git remote --verbose )  >>$LOG #Worldwide readers of the log can get the software!
 
-#echo DEBUG: Before testing to kill xterms
-#stty
-
 if [ $KILLALL_XTERMS_AT_START"x" == "yesx" ]
 then
     killall -q xterm 
 fi
-#echo DEBUG: Before calling xterm
-#stty
+
 xterm ${XTERM_PARAM} -geometry 150x80+1000+0 -sb -title 'C-TAP LOG' -e less +F -f $LOG &
 #option +F acts like user types F (continue after end of file)
 xterm_pids+=" $!" #for killing 'em
-#echo DEBUG: after calling xterm
-#stty
+
 ################################################################################
 
 RESULT_OF_1a_BASE="${moviePrefix}.int.${logn}"
@@ -183,9 +169,9 @@ else
 	else
    	    echo ERR: You are trying to reuse a Phase1a result that doesn\'t exist.
 	    echo In $0
-	    echo You set USE_PHASE_1a_RESULT_N to $USE_OLD_PHASE_1a_RESULT_N
+	    echo You set USE_OLD_PHASE_1a_RESULT_N to $USE_OLD_PHASE_1a_RESULT_N
 	    echo but we can\'t read
-	    echo ${moviePrefix}.int.${USE_PHASE_1a_OLD_RESULT_N}
+	    echo ${moviePrefix}.int.${USE_OLD_PHASE_1a_RESULT_N}
 	    kill_our_xterms
 	    exit 1
 	fi
@@ -370,8 +356,6 @@ then
     continue #top level movie loop
 fi
 # number above assumes 2.9 MB/image: (2.9*(46500+216e3))/1e3 = 760 GB of free space needed! Adjust for your machine
-
-
 
 if [ $MAKE_BABY_MOVIE"wawa" = "yeswawa" ]
 then

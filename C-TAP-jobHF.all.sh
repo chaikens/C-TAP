@@ -16,8 +16,7 @@ echo YOUR-SYSCONF-$JOBNAME #
 FAST_FILESYS_DIR_IF_USED="/media/seth/CTAP"
 
 PHASE_1a=F1a.all
-PHASE_1a_RESULT_OLD_N_OR_NONE=
-
+USE_OLD_PHASE_1a_RESULT_N=
 
 ARCHITECTURE="framefile"
 #"framefile" #vs pipeline

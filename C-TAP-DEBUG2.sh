@@ -31,7 +31,7 @@ KILL_OUR_XTERMS_BEFORE_EACH_MOVIE=yes
 REUSE_BMPS=yes
 
 PHASE_1a=F1a.orig
-PHASE_1a_RESULT_OLD_N_OR_NONE=
+USE_OLD_PHASE_1a_RESULT_N=
 
 ARCHITECTURE="framefile"
 #"framefile" #vs pipeline

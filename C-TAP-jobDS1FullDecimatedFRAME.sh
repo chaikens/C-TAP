@@ -62,7 +62,7 @@ source code-MOVIES.h.sh         #
 echo YOUR-ANALYSIS-$JOBNAME     #
 #################################
 
-PHASE_1a_RESULT_OLD_N_OR_NONE=
+USE_OLD_PHASE_1a_RESULT_N=
 
 
 ############ Vary CamSett.txt settings here! #########

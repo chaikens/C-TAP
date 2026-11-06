@@ -273,23 +273,23 @@ mv $generic_baby_movie_name $baby_movie_logn  #rename what we save
 ln -s $baby_movie_logn $generic_baby_movie_name
 #In addition to this, we generate command ffplay -f mov ..
 
-popd 
+popd > /dev/null 
 
 
-echo 'in' $(pwd) code-BABYMOVIE-BMP.h.sh done 
+#echo 'in' $(pwd) code-BABYMOVIE-BMP.h.sh done 
 
 #see above
 if [ ${ALLOW_THRASHING_BABIES}wawa != yeswawa ]
 then   
     ${SOFTWARE_DIR}/semup BABYMAKER
     (echo -n semup BABYMAKER ' ' ; date) | cat >> ${LOG}
-    (echo -n semup BABYMAKER ' '; date)
+    #(echo -n semup BABYMAKER ' '; date)
     #as before, the shared shell parameter holding the symlinks name is
     # ${RESULTS_DIR}/{moviePrefix}.${EXT}
     # We use that in exit_greeting() which helps cd to result dir and ffplay the movie.
 else
-    echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER FINISHED '  '
-    date
+    #echo -n TIME: ${JOBNAME} 's' COMPETITIVE BABY MAKER FINISHED '  '
+    #date
     echo -n TIME: A COMPETITIVE BABY MAKER FINISHED '  ' >> ${LOG}
     date >> ${LOG}
 fi

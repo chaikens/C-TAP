@@ -21,8 +21,8 @@ FILE* p1bfp = 0;  //fd: output from Phase1b (event frame# maxdiff x y prob)
 
 int offset = 0; //select ith frame where i=requested+offset
 
-float cradius = 10.0;
-float cthick = 2.0;
+float cradius = 20.0;  //defaults good for
+float cthick = 3.0;    //1920x1080, we will modify
 int outyuvfd; //output fd for raw yuv video.
 char *pgm;
 int main(int argc, char * argv[] )
@@ -45,6 +45,8 @@ int main(int argc, char * argv[] )
   }
 
   MyYUV YUV(width, height, buf);
+  cradius = (cradius*width)/1920.;
+  cthick = (cthick*width)/1920.;
   FILE *inyuvfp = fdopen(3,"r");
   BlobGetter BG( inyuvfp, bloblen);
   FILE *outyuvfp = fdopen(4,"w");
@@ -75,7 +77,7 @@ int main(int argc, char * argv[] )
     else { //Yes, we want to select and draw circles!
       if( i == p1b_frame_no+offset ) {
 	//one we want
-	YUV.circle( p1b_x, p1b_y, 20, 3 );
+	YUV.circle( p1b_x, p1b_y, cradius, cthick );
 	if( 1 != fwrite( buf, bloblen, 1, outyuvfp ) ) {
 	  error(1, errno, "%s cant write yuv frame %d.", pgm, i);
 	}

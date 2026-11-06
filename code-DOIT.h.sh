@@ -95,7 +95,6 @@ then
    exit 1
 fi
 
-
 o=0
 for movie_file in $movie_files
 do
@@ -133,13 +132,9 @@ do
 	kill_our_xterms #our shell fn OK to call with no xterms to kill
     fi
 
-
     ###########################################################################
     source ${SOFTWARE_DIR}/code-ONEMOVIE.h.sh
     ###########################################################################
-
-    #echo DEBUG: after code-ONEMOVIE
-    #stty
     
     if [ -e Please_Stop_${JOBNAME} ]
     then

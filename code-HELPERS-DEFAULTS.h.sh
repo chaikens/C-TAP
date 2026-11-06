@@ -219,19 +219,19 @@ echo "True, full consciousness can now be reasserted by you poor human user."
 
 echo "See the results in the xterms."
 cd ${start_dir}
-if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]
-then
-	$(kill_our_xterms) 
-else
-    echo -n "Type yes to kill the xterms. Or, no, or wait 30sec:"
-    if ! read -t 30 yes
-    then
-	echo OK. Time for asking done, leaving the xterms.
-	echo Kill them manually or use ./killxterms.sh
-    else
-	$(kill_our_xterms)
-    fi
-fi
+#if [ ${KILL_XTERMS_DONT_ASK}"" = "yes" ]
+#then
+#	$(kill_our_xterms) 
+#else
+#    echo -n "Type yes to kill the xterms. Or, no, or wait 30sec:"
+#    if ! read -t 30 yes
+#    then
+#	echo OK. Time for asking done, leaving the xterms.
+#	echo Kill them manually or use ./killxterms.sh
+#    else
+#	$(kill_our_xterms)
+#    fi
+#fi
 
 echo $0 Done
 
@@ -267,7 +267,8 @@ fi
 #Why is a mystery.  There are commented out DEBUG operations that had
 #been used to try to sort this out.  I'm giving up on this for now
 #
-stty echo
+#stty echo
+#fixed see code-BABYMOVIE-YUVPIPE.h.sh
 }
 
 

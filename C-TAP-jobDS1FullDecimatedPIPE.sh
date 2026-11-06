@@ -10,7 +10,7 @@ echo STEP: Do and check settings.   #
 
 #When you had a good run numbered N, you could just
 #redo Phase1b and babymovie by setting this:
-#USE_OLD_PHASE_1a_RESULT_N=2
+#USE_OLD_PHASE_1a_RESULT_N=
 
 #When input movies are in a slow filesystem, you can specify
 #where in big fast filesystem we will copy them for temporary use.
@@ -35,7 +35,7 @@ source code-SYSCONFIG.h.sh                              #
 #SLOW_MOVIE_DIR=$(pwd)
 
 ext=mp4  #TO DO--refactor to a CAP_UND style USER_SETTING, not internal-var.
-movie_files="$SLOW_MOVIE_DIR/DroneShort1HalfDecimated.$ext"
+movie_files="$SLOW_MOVIE_DIR/DroneShort1FullDecimated.$ext"
 #### note-we use different names for the same movie
 #    to separate results of different experiments.
 
