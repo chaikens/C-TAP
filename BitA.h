@@ -5,11 +5,15 @@
 #include <iostream>
 #include <stdio.h>
 
+/**
+ * class BitA
+ * Allocate a zero rectangular bit array, set one bit at a time,  write to a named file. 
+ */
+
 using namespace std;
 class BitA
-{ //SSSTTTuuuuuUUUUUpppPPPiiIIIDDDD
-  //initialization order is order of DECLARATION!!!!
-  //not the initializers.UUUGGHHH
+{   //initialization order is order of DECLARATION!!!!
+    //not the initializers.UUUGGHHH
   const size_t width, height, wh, size;
   uint8_t * const A;
  public:
