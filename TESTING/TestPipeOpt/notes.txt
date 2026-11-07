@@ -1,2 +1,0 @@
-Tested symlinked YUVToBMPStreamFilter on ref yuv looked good in YUView.
-
