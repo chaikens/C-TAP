@@ -37,6 +37,7 @@ BITMAPS_DIR_NAME="bitmaps-${JOBNAME}"
 BITMAPS_DIR="${BITMAPS_PARENT_DIR}/${BITMAPS_DIR_NAME}"
 
 PHASE_1a=F1a.orig
+USE_OLD_PHASE_1a_RESULT_N=
 
 ARCHITECTURE="pipeline"
 #"framefile" #vs pipeline
