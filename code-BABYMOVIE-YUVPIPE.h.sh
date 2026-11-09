@@ -64,8 +64,9 @@ ${time_cmd_prefix} ${SOFTWARE_DIR}/BabyFilter --phase-1b-file ${phase1b_out} --o
 #echo BEFORE STARTING STAGE 3 OF YUVPIPE BABYMAKER, A TIMED CALL TO FFMPEG
 #stty -g
 #Stage 3
-#${time_cmd_prefix}
-eval ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25 "${RESULTS_DIR}/${generic_baby_movie_name}" &>>${RESULTS_DIR}/ffmpeg.log
+${time_cmd_prefix} ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  ${RESULTS_DIR}/${generic_baby_movie_name} &>>${RESULTS_DIR}/ffmpeg.log
+
+#eval ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25 "${RESULTS_DIR}/${generic_baby_movie_name}" &>>${RESULTS_DIR}/ffmpeg.log
 
 #from the original baby making code,
 #$FFMPEG -s $S -threads 0 -r 60  -i $SrcToBabyPipe  -vcodec libx264 -crf 25 -pix_fmt yuv420p $BABYMOV
@@ -77,7 +78,13 @@ eval ffmpeg -hide_banner -y -s $imgdim -r 60 -i $pipe_yuv_from_filter  -crf 25 "
 #stty -g
 
 #
-# Here's a story of weirdness. The /usr/bin/time command on the ffmpeg command and arguments
+# Here's a story of weirdness.
+# In ALL cases, when the -crf 25 option is in the above ffmpeg baby movie making cmd, the
+# terminal from which we run C-TAP-jobname.sh gets it settings changed, and they dont
+# change when -crf 25 is omitted and all things being equal!!!
+
+
+# The /usr/bin/time command on the ffmpeg command and arguments
 # coded above worked EXCEPT it left the invoking shell's stty settings an abnormal state, including
 # that there was no echoing and the CR key was not interpreted as an end of shell line.
 # So, I removed the command timing, and invoked ffmpeg via the bash eval builtin.
