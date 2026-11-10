@@ -122,8 +122,16 @@ MAKE_BABY_MOVIE=yes
 #DOC: EXT baby movie extension
 EXT="MOV" #baby movie extension
 
-#DOC: KEEP_BABY_BMPS
+#DOC: KEEP_BABY_BMPS See code-BABYMOVIE-ALL-INCL-BITMAP.h.sh
 KEEP_BABY_BMPS=no
+#Do not delete all the bitmap files (original and drawn in) after making
+#the baby movie. 
+#Set to yes for when you need to reuse the extracted bitmaps
+
+#DOC: KEEP_FIRST_BMPS for frame file baby movie making,
+#do not delete an extracted bitmap after making the image with circle from it.
+#Set to yes for when you need to reuse the extracted bitmaps
+KEEP_FIRST_BMPS=no
 
 #DOC: PHASE1A_OTHER_OPTIONS
 #Other and future uses will not use this, it's referred in the Phase1a command.

@@ -190,9 +190,12 @@ do
 
 	#Don't bother saving nohow since it differs little from outbmpPaName img
 	if [ ${inbmpPaName} != ${outbmpPaName} ]
+	   then
+	       if [ ${KEEP_FIRST_BMPS}xxx = noxxx ]
 	   #whoops! when we TRY_CONVERT_picbmp_TO_picbmp, cheap direct problem sol'n if code.
-	then
-	    rm ${inbmpPaName}
+	       then
+		   rm ${inbmpPaName}
+	       fi
 	fi
 	
 	
